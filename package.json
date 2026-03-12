@@ -1,0 +1,20 @@
+{
+  "name": "madara-playground",
+  "version": "1.0.0",
+  "description": "Collection de bots Social Media AI - Stratégie, Contenu, Calendrier, Posts & Vidéos",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "bot:strategie": "node index.js --bot strategie-social-media",
+    "bot:piliers": "node index.js --bot piliers-contenu",
+    "bot:calendrier": "node index.js --bot calendrier-30-jours",
+    "bot:posts": "node index.js --bot createur-posts",
+    "bot:video": "node index.js --bot script-video"
+  },
+  "keywords": ["social-media", "ai", "bots", "content-strategy"],
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0"
+  }
+}
