@@ -1,0 +1,63 @@
+{
+  "app": {
+    "name": "Madara Playground",
+    "tagline": "Tes bots Social Media & Créatifs propulsés par l'IA"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "history": "Historique",
+    "settings": "Paramètres",
+    "logout": "Déconnexion"
+  },
+  "auth": {
+    "login": "Connexion",
+    "register": "Inscription",
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "name": "Nom complet",
+    "loginWith": "Se connecter avec {provider}",
+    "registerWith": "S'inscrire avec {provider}",
+    "noAccount": "Pas encore de compte ?",
+    "hasAccount": "Déjà un compte ?",
+    "orContinueWith": "ou continuer avec"
+  },
+  "dashboard": {
+    "title": "Mes Bots",
+    "subtitle": "Sélectionne un bot pour commencer à créer",
+    "textBots": "Bots Social Media",
+    "creativeBots": "Bots Créatifs",
+    "run": "Lancer",
+    "comingSoon": "Bientôt"
+  },
+  "bot": {
+    "fillFields": "Remplis les champs pour personnaliser ta génération",
+    "generate": "Générer",
+    "generating": "Génération en cours...",
+    "result": "Résultat",
+    "copy": "Copier",
+    "copied": "Copié !",
+    "save": "Sauvegarder",
+    "saved": "Sauvegardé !",
+    "export": "Exporter",
+    "newGeneration": "Nouvelle génération",
+    "back": "Retour"
+  },
+  "history": {
+    "title": "Historique",
+    "subtitle": "Retrouve toutes tes générations passées",
+    "empty": "Aucune génération pour le moment",
+    "delete": "Supprimer",
+    "view": "Voir",
+    "search": "Rechercher dans l'historique..."
+  },
+  "categories": {
+    "strategy": "Stratégie",
+    "content": "Contenu",
+    "calendar": "Calendrier",
+    "posts": "Posts",
+    "video": "Vidéo",
+    "image": "Image",
+    "design": "Design"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "app": {
+    "name": "Madara Playground",
+    "tagline": "Your Social Media & Creative bots powered by AI"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "history": "History",
+    "settings": "Settings",
+    "logout": "Log out"
+  },
+  "auth": {
+    "login": "Log in",
+    "register": "Sign up",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "name": "Full name",
+    "loginWith": "Log in with {provider}",
+    "registerWith": "Sign up with {provider}",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "orContinueWith": "or continue with"
+  },
+  "dashboard": {
+    "title": "My Bots",
+    "subtitle": "Select a bot to start creating",
+    "textBots": "Social Media Bots",
+    "creativeBots": "Creative Bots",
+    "run": "Run",
+    "comingSoon": "Coming soon"
+  },
+  "bot": {
+    "fillFields": "Fill in the fields to customize your generation",
+    "generate": "Generate",
+    "generating": "Generating...",
+    "result": "Result",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "save": "Save",
+    "saved": "Saved!",
+    "export": "Export",
+    "newGeneration": "New generation",
+    "back": "Back"
+  },
+  "history": {
+    "title": "History",
+    "subtitle": "Find all your past generations",
+    "empty": "No generations yet",
+    "delete": "Delete",
+    "view": "View",
+    "search": "Search history..."
+  },
+  "categories": {
+    "strategy": "Strategy",
+    "content": "Content",
+    "calendar": "Calendar",
+    "posts": "Posts",
+    "video": "Video",
+    "image": "Image",
+    "design": "Design"
+  }
+}
