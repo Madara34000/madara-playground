@@ -19,7 +19,7 @@ export interface Bot {
   badgeClass: string;
   prompt: string;
   variables: BotVariable[];
-  apiProvider?: "anthropic" | "higgsfield" | "banana";
+  apiProvider?: "anthropic" | "higgsfield" | "banana" | "google";
 }
 
 const bots: Bot[] = [
@@ -290,14 +290,14 @@ Version B : Style storytelling/divertissant`,
     id: "generateur-image",
     name: "Générateur d'Image IA",
     nameEn: "AI Image Generator",
-    description: "Crée des visuels et photos via Banana AI pour tes posts et stories.",
-    descriptionEn: "Create visuals and photos via Banana AI for your posts and stories.",
+    description: "Crée des visuels et photos via Google Gemini pour tes posts et stories.",
+    descriptionEn: "Create visuals and photos via Google Gemini for your posts and stories.",
     category: "creative",
     type: "image",
     icon: "🖼️",
     color: "green",
     badgeClass: "badge-green",
-    apiProvider: "banana",
+    apiProvider: "google",
     prompt: "",
     variables: [
       { key: "prompt", label: "Description de l'image", labelEn: "Image description", placeholder: "Ex: Flat lay minimaliste d'un bureau avec laptop et café", placeholderEn: "E.g.: Minimalist flat lay of a desk with laptop and coffee" },
@@ -309,14 +309,14 @@ Version B : Style storytelling/divertissant`,
     id: "graphiste-ia",
     name: "Graphiste IA",
     nameEn: "AI Graphic Designer",
-    description: "Crée des designs (carrousels, covers, bannières) via Banana AI.",
-    descriptionEn: "Create designs (carousels, covers, banners) via Banana AI.",
+    description: "Crée des designs (carrousels, covers, bannières) via Google Gemini.",
+    descriptionEn: "Create designs (carousels, covers, banners) via Google Gemini.",
     category: "creative",
     type: "design",
     icon: "🎨",
     color: "orange",
     badgeClass: "badge-orange",
-    apiProvider: "banana",
+    apiProvider: "google",
     prompt: "",
     variables: [
       { key: "prompt", label: "Description du design", labelEn: "Design description", placeholder: "Ex: Couverture de carrousel sur les 5 erreurs marketing", placeholderEn: "E.g.: Carousel cover about 5 marketing mistakes" },

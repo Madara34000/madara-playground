@@ -23,6 +23,7 @@
         <span v-if="bot.apiProvider === 'anthropic'" class="text-xs text-gray-400">Claude AI</span>
         <span v-else-if="bot.apiProvider === 'higgsfield'" class="text-xs text-gray-400">Higgsfield</span>
         <span v-else-if="bot.apiProvider === 'banana'" class="text-xs text-gray-400">Banana AI</span>
+        <span v-else-if="bot.apiProvider === 'google'" class="text-xs text-gray-400">Google Gemini</span>
       </div>
 
       <span class="text-sm font-medium text-gray-900 group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-1">

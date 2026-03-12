@@ -26,6 +26,7 @@ export default defineNuxtConfig({
     anthropicApiKey: process.env.ANTHROPIC_API_KEY || "",
     higgsFieldApiKey: process.env.HIGGSFIELD_API_KEY || "",
     bananaApiKey: process.env.BANANA_API_KEY || "",
+    googleAiApiKey: process.env.GOOGLE_AI_API_KEY || "",
     jwtSecret: process.env.JWT_SECRET || "madara-playground-secret-change-me",
     public: {
       appName: "Madara Playground",
