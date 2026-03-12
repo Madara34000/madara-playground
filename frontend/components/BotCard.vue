@@ -1,37 +1,36 @@
 <template>
   <NuxtLink
     :to="`/bot/${bot.id}`"
-    class="card p-6 group cursor-pointer block"
+    class="card p-4 active:scale-[0.98] transition-all duration-150 block"
   >
-    <div class="flex items-start justify-between mb-4">
-      <span class="text-3xl">{{ bot.icon }}</span>
-      <span :class="bot.badgeClass">
-        {{ $t(`categories.${bot.type === 'social-media' ? 'content' : bot.type}`) }}
-      </span>
-    </div>
-
-    <h3 class="font-semibold text-gray-900 mb-2 group-hover:text-black transition-colors">
-      {{ locale === 'fr' ? bot.name : bot.nameEn }}
-    </h3>
-
-    <p class="text-sm text-gray-500 leading-relaxed mb-4">
-      {{ locale === 'fr' ? bot.description : bot.descriptionEn }}
-    </p>
-
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-1.5">
-        <span v-if="bot.apiProvider === 'anthropic'" class="text-xs text-gray-400">Claude AI</span>
-        <span v-else-if="bot.apiProvider === 'higgsfield'" class="text-xs text-gray-400">Higgsfield</span>
-        <span v-else-if="bot.apiProvider === 'banana'" class="text-xs text-gray-400">Banana AI</span>
-        <span v-else-if="bot.apiProvider === 'google'" class="text-xs text-gray-400">Google Gemini</span>
+    <div class="flex items-start gap-3.5">
+      <div class="w-11 h-11 rounded-2xl bg-gray-50 flex items-center justify-center flex-shrink-0">
+        <span class="text-xl">{{ bot.icon }}</span>
       </div>
 
-      <span class="text-sm font-medium text-gray-900 group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-1">
-        {{ $t('dashboard.run') }}
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
-      </span>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center justify-between mb-0.5">
+          <h3 class="font-semibold text-[15px] text-gray-900 truncate pr-2">
+            {{ locale === 'fr' ? bot.name : bot.nameEn }}
+          </h3>
+          <svg class="w-4 h-4 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+
+        <p class="text-[13px] text-gray-500 leading-relaxed line-clamp-2">
+          {{ locale === 'fr' ? bot.description : bot.descriptionEn }}
+        </p>
+
+        <div class="flex items-center gap-2 mt-2.5">
+          <span :class="bot.badgeClass">
+            {{ $t(`categories.${bot.type === 'social-media' ? 'content' : bot.type}`) }}
+          </span>
+          <span class="text-[11px] text-gray-300">
+            {{ bot.apiProvider === 'anthropic' ? 'Claude' : bot.apiProvider === 'higgsfield' ? 'Higgsfield' : bot.apiProvider === 'google' ? 'Gemini' : bot.apiProvider }}
+          </span>
+        </div>
+      </div>
     </div>
   </NuxtLink>
 </template>

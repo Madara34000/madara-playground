@@ -4,78 +4,78 @@
 
 @layer base {
   body {
-    font-family: 'Inter', sans-serif;
-    @apply bg-gray-50 text-gray-900;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    @apply bg-gray-50 text-gray-900 antialiased;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply px-6 py-2.5 bg-black text-white rounded-lg font-medium text-sm
-           hover:bg-gray-800 transition-all duration-200
+    @apply px-5 py-3 bg-black text-white rounded-2xl font-medium text-sm
+           active:scale-[0.98] transition-all duration-150
            focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2;
   }
 
   .btn-secondary {
-    @apply px-6 py-2.5 bg-white text-gray-900 border border-gray-200 rounded-lg font-medium text-sm
-           hover:bg-gray-50 transition-all duration-200
-           focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2;
+    @apply px-5 py-3 bg-white text-gray-700 border border-gray-200 rounded-2xl font-medium text-sm
+           active:scale-[0.98] transition-all duration-150
+           focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2;
   }
 
   .card {
-    @apply bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200;
+    @apply bg-white rounded-2xl border border-gray-100;
   }
 
   .input-field {
-    @apply w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm
-           placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400
+    @apply w-full px-4 py-3.5 bg-gray-50 border-0 rounded-2xl text-[15px]
+           placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/5 focus:bg-white
            transition-all duration-200;
   }
 
   .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide;
   }
 
   .badge-blue {
-    @apply badge bg-blue-50 text-blue-700;
+    @apply badge bg-blue-50 text-blue-600;
   }
 
   .badge-green {
-    @apply badge bg-emerald-50 text-emerald-700;
+    @apply badge bg-emerald-50 text-emerald-600;
   }
 
   .badge-purple {
-    @apply badge bg-purple-50 text-purple-700;
+    @apply badge bg-purple-50 text-purple-600;
   }
 
   .badge-orange {
-    @apply badge bg-orange-50 text-orange-700;
+    @apply badge bg-amber-50 text-amber-600;
   }
 
   .badge-pink {
-    @apply badge bg-pink-50 text-pink-700;
+    @apply badge bg-pink-50 text-pink-600;
+  }
+
+  .section-label {
+    @apply text-[11px] font-semibold text-gray-400 uppercase tracking-widest;
   }
 }
 
-/* Streaming text animation */
+/* Streaming cursor */
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
 }
-
 .cursor-blink::after {
-  content: '▊';
+  content: '|';
   animation: blink 1s infinite;
-  @apply text-black/60 ml-0.5;
+  @apply text-black/40 ml-0.5 font-light;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  @apply bg-transparent;
-}
-::-webkit-scrollbar-thumb {
-  @apply bg-gray-200 rounded-full hover:bg-gray-300;
-}
+/* Minimal scrollbar */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { @apply bg-transparent; }
+::-webkit-scrollbar-thumb { @apply bg-gray-200 rounded-full; }
+
+/* Remove tap highlight on mobile */
+* { -webkit-tap-highlight-color: transparent; }
