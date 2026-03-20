@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Weekly FR - {{ digest.week_end.strftime('%d/%m/%Y') }}</title>
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --card: #13131a;
+            --accent: #7c3aed;
+            --accent2: #06b6d4;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --border: #1e1e2e;
+            --gold: #f59e0b;
+            --silver: #94a3b8;
+            --bronze: #d97706;
+            --green: #22c55e;
+            --red: #ef4444;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 2px solid var(--accent);
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header .date { color: var(--muted); font-size: 1.1rem; margin-top: 8px; }
+        .section {
+            margin: 30px 0;
+            background: var(--card);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border);
+        }
+        .section h2 {
+            font-size: 1.3rem;
+            margin-bottom: 16px;
+            color: var(--accent2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .platform-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-spotify { background: #1db954; color: #000; }
+        .badge-apple { background: #fc3c44; color: #fff; }
+        .badge-deezer { background: #a238ff; color: #fff; }
+        .badge-shazam { background: #08f; color: #fff; }
+        .badge-youtube { background: #f00; color: #fff; }
+        .badge-snep { background: #002395; color: #fff; }
+        .badge-snap { background: #fffc00; color: #000; }
+        .badge-genius { background: #ffff64; color: #000; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        th {
+            text-align: left;
+            padding: 10px 8px;
+            border-bottom: 1px solid var(--border);
+            color: var(--muted);
+            font-weight: 500;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+        td {
+            padding: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+        tr:hover { background: rgba(124, 58, 237, 0.05); }
+        .rank { font-weight: 700; width: 40px; text-align: center; }
+        .rank-1 { color: var(--gold); }
+        .rank-2 { color: var(--silver); }
+        .rank-3 { color: var(--bronze); }
+        .artist { font-weight: 600; }
+        .streams { color: var(--accent2); font-variant-numeric: tabular-nums; }
+        .evo-new { color: var(--green); font-weight: 700; }
+        .evo-up { color: var(--green); }
+        .evo-down { color: var(--red); }
+        .evo-stable { color: var(--muted); }
+        .highlight {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .highlight h3 { color: var(--gold); margin-bottom: 8px; }
+        .milestone {
+            padding: 8px 12px;
+            margin: 6px 0;
+            background: rgba(124, 58, 237, 0.1);
+            border-left: 3px solid var(--accent);
+            border-radius: 4px;
+        }
+        .viral-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            background: var(--green);
+            color: #000;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            color: var(--muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>MUSIC WEEKLY FR</h1>
+            <p class="date">Semaine du {{ digest.week_start.strftime('%d/%m') }} au {{ digest.week_end.strftime('%d/%m/%Y') }}</p>
+        </div>
+
+        {% if digest.milestones %}
+        <div class="section">
+            <h2>FAITS MARQUANTS</h2>
+            {% for m in digest.milestones %}
+            <div class="milestone">{{ m }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if digest.most_streamed_track %}
+        <div class="highlight">
+            <h3>TRACK LE PLUS STREAME</h3>
+            <p><strong>{{ digest.most_streamed_track.artist }} - {{ digest.most_streamed_track.title }}</strong></p>
+            <p class="streams">{{ digest.most_streamed_track.streams | format_number }} streams ({{ digest.most_streamed_track.platform.value }})</p>
+        </div>
+        {% endif %}
+
+        {% macro chart_table(chart, badge_class, show_streams=false, show_views=false, show_shazams=false, show_creations=false, show_evo=false, limit=20) %}
+        {% if chart and chart.entries %}
+        <div class="section">
+            <h2><span class="platform-badge {{ badge_class }}">{{ chart.platform.value }}</span> {{ chart.chart_name }}</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Artiste</th>
+                        <th>Titre</th>
+                        {% if show_streams %}<th>Streams</th>{% endif %}
+                        {% if show_views %}<th>Vues</th>{% endif %}
+                        {% if show_shazams %}<th>Shazams</th>{% endif %}
+                        {% if show_creations %}<th>Creations</th>{% endif %}
+                        {% if show_evo %}<th>Evol.</th><th>Sem.</th>{% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for e in chart.entries[:limit] %}
+                    <tr>
+                        <td class="rank {% if e.rank == 1 %}rank-1{% elif e.rank == 2 %}rank-2{% elif e.rank == 3 %}rank-3{% endif %}">{{ e.rank }}</td>
+                        <td class="artist">{{ e.artist }}</td>
+                        <td>{{ e.title }}</td>
+                        {% if show_streams %}<td class="streams">{{ e.streams | format_streams }}</td>{% endif %}
+                        {% if show_views %}<td class="streams">{{ e.views | format_streams }}</td>{% endif %}
+                        {% if show_shazams %}<td class="streams">{{ e.shazams | format_number }}</td>{% endif %}
+                        {% if show_creations %}<td class="streams">{{ e.snap_creations | format_number }}</td>{% endif %}
+                        {% if show_evo %}
+                        <td>
+                            {% set evo = e.evolution | evolution_display %}
+                            {% if 'NEW' in evo %}<span class="evo-new">{{ evo }}</span>
+                            {% elif '+' in evo %}<span class="evo-up">{{ evo }}</span>
+                            {% elif '-' in evo %}<span class="evo-down">{{ evo }}</span>
+                            {% else %}<span class="evo-stable">{{ evo }}</span>{% endif %}
+                        </td>
+                        <td>{{ e.weeks_on_chart or '-' }}</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        {% endmacro %}
+
+        {{ chart_table(digest.spotify_top_50, "badge-spotify", show_streams=true) }}
+        {{ chart_table(digest.apple_music_top_25, "badge-apple", limit=15) }}
+        {{ chart_table(digest.deezer_top_50, "badge-deezer") }}
+        {{ chart_table(digest.shazam_top_20, "badge-shazam", show_shazams=true, limit=15) }}
+        {{ chart_table(digest.youtube_trending, "badge-youtube", show_views=true, limit=15) }}
+        {{ chart_table(digest.snep_top_singles, "badge-snep", show_evo=true) }}
+        {{ chart_table(digest.snap_top_sounds, "badge-snap", show_creations=true, limit=15) }}
+
+        {% if digest.viral_tracks %}
+        <div class="section">
+            <h2>TRACKS VIRAUX</h2>
+            <table>
+                <thead><tr><th>Artiste</th><th>Titre</th><th>Status</th></tr></thead>
+                <tbody>
+                {% for t in digest.viral_tracks %}
+                <tr>
+                    <td class="artist">{{ t.artist }}</td>
+                    <td>{{ t.title }}</td>
+                    <td><span class="viral-tag">VIRAL</span></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if digest.new_releases %}
+        <div class="section">
+            <h2>SORTIES DE LA SEMAINE</h2>
+            {% for r in digest.new_releases %}
+            <div class="milestone">
+                <strong>{{ r.artist }} - {{ r.title }}</strong> ({{ r.release_type }})
+                {% if r.label %} | Label: {{ r.label }}{% endif %}
+                {% if r.first_day_streams %} | J1: {{ r.first_day_streams | format_streams }}{% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if digest.yesterday_releases %}
+        <div class="section">
+            <h2>SORTIES D'HIER</h2>
+            {% for r in digest.yesterday_releases %}
+            <div class="milestone">
+                <strong>{{ r.artist }} - {{ r.title }}</strong> ({{ r.release_type }})
+                {% if r.label %} | Label: {{ r.label }}{% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="footer">
+            <p>Music Weekly FR - Newsletter generee automatiquement</p>
+            <p>Sources: Spotify, Apple Music, Deezer, Shazam, YouTube, SNEP, Snapchat, Genius, Soundcharts</p>
+            <p>{{ generated_at.strftime('%d/%m/%Y %H:%M') }}</p>
+        </div>
+    </div>
+</body>
+</html>
