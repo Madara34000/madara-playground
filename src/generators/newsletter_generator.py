@@ -128,6 +128,7 @@ class NewsletterGenerator:
             pointer-events: none;
         }}
         .container {{ max-width: 520px; padding: 60px 40px; text-align: center; position: relative; z-index: 1; }}
+        .logo {{ margin: 0 auto 24px; width: 72px; height: 72px; filter: drop-shadow(0 0 16px rgba(124, 58, 237, 0.4)); }}
         .edition-tag {{
             display: inline-block; padding: 4px 16px; border: 1px solid var(--accent);
             border-radius: 20px; font-size: 0.65rem; font-weight: 700;
@@ -162,6 +163,25 @@ class NewsletterGenerator:
 </head>
 <body>
     <div class="container">
+        <div class="logo">
+            <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="lg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#a78bfa"/><stop offset="50%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#06b6d4"/>
+                    </linearGradient>
+                    <linearGradient id="li" x1="20" y1="20" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#c4b5fd"/><stop offset="100%" stop-color="#7c3aed"/>
+                    </linearGradient>
+                </defs>
+                <circle cx="40" cy="40" r="38" stroke="url(#lg)" stroke-width="2.5" fill="none"/>
+                <path d="M40 8 L67 22 L67 58 L40 72 L13 58 L13 22Z" stroke="url(#lg)" stroke-width="1.5" fill="rgba(124,58,237,0.08)"/>
+                <path d="M22 55 L22 30 L32 45 L40 28 L48 45 L58 30 L58 55" stroke="url(#li)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                <path d="M22 58 Q28 54 34 58 Q40 62 46 58 Q52 54 58 58" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+                <circle cx="40" cy="18" r="2.5" fill="#a78bfa"/>
+                <circle cx="22" cy="26" r="1.5" fill="#7c3aed" opacity="0.6"/>
+                <circle cx="58" cy="26" r="1.5" fill="#06b6d4" opacity="0.6"/>
+            </svg>
+        </div>
         <div class="edition-tag">Newsletter Musique</div>
         <h1>Music Weekly FR</h1>
         <p class="subtitle">La revue hebdomadaire des charts musicaux francais</p>

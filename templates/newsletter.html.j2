@@ -38,51 +38,91 @@
         /* ── HERO ── */
         .hero {
             text-align: center;
-            padding: 60px 20px 40px;
+            padding: 50px 20px 40px;
             position: relative;
             overflow: hidden;
+            background: linear-gradient(180deg, #1a0a2e 0%, #0f0620 40%, var(--bg) 100%);
+            border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+            margin-bottom: 8px;
         }
         .hero::before {
             content: '';
             position: absolute;
-            top: 0; left: 50%;
+            top: -100px; left: 50%;
             transform: translateX(-50%);
-            width: 600px; height: 600px;
-            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            width: 800px; height: 800px;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.25) 0%, rgba(99, 25, 210, 0.08) 40%, transparent 70%);
             pointer-events: none;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+        .hero-logo {
+            margin: 0 auto 20px;
+            width: 80px;
+            height: 80px;
+            filter: drop-shadow(0 0 20px rgba(124, 58, 237, 0.4));
+        }
+        .hero-character {
+            position: absolute;
+            bottom: 0;
+            opacity: 0.12;
+            pointer-events: none;
+        }
+        .hero-character-left {
+            left: -20px;
+            width: 200px;
+            height: 300px;
+        }
+        .hero-character-right {
+            right: -20px;
+            width: 180px;
+            height: 280px;
+            transform: scaleX(-1);
         }
         .hero-edition {
             display: inline-block;
             padding: 4px 16px;
-            border: 1px solid var(--accent);
+            border: 1px solid rgba(124, 58, 237, 0.5);
             border-radius: 20px;
             font-size: 0.7rem;
             font-weight: 600;
             letter-spacing: 3px;
             text-transform: uppercase;
-            color: var(--accent);
+            color: #a78bfa;
             margin-bottom: 20px;
+            background: rgba(124, 58, 237, 0.1);
         }
         .hero h1 {
             font-size: 3rem;
             font-weight: 900;
             letter-spacing: -1px;
-            background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent2) 100%);
+            background: linear-gradient(135deg, #fff 0%, #c4b5fd 40%, var(--accent) 70%, var(--accent2) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             line-height: 1.1;
+            position: relative;
+            z-index: 1;
         }
         .hero-subtitle {
-            color: var(--muted-light);
+            color: #c4b5fd;
             font-size: 1rem;
             margin-top: 12px;
             font-weight: 300;
+            position: relative;
+            z-index: 1;
         }
         .hero-date {
-            color: var(--muted);
+            color: var(--muted-light);
             font-size: 0.85rem;
             margin-top: 8px;
+            position: relative;
+            z-index: 1;
         }
         .hero-tags {
             display: flex;
@@ -90,14 +130,16 @@
             gap: 8px;
             justify-content: center;
             margin-top: 24px;
+            position: relative;
+            z-index: 1;
         }
         .hero-tag {
             padding: 4px 12px;
-            background: var(--card);
-            border: 1px solid var(--border);
+            background: rgba(124, 58, 237, 0.15);
+            border: 1px solid rgba(124, 58, 237, 0.3);
             border-radius: 6px;
             font-size: 0.7rem;
-            color: var(--muted-light);
+            color: #c4b5fd;
             font-weight: 500;
         }
 
@@ -445,6 +487,86 @@
 
         <!-- ════ HERO ════ -->
         <div class="hero">
+            <!-- Character silhouette left -->
+            <svg class="hero-character hero-character-left" viewBox="0 0 200 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="charGrad" x1="100" y1="0" x2="100" y2="300" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#7c3aed"/>
+                        <stop offset="100%" stop-color="#1a0a2e"/>
+                    </linearGradient>
+                </defs>
+                <!-- Hooded figure with headphones -->
+                <ellipse cx="100" cy="60" rx="35" ry="38" fill="url(#charGrad)"/>
+                <!-- Hood -->
+                <path d="M55 55 Q60 10 100 8 Q140 10 145 55 Q145 70 140 80 L60 80 Q55 70 55 55Z" fill="url(#charGrad)"/>
+                <!-- Headphones band -->
+                <path d="M58 45 Q60 20 100 18 Q140 20 142 45" stroke="#a78bfa" stroke-width="3" fill="none"/>
+                <!-- Headphone ear pieces -->
+                <rect x="50" y="42" width="14" height="22" rx="7" fill="#a78bfa"/>
+                <rect x="136" y="42" width="14" height="22" rx="7" fill="#a78bfa"/>
+                <!-- Body -->
+                <path d="M65 80 L55 180 Q50 200 60 210 L80 300 L120 300 L140 210 Q150 200 145 180 L135 80Z" fill="url(#charGrad)"/>
+                <!-- Jacket detail -->
+                <line x1="100" y1="80" x2="100" y2="200" stroke="#a78bfa" stroke-width="1" opacity="0.5"/>
+                <!-- Arms -->
+                <path d="M65 90 Q30 130 40 170 L50 165 Q45 135 70 100Z" fill="url(#charGrad)"/>
+                <path d="M135 90 Q170 130 160 170 L150 165 Q155 135 130 100Z" fill="url(#charGrad)"/>
+                <!-- Music notes floating -->
+                <text x="25" y="130" font-size="16" fill="#a78bfa" opacity="0.6">&#9835;</text>
+                <text x="160" y="100" font-size="12" fill="#7c3aed" opacity="0.4">&#9834;</text>
+                <text x="15" y="170" font-size="10" fill="#a78bfa" opacity="0.3">&#9833;</text>
+            </svg>
+
+            <!-- Character silhouette right -->
+            <svg class="hero-character hero-character-right" viewBox="0 0 200 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="charGrad2" x1="100" y1="0" x2="100" y2="300" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#6d28d9"/>
+                        <stop offset="100%" stop-color="#0f0620"/>
+                    </linearGradient>
+                </defs>
+                <ellipse cx="100" cy="60" rx="33" ry="36" fill="url(#charGrad2)"/>
+                <path d="M58 55 Q62 12 100 10 Q138 12 142 55 Q142 68 138 78 L62 78 Q58 68 58 55Z" fill="url(#charGrad2)"/>
+                <path d="M60 45 Q62 22 100 20 Q138 22 140 45" stroke="#8b5cf6" stroke-width="3" fill="none"/>
+                <rect x="52" y="42" width="13" height="20" rx="6.5" fill="#8b5cf6"/>
+                <rect x="135" y="42" width="13" height="20" rx="6.5" fill="#8b5cf6"/>
+                <path d="M67 78 L58 175 Q54 195 62 205 L82 300 L118 300 L138 205 Q146 195 142 175 L133 78Z" fill="url(#charGrad2)"/>
+                <line x1="100" y1="78" x2="100" y2="195" stroke="#8b5cf6" stroke-width="1" opacity="0.4"/>
+                <path d="M67 88 Q35 125 42 165 L52 160 Q48 130 72 98Z" fill="url(#charGrad2)"/>
+                <path d="M133 88 Q165 125 158 165 L148 160 Q152 130 128 98Z" fill="url(#charGrad2)"/>
+                <text x="30" y="120" font-size="14" fill="#8b5cf6" opacity="0.5">&#9835;</text>
+                <text x="155" y="90" font-size="11" fill="#6d28d9" opacity="0.3">&#9834;</text>
+            </svg>
+
+            <!-- Logo -->
+            <div class="hero-logo">
+                <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="logoGrad" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#a78bfa"/>
+                            <stop offset="50%" stop-color="#7c3aed"/>
+                            <stop offset="100%" stop-color="#06b6d4"/>
+                        </linearGradient>
+                        <linearGradient id="logoInner" x1="20" y1="20" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#c4b5fd"/>
+                            <stop offset="100%" stop-color="#7c3aed"/>
+                        </linearGradient>
+                    </defs>
+                    <!-- Outer ring -->
+                    <circle cx="40" cy="40" r="38" stroke="url(#logoGrad)" stroke-width="2.5" fill="none"/>
+                    <!-- Inner hexagonal shape -->
+                    <path d="M40 8 L67 22 L67 58 L40 72 L13 58 L13 22Z" stroke="url(#logoGrad)" stroke-width="1.5" fill="rgba(124,58,237,0.08)"/>
+                    <!-- M letter stylized -->
+                    <path d="M22 55 L22 30 L32 45 L40 28 L48 45 L58 30 L58 55" stroke="url(#logoInner)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <!-- Music wave under M -->
+                    <path d="M22 58 Q28 54 34 58 Q40 62 46 58 Q52 54 58 58" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+                    <!-- Dot accents -->
+                    <circle cx="40" cy="18" r="2.5" fill="#a78bfa"/>
+                    <circle cx="22" cy="26" r="1.5" fill="#7c3aed" opacity="0.6"/>
+                    <circle cx="58" cy="26" r="1.5" fill="#06b6d4" opacity="0.6"/>
+                </svg>
+            </div>
+
             <div class="hero-edition">MUSIC WEEKLY FR</div>
             <h1>La Revue<br>Musique FR</h1>
             <p class="hero-subtitle">Charts, tendances & analyse de la scene musicale francaise</p>
@@ -686,6 +808,13 @@
 
         <!-- ════ FOOTER ════ -->
         <div class="footer">
+            <div style="margin: 0 auto 16px; width: 48px; height: 48px; opacity: 0.5;">
+                <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="40" cy="40" r="38" stroke="#7c3aed" stroke-width="2" fill="none" opacity="0.4"/>
+                    <path d="M40 8 L67 22 L67 58 L40 72 L13 58 L13 22Z" stroke="#7c3aed" stroke-width="1" fill="none" opacity="0.2"/>
+                    <path d="M22 55 L22 30 L32 45 L40 28 L48 45 L58 30 L58 55" stroke="#7c3aed" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.5"/>
+                </svg>
+            </div>
             <div class="footer-brand">MUSIC WEEKLY FR</div>
             <div class="footer-sub">La Revue Musique — Newsletter generee automatiquement</div>
             <div class="footer-sub">{{ generated_at.strftime('%d/%m/%Y %H:%M') }}</div>
