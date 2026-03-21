@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -14,6 +15,7 @@ from src.utils.models import ChartData, TrackEntry, WeeklyDigest
 
 TEMPLATES_DIR = Path(__file__).resolve().parent.parent.parent / "templates"
 OUTPUT_DIR = Path(__file__).resolve().parent.parent.parent / "output"
+DOCS_DIR = Path(__file__).resolve().parent.parent.parent / "docs"
 
 
 class NewsletterGenerator:
@@ -72,7 +74,77 @@ class NewsletterGenerator:
         json_path.write_text(json_content, encoding="utf-8")
         paths["json"] = json_path
 
+        # Copy HTML to docs/ for GitHub Pages
+        self._publish_to_docs(html_path, date_str)
+
         return paths
+
+    def _publish_to_docs(self, html_path: Path, date_str: str) -> None:
+        """Copy the HTML newsletter to docs/ and update the index page."""
+        docs_dir = DOCS_DIR
+        docs_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(html_path, docs_dir / html_path.name)
+
+        # Collect all newsletters in docs/
+        newsletters = sorted(
+            [f for f in docs_dir.glob("newsletter_*.html")],
+            reverse=True,
+        )
+
+        # Generate index.html
+        items_html = ""
+        for i, f in enumerate(newsletters):
+            name = f.stem.replace("newsletter_", "")
+            badge = '<span class="badge">Derniere</span>' if i == 0 else ""
+            items_html += (
+                f'<li><a href="{f.name}">Semaine du {name}{badge}</a></li>\n'
+            )
+
+        index_html = f"""<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Weekly FR</title>
+    <style>
+        :root {{
+            --bg: #0a0a0f; --card: #13131a; --accent: #7c3aed;
+            --text: #e2e8f0; --muted: #94a3b8; --border: #1e1e2e;
+        }}
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg); color: var(--text); line-height: 1.6;
+            display: flex; align-items: center; justify-content: center; min-height: 100vh;
+        }}
+        .container {{ max-width: 600px; padding: 40px; text-align: center; }}
+        h1 {{ font-size: 2rem; margin-bottom: 8px; }}
+        .subtitle {{ color: var(--muted); margin-bottom: 40px; }}
+        .newsletter-list {{ list-style: none; }}
+        .newsletter-list li {{ margin-bottom: 12px; }}
+        .newsletter-list a {{
+            display: block; padding: 16px 24px; background: var(--card);
+            border: 1px solid var(--border); border-radius: 12px;
+            color: var(--text); text-decoration: none; transition: all 0.2s;
+        }}
+        .newsletter-list a:hover {{ border-color: var(--accent); transform: translateY(-2px); }}
+        .badge {{
+            display: inline-block; background: var(--accent); color: white;
+            padding: 2px 10px; border-radius: 20px; font-size: 0.75rem; margin-left: 8px;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Music Weekly FR</h1>
+        <p class="subtitle">Newsletter hebdomadaire des charts musicaux francais</p>
+        <ul class="newsletter-list">
+            {items_html}
+        </ul>
+    </div>
+</body>
+</html>"""
+        (docs_dir / "index.html").write_text(index_html, encoding="utf-8")
 
     @staticmethod
     def _format_number(value: Optional[int]) -> str:

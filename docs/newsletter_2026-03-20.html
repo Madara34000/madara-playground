@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Weekly FR - 20/03/2026</title>
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --card: #13131a;
+            --accent: #7c3aed;
+            --accent2: #06b6d4;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --border: #1e1e2e;
+            --gold: #f59e0b;
+            --silver: #94a3b8;
+            --bronze: #d97706;
+            --green: #22c55e;
+            --red: #ef4444;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 2px solid var(--accent);
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header .date { color: var(--muted); font-size: 1.1rem; margin-top: 8px; }
+        .section {
+            margin: 30px 0;
+            background: var(--card);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border);
+        }
+        .section h2 {
+            font-size: 1.3rem;
+            margin-bottom: 16px;
+            color: var(--accent2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .platform-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-spotify { background: #1db954; color: #000; }
+        .badge-apple { background: #fc3c44; color: #fff; }
+        .badge-deezer { background: #a238ff; color: #fff; }
+        .badge-shazam { background: #08f; color: #fff; }
+        .badge-youtube { background: #f00; color: #fff; }
+        .badge-snep { background: #002395; color: #fff; }
+        .badge-snap { background: #fffc00; color: #000; }
+        .badge-genius { background: #ffff64; color: #000; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        th {
+            text-align: left;
+            padding: 10px 8px;
+            border-bottom: 1px solid var(--border);
+            color: var(--muted);
+            font-weight: 500;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+        td {
+            padding: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+        tr:hover { background: rgba(124, 58, 237, 0.05); }
+        .rank { font-weight: 700; width: 40px; text-align: center; }
+        .rank-1 { color: var(--gold); }
+        .rank-2 { color: var(--silver); }
+        .rank-3 { color: var(--bronze); }
+        .artist { font-weight: 600; }
+        .streams { color: var(--accent2); font-variant-numeric: tabular-nums; }
+        .evo-new { color: var(--green); font-weight: 700; }
+        .evo-up { color: var(--green); }
+        .evo-down { color: var(--red); }
+        .evo-stable { color: var(--muted); }
+        .highlight {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .highlight h3 { color: var(--gold); margin-bottom: 8px; }
+        .milestone {
+            padding: 8px 12px;
+            margin: 6px 0;
+            background: rgba(124, 58, 237, 0.1);
+            border-left: 3px solid var(--accent);
+            border-radius: 4px;
+        }
+        .viral-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            background: var(--green);
+            color: #000;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            color: var(--muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>MUSIC WEEKLY FR</h1>
+            <p class="date">Semaine du 13/03 au 20/03/2026</p>
+        </div>
+
+        <div class="section">
+            <h2>FAITS MARQUANTS</h2>
+            <div class="milestone">PLK domine les charts avec 25 entrees sur l'ensemble des plateformes</div>
+        </div>
+
+        <div class="highlight">
+            <h3>TRACK LE PLUS STREAME</h3>
+            <p><strong>disiz - melodrama(w/Theodora)</strong></p>
+            <p class="streams">2 988 753 streams (spotify)</p>
+        </div>
+
+
+                <div class="section">
+            <h2><span class="platform-badge badge-spotify">spotify</span> Top 50 France</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Artiste</th>
+                        <th>Titre</th>
+<th>Streams</th>                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="rank rank-1">1</td>
+                        <td class="artist">disiz</td>
+                        <td>melodrama(w/Theodora)</td>
+<td class="streams">3.0M</td>                    </tr>
+                    <tr>
+                        <td class="rank rank-2">2</td>
+                        <td class="artist">PLK</td>
+                        <td>Pocahontas</td>
+<td class="streams">2.8M</td>                    </tr>
+                    <tr>
+                        <td class="rank rank-3">3</td>
+                        <td class="artist">Rambo goyard</td>
+                        <td>B.M.S (by my side)</td>
+<td class="streams">2.3M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">4</td>
+                        <td class="artist">PLK</td>
+                        <td>Sex Model(w/Theodora)</td>
+<td class="streams">2.3M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">5</td>
+                        <td class="artist">WIXO & LA2S</td>
+                        <td>GMK</td>
+<td class="streams">2.2M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">6</td>
+                        <td class="artist">Nono La Grinta</td>
+                        <td>LOVE YOU</td>
+<td class="streams">2.1M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">7</td>
+                        <td class="artist">PLK</td>
+                        <td>Jamie Bynoe-Gittens(w/La Rvfleuze)</td>
+<td class="streams">1.9M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">8</td>
+                        <td class="artist">RnBoi</td>
+                        <td>MON BÉBÉ</td>
+<td class="streams">1.8M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">9</td>
+                        <td class="artist">RnBoi</td>
+                        <td>AVEC MOI(w/Nono La Grinta)</td>
+<td class="streams">1.7M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">10</td>
+                        <td class="artist">GIMS</td>
+                        <td>SPA(w/Theodora)</td>
+<td class="streams">1.7M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">11</td>
+                        <td class="artist">Franglish</td>
+                        <td>Génération impolie(w/KeBlack)</td>
+<td class="streams">1.6M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">12</td>
+                        <td class="artist">La Rvfleuze</td>
+                        <td>Argent Sale - A COLORS SHOW(w/COLORS)</td>
+<td class="streams">1.6M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">13</td>
+                        <td class="artist">Genezio</td>
+                        <td>OG(w/Niska)</td>
+<td class="streams">1.5M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">14</td>
+                        <td class="artist">PLK</td>
+                        <td>Façon d'penser</td>
+<td class="streams">1.4M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">15</td>
+                        <td class="artist">Bad Bunny</td>
+                        <td>NUEVAYoL</td>
+<td class="streams">1.4M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">16</td>
+                        <td class="artist">PLK</td>
+                        <td>Tu dors ?</td>
+<td class="streams">1.4M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">17</td>
+                        <td class="artist">PLK</td>
+                        <td>Le cœur des hommes</td>
+<td class="streams">1.4M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">18</td>
+                        <td class="artist">PLK</td>
+                        <td>Toi</td>
+<td class="streams">1.4M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">19</td>
+                        <td class="artist">R2</td>
+                        <td>RUINART</td>
+<td class="streams">1.4M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">20</td>
+                        <td class="artist">GIMS</td>
+                        <td>PARISIENNE(w/La Mano 1.9)</td>
+<td class="streams">1.4M</td>                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+                <div class="section">
+            <h2><span class="platform-badge badge-apple">apple_music</span> Top 25 France</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Artiste</th>
+                        <th>Titre</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="rank rank-1">1</td>
+                        <td class="artist">PLK</td>
+                        <td>Pocahontas</td>
+                    </tr>
+                    <tr>
+                        <td class="rank rank-2">2</td>
+                        <td class="artist">PLK & Theodora</td>
+                        <td>Sex Model</td>
+                    </tr>
+                    <tr>
+                        <td class="rank rank-3">3</td>
+                        <td class="artist">disiz & Theodora</td>
+                        <td>melodrama</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">4</td>
+                        <td class="artist">PLK & La Rvfleuze</td>
+                        <td>Jamie Bynoe-Gittens</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">5</td>
+                        <td class="artist">La Rvfleuze</td>
+                        <td>Argent Sale - A COLORS SHOW</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">6</td>
+                        <td class="artist">PLK</td>
+                        <td>Tu dors ?</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">7</td>
+                        <td class="artist">RnBoi & Nono La Grinta</td>
+                        <td>AVEC MOI</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">8</td>
+                        <td class="artist">GIMS & Theodora</td>
+                        <td>SPA</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">9</td>
+                        <td class="artist">PLK</td>
+                        <td>Façon d'penser</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">10</td>
+                        <td class="artist">PLK & Jolagreen23</td>
+                        <td>Porte d'Orléans</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">11</td>
+                        <td class="artist">PLK</td>
+                        <td>Toi</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">12</td>
+                        <td class="artist">Nono La Grinta</td>
+                        <td>LOVE YOU</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">13</td>
+                        <td class="artist">Jul</td>
+                        <td>Triste everyday</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">14</td>
+                        <td class="artist">PLK</td>
+                        <td>Le cœur des hommes</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">15</td>
+                        <td class="artist">RnBoi</td>
+                        <td>MON BÉBÉ</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+                <div class="section">
+            <h2><span class="platform-badge badge-deezer">deezer</span> Top 50 France</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Artiste</th>
+                        <th>Titre</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="rank rank-1">1</td>
+                        <td class="artist">HUNTR/X</td>
+                        <td>Golden</td>
+                    </tr>
+                    <tr>
+                        <td class="rank rank-2">2</td>
+                        <td class="artist">Djo</td>
+                        <td>End of Beginning</td>
+                    </tr>
+                    <tr>
+                        <td class="rank rank-3">3</td>
+                        <td class="artist">sombr</td>
+                        <td>back to friends</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">4</td>
+                        <td class="artist">Ella Langley</td>
+                        <td>Choosin' Texas</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">5</td>
+                        <td class="artist">Bruno Mars</td>
+                        <td>I Just Might</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">6</td>
+                        <td class="artist">Kehlani</td>
+                        <td>Folded</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">7</td>
+                        <td class="artist">Olivia Dean</td>
+                        <td>Man I Need</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">8</td>
+                        <td class="artist">Harry Styles</td>
+                        <td>American Girls</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">9</td>
+                        <td class="artist">Taylor Swift</td>
+                        <td>Opalite</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">10</td>
+                        <td class="artist">Myles Smith</td>
+                        <td>Stargazing</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">11</td>
+                        <td class="artist">Bad Bunny</td>
+                        <td>DtMF</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">12</td>
+                        <td class="artist">Taylor Swift</td>
+                        <td>The Fate of Ophelia</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">13</td>
+                        <td class="artist">Max McNown</td>
+                        <td>Better Me For You (Brown Eyes)</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">14</td>
+                        <td class="artist">LISA</td>
+                        <td>Moonlit Floor (Kiss Me)</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">15</td>
+                        <td class="artist">Mariah The Scientist</td>
+                        <td>Burning Blue</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">16</td>
+                        <td class="artist">SZA</td>
+                        <td>Sweet November</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">17</td>
+                        <td class="artist">Tame Impala</td>
+                        <td>Dracula (JENNIE Remix)</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">18</td>
+                        <td class="artist">The Marías</td>
+                        <td>No One Noticed</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">19</td>
+                        <td class="artist">Harry Styles</td>
+                        <td>Aperture</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">20</td>
+                        <td class="artist">Mergui</td>
+                        <td>3 Tears</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        
+                <div class="section">
+            <h2><span class="platform-badge badge-youtube">youtube</span> Top YouTube Music France</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Artiste</th>
+                        <th>Titre</th>
+<th>Vues</th>                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="rank rank-1">1</td>
+                        <td class="artist">GIMS</td>
+                        <td>PARISIENNE</td>
+<td class="streams">1.7M</td>                    </tr>
+                    <tr>
+                        <td class="rank rank-2">2</td>
+                        <td class="artist">disiz</td>
+                        <td>melodrama</td>
+<td class="streams">1.4M</td>                    </tr>
+                    <tr>
+                        <td class="rank rank-3">3</td>
+                        <td class="artist">GIMS</td>
+                        <td>SPA</td>
+<td class="streams">1.3M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">4</td>
+                        <td class="artist">RnBoi</td>
+                        <td>MON BÉBÉ</td>
+<td class="streams">1.1M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">5</td>
+                        <td class="artist">ZXKAI</td>
+                        <td>NO BATIDÃO</td>
+<td class="streams">1.1M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">6</td>
+                        <td class="artist">Bleu Soleil</td>
+                        <td>Soleil Bleu</td>
+<td class="streams">919K</td>                    </tr>
+                    <tr>
+                        <td class="rank ">7</td>
+                        <td class="artist">HUNTR/X</td>
+                        <td>Golden</td>
+<td class="streams">909K</td>                    </tr>
+                    <tr>
+                        <td class="rank ">8</td>
+                        <td class="artist">Rambo Goyard</td>
+                        <td>B.M.S (by my side)</td>
+<td class="streams">863K</td>                    </tr>
+                    <tr>
+                        <td class="rank ">9</td>
+                        <td class="artist">KeBlack</td>
+                        <td>Melrose Place (feat. Guy2Bezbar)</td>
+<td class="streams">818K</td>                    </tr>
+                    <tr>
+                        <td class="rank ">10</td>
+                        <td class="artist">La Rvfleuze</td>
+                        <td>Argent Sale - A COLORS SHOW</td>
+<td class="streams">772K</td>                    </tr>
+                    <tr>
+                        <td class="rank ">11</td>
+                        <td class="artist">R2</td>
+                        <td>RUINART</td>
+<td class="streams">736K</td>                    </tr>
+                    <tr>
+                        <td class="rank ">12</td>
+                        <td class="artist">Nono La Grinta</td>
+                        <td>LOVE YOU</td>
+<td class="streams">724K</td>                    </tr>
+                    <tr>
+                        <td class="rank ">13</td>
+                        <td class="artist">WIXO & LA2S</td>
+                        <td>GMK</td>
+<td class="streams">711K</td>                    </tr>
+                    <tr>
+                        <td class="rank ">14</td>
+                        <td class="artist">Franglish</td>
+                        <td>Génération impolie</td>
+<td class="streams">685K</td>                    </tr>
+                    <tr>
+                        <td class="rank ">15</td>
+                        <td class="artist">JECK</td>
+                        <td>La recette</td>
+<td class="streams">634K</td>                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        
+        
+
+        <div class="section">
+            <h2>TRACKS VIRAUX</h2>
+            <table>
+                <thead><tr><th>Artiste</th><th>Titre</th><th>Status</th></tr></thead>
+                <tbody>
+                <tr>
+                    <td class="artist">Rambo goyard</td>
+                    <td>B.M.S (by my side)</td>
+                    <td><span class="viral-tag">VIRAL</span></td>
+                </tr>
+                <tr>
+                    <td class="artist">WIXO & LA2S</td>
+                    <td>GMK</td>
+                    <td><span class="viral-tag">VIRAL</span></td>
+                </tr>
+                <tr>
+                    <td class="artist">Nono La Grinta</td>
+                    <td>LOVE YOU</td>
+                    <td><span class="viral-tag">VIRAL</span></td>
+                </tr>
+                <tr>
+                    <td class="artist">RnBoi</td>
+                    <td>MON BÉBÉ</td>
+                    <td><span class="viral-tag">VIRAL</span></td>
+                </tr>
+                <tr>
+                    <td class="artist">Taylor Swift</td>
+                    <td>The Fate of Ophelia</td>
+                    <td><span class="viral-tag">VIRAL</span></td>
+                </tr>
+                <tr>
+                    <td class="artist">Bad Bunny</td>
+                    <td>DtMF</td>
+                    <td><span class="viral-tag">VIRAL</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+
+        <div class="footer">
+            <p>Music Weekly FR - Newsletter generee automatiquement</p>
+            <p>Sources: Spotify, Apple Music, Deezer, Shazam, YouTube, SNEP, Snapchat, Genius, Soundcharts</p>
+            <p>20/03/2026 21:13</p>
+        </div>
+    </div>
+</body>
+</html>
