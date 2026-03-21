@@ -97,7 +97,8 @@ class NewsletterGenerator:
             name = f.stem.replace("newsletter_", "")
             badge = '<span class="badge">Derniere</span>' if i == 0 else ""
             items_html += (
-                f'<li><a href="{f.name}">Semaine du {name}{badge}</a></li>\n'
+                f'<li><a href="{f.name}">'
+                f'Semaine du {name}{badge}</a></li>\n'
             )
 
         index_html = f"""<!DOCTYPE html>
@@ -105,42 +106,69 @@ class NewsletterGenerator:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Music Weekly FR</title>
+    <title>Music Weekly FR — La Revue Musique</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         :root {{
-            --bg: #0a0a0f; --card: #13131a; --accent: #7c3aed;
-            --text: #e2e8f0; --muted: #94a3b8; --border: #1e1e2e;
+            --bg: #06060b; --card: #111119; --accent: #7c3aed; --accent2: #06b6d4;
+            --text: #e2e8f0; --text-bright: #f8fafc; --muted: #64748b;
+            --muted-light: #94a3b8; --border: #1e1e2e;
         }}
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg); color: var(--text); line-height: 1.6;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg); color: var(--text); line-height: 1.7;
             display: flex; align-items: center; justify-content: center; min-height: 100vh;
+            position: relative; overflow: hidden;
         }}
-        .container {{ max-width: 600px; padding: 40px; text-align: center; }}
-        h1 {{ font-size: 2rem; margin-bottom: 8px; }}
-        .subtitle {{ color: var(--muted); margin-bottom: 40px; }}
+        body::before {{
+            content: ''; position: absolute; top: -200px; left: 50%;
+            transform: translateX(-50%); width: 800px; height: 800px;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }}
+        .container {{ max-width: 520px; padding: 60px 40px; text-align: center; position: relative; z-index: 1; }}
+        .edition-tag {{
+            display: inline-block; padding: 4px 16px; border: 1px solid var(--accent);
+            border-radius: 20px; font-size: 0.65rem; font-weight: 700;
+            letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 24px;
+        }}
+        h1 {{
+            font-size: 2.5rem; font-weight: 900; letter-spacing: -1px;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent2) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; line-height: 1.1;
+        }}
+        .subtitle {{ color: var(--muted-light); margin-top: 12px; margin-bottom: 40px; font-size: 0.9rem; font-weight: 300; }}
         .newsletter-list {{ list-style: none; }}
-        .newsletter-list li {{ margin-bottom: 12px; }}
+        .newsletter-list li {{ margin-bottom: 10px; }}
         .newsletter-list a {{
-            display: block; padding: 16px 24px; background: var(--card);
-            border: 1px solid var(--border); border-radius: 12px;
-            color: var(--text); text-decoration: none; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 18px 24px; background: var(--card); border: 1px solid var(--border);
+            border-radius: 14px; color: var(--text); text-decoration: none;
+            transition: all 0.25s ease; font-size: 0.9rem; font-weight: 500;
         }}
-        .newsletter-list a:hover {{ border-color: var(--accent); transform: translateY(-2px); }}
+        .newsletter-list a:hover {{
+            border-color: var(--accent); transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(124, 58, 237, 0.15);
+        }}
         .badge {{
             display: inline-block; background: var(--accent); color: white;
-            padding: 2px 10px; border-radius: 20px; font-size: 0.75rem; margin-left: 8px;
+            padding: 3px 12px; border-radius: 20px; font-size: 0.65rem;
+            font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
         }}
+        .footer {{ margin-top: 48px; font-size: 0.75rem; color: var(--muted); }}
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="edition-tag">Newsletter Musique</div>
         <h1>Music Weekly FR</h1>
-        <p class="subtitle">Newsletter hebdomadaire des charts musicaux francais</p>
+        <p class="subtitle">La revue hebdomadaire des charts musicaux francais</p>
         <ul class="newsletter-list">
             {items_html}
         </ul>
+        <div class="footer">Music Weekly FR — Newsletter generee automatiquement</div>
     </div>
 </body>
 </html>"""

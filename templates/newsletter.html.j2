@@ -5,14 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Weekly FR - {{ digest.week_end.strftime('%d/%m/%Y') }}</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         :root {
-            --bg: #0a0a0f;
-            --card: #13131a;
+            --bg: #06060b;
+            --bg2: #0c0c14;
+            --card: #111119;
+            --card-hover: #16161f;
             --accent: #7c3aed;
             --accent2: #06b6d4;
+            --accent-glow: rgba(124, 58, 237, 0.15);
             --text: #e2e8f0;
-            --muted: #94a3b8;
+            --text-bright: #f8fafc;
+            --muted: #64748b;
+            --muted-light: #94a3b8;
             --border: #1e1e2e;
+            --border-light: #2a2a3d;
             --gold: #f59e0b;
             --silver: #94a3b8;
             --bronze: #d97706;
@@ -21,47 +28,246 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
             color: var(--text);
-            line-height: 1.6;
+            line-height: 1.7;
         }
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        .header {
+        .container { max-width: 780px; margin: 0 auto; padding: 0 20px; }
+
+        /* ── HERO ── */
+        .hero {
             text-align: center;
-            padding: 40px 0;
-            border-bottom: 2px solid var(--accent);
+            padding: 60px 20px 40px;
+            position: relative;
+            overflow: hidden;
         }
-        .header h1 {
-            font-size: 2.5rem;
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero-edition {
+            display: inline-block;
+            padding: 4px 16px;
+            border: 1px solid var(--accent);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+        }
+        .hero-subtitle {
+            color: var(--muted-light);
+            font-size: 1rem;
+            margin-top: 12px;
+            font-weight: 300;
+        }
+        .hero-date {
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+        .hero-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+        .hero-tag {
+            padding: 4px 12px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.7rem;
+            color: var(--muted-light);
+            font-weight: 500;
+        }
+
+        /* ── SOMMAIRE ── */
+        .sommaire {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px 32px;
+            margin: 0 0 40px;
+        }
+        .sommaire h2 {
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+        .sommaire-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 24px;
+        }
+        .sommaire-item {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            padding: 4px 0;
+            font-size: 0.85rem;
+            color: var(--muted-light);
+        }
+        .sommaire-num {
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 0.75rem;
+            min-width: 18px;
+        }
+
+        /* ── SECTIONS ── */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 48px 0 24px;
+        }
+        .section-num {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: 2px;
+            white-space: nowrap;
+        }
+        .section-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-bright);
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+        }
+        .card:hover { border-color: var(--border-light); }
+        .card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-bright);
+            margin-bottom: 12px;
+        }
+
+        /* ── HIGHLIGHT BOX ── */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(6, 182, 212, 0.08));
+            border: 1px solid var(--accent);
+            border-radius: 16px;
+            padding: 28px;
+            margin: 16px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .highlight-box::after {
+            content: '';
+            position: absolute;
+            top: -50%; right: -50%;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.1), transparent 70%);
+            pointer-events: none;
+        }
+        .highlight-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 8px;
+        }
+        .highlight-track {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-bright);
+        }
+        .highlight-meta {
+            color: var(--accent2);
+            font-size: 1rem;
+            margin-top: 4px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ── MILESTONES ── */
+        .milestone {
+            padding: 12px 16px;
+            margin: 8px 0;
+            background: rgba(124, 58, 237, 0.06);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        /* ── STATS ROW ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .stat-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
             background: linear-gradient(135deg, var(--accent), var(--accent2));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        .header .date { color: var(--muted); font-size: 1.1rem; margin-top: 8px; }
-        .section {
-            margin: 30px 0;
-            background: var(--card);
-            border-radius: 12px;
-            padding: 24px;
-            border: 1px solid var(--border);
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
         }
-        .section h2 {
-            font-size: 1.3rem;
-            margin-bottom: 16px;
-            color: var(--accent2);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+
+        /* ── PLATFORM BADGES ── */
         .platform-badge {
             display: inline-block;
-            padding: 2px 10px;
+            padding: 3px 12px;
             border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
+            font-size: 0.7rem;
+            font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .badge-spotify { background: #1db954; color: #000; }
         .badge-apple { background: #fc3c44; color: #fff; }
@@ -71,106 +277,286 @@
         .badge-snep { background: #002395; color: #fff; }
         .badge-snap { background: #fffc00; color: #000; }
         .badge-genius { background: #ffff64; color: #000; }
+
+        /* ── CHART TABLES ── */
+        .chart-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 0;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .chart-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .chart-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-bright);
+        }
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         th {
             text-align: left;
-            padding: 10px 8px;
-            border-bottom: 1px solid var(--border);
+            padding: 10px 12px;
             color: var(--muted);
-            font-weight: 500;
-            font-size: 0.8rem;
+            font-weight: 600;
+            font-size: 0.7rem;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            background: var(--bg2);
         }
         td {
-            padding: 8px;
-            border-bottom: 1px solid var(--border);
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(30, 30, 46, 0.5);
         }
-        tr:hover { background: rgba(124, 58, 237, 0.05); }
-        .rank { font-weight: 700; width: 40px; text-align: center; }
+        tr:hover td { background: rgba(124, 58, 237, 0.03); }
+        .rank {
+            font-weight: 800;
+            width: 36px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
         .rank-1 { color: var(--gold); }
         .rank-2 { color: var(--silver); }
         .rank-3 { color: var(--bronze); }
-        .artist { font-weight: 600; }
-        .streams { color: var(--accent2); font-variant-numeric: tabular-nums; }
-        .evo-new { color: var(--green); font-weight: 700; }
+        .artist { font-weight: 600; color: var(--text-bright); }
+        .title-cell { color: var(--muted-light); }
+        .streams {
+            color: var(--accent2);
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            text-align: right;
+        }
+        .evo-new { color: var(--green); font-weight: 700; font-size: 0.75rem; }
         .evo-up { color: var(--green); }
         .evo-down { color: var(--red); }
         .evo-stable { color: var(--muted); }
-        .highlight {
-            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
-            border: 1px solid var(--accent);
+
+        /* ── VIRAL SECTION ── */
+        .viral-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+        }
+        .viral-item {
+            background: var(--bg2);
+            border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 20px;
-            margin: 20px 0;
+            padding: 16px;
+            position: relative;
         }
-        .highlight h3 { color: var(--gold); margin-bottom: 8px; }
-        .milestone {
-            padding: 8px 12px;
-            margin: 6px 0;
-            background: rgba(124, 58, 237, 0.1);
-            border-left: 3px solid var(--accent);
-            border-radius: 4px;
-        }
+        .viral-item .artist { font-size: 0.9rem; }
+        .viral-item .title-cell { font-size: 0.8rem; margin-top: 2px; }
         .viral-tag {
             display: inline-block;
-            padding: 2px 8px;
+            padding: 2px 10px;
             background: var(--green);
             color: #000;
             border-radius: 10px;
-            font-size: 0.7rem;
-            font-weight: 700;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            position: absolute;
+            top: 12px;
+            right: 12px;
         }
+
+        /* ── RELEASES ── */
+        .release-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 16px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin: 8px 0;
+        }
+        .release-type {
+            padding: 2px 10px;
+            border-radius: 6px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: var(--accent);
+            color: #fff;
+            white-space: nowrap;
+        }
+        .release-info { flex: 1; }
+        .release-info strong { color: var(--text-bright); }
+        .release-info .release-meta {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        /* ── FOOTER ── */
         .footer {
             text-align: center;
-            padding: 30px 0;
-            color: var(--muted);
-            font-size: 0.85rem;
+            padding: 48px 20px 40px;
+            margin-top: 48px;
             border-top: 1px solid var(--border);
+        }
+        .footer-brand {
+            font-size: 1.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        .footer-sub {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+        .footer-sources {
+            font-size: 0.7rem;
+            color: var(--muted);
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 640px) {
+            .hero h1 { font-size: 2rem; }
+            .sommaire-grid { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: 1fr 1fr; }
+            .viral-grid { grid-template-columns: 1fr; }
+            .card, .chart-card { border-radius: 12px; }
+            .hero { padding: 40px 16px 30px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>MUSIC WEEKLY FR</h1>
-            <p class="date">Semaine du {{ digest.week_start.strftime('%d/%m') }} au {{ digest.week_end.strftime('%d/%m/%Y') }}</p>
+
+        <!-- ════ HERO ════ -->
+        <div class="hero">
+            <div class="hero-edition">MUSIC WEEKLY FR</div>
+            <h1>La Revue<br>Musique FR</h1>
+            <p class="hero-subtitle">Charts, tendances & analyse de la scene musicale francaise</p>
+            <p class="hero-date">Semaine du {{ digest.week_start.strftime('%d/%m') }} au {{ digest.week_end.strftime('%d/%m/%Y') }}</p>
+            {% if digest.milestones %}
+            <div class="hero-tags">
+                {% for m in digest.milestones[:4] %}
+                <span class="hero-tag">{{ m[:60] }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
 
+        <!-- ════ SOMMAIRE ════ -->
+        <div class="sommaire">
+            <h2>Sommaire</h2>
+            <div class="sommaire-grid">
+                <div class="sommaire-item"><span class="sommaire-num">01</span> Faits marquants</div>
+                <div class="sommaire-item"><span class="sommaire-num">02</span> Track le plus streame</div>
+                {% set section_num = [3] %}
+                {% if digest.spotify_top_50 and digest.spotify_top_50.entries %}
+                <div class="sommaire-item"><span class="sommaire-num">{{ '%02d' % section_num[0] }}</span> Top Spotify France</div>
+                {% if section_num.append(section_num.pop() + 1) %}{% endif %}
+                {% endif %}
+                {% if digest.apple_music_top_25 and digest.apple_music_top_25.entries %}
+                <div class="sommaire-item"><span class="sommaire-num">{{ '%02d' % section_num[0] }}</span> Top Apple Music</div>
+                {% if section_num.append(section_num.pop() + 1) %}{% endif %}
+                {% endif %}
+                {% if digest.deezer_top_50 and digest.deezer_top_50.entries %}
+                <div class="sommaire-item"><span class="sommaire-num">{{ '%02d' % section_num[0] }}</span> Top Deezer</div>
+                {% if section_num.append(section_num.pop() + 1) %}{% endif %}
+                {% endif %}
+                {% if digest.youtube_trending and digest.youtube_trending.entries %}
+                <div class="sommaire-item"><span class="sommaire-num">{{ '%02d' % section_num[0] }}</span> Top YouTube</div>
+                {% if section_num.append(section_num.pop() + 1) %}{% endif %}
+                {% endif %}
+                {% if digest.viral_tracks %}
+                <div class="sommaire-item"><span class="sommaire-num">{{ '%02d' % section_num[0] }}</span> Tracks viraux</div>
+                {% if section_num.append(section_num.pop() + 1) %}{% endif %}
+                {% endif %}
+                {% if digest.new_releases %}
+                <div class="sommaire-item"><span class="sommaire-num">{{ '%02d' % section_num[0] }}</span> Sorties de la semaine</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ════ 01 — FAITS MARQUANTS ════ -->
         {% if digest.milestones %}
-        <div class="section">
-            <h2>FAITS MARQUANTS</h2>
-            {% for m in digest.milestones %}
-            <div class="milestone">{{ m }}</div>
-            {% endfor %}
+        <div class="section-divider">
+            <span class="section-num">01</span>
+            <div class="section-line"></div>
         </div>
+        <h2 class="section-title">Faits Marquants</h2>
+        {% for m in digest.milestones %}
+        <div class="milestone">{{ m }}</div>
+        {% endfor %}
         {% endif %}
 
+        <!-- ════ 02 — TRACK LE PLUS STREAME ════ -->
         {% if digest.most_streamed_track %}
-        <div class="highlight">
-            <h3>TRACK LE PLUS STREAME</h3>
-            <p><strong>{{ digest.most_streamed_track.artist }} - {{ digest.most_streamed_track.title }}</strong></p>
-            <p class="streams">{{ digest.most_streamed_track.streams | format_number }} streams ({{ digest.most_streamed_track.platform.value }})</p>
+        <div class="section-divider">
+            <span class="section-num">02</span>
+            <div class="section-line"></div>
+        </div>
+        <h2 class="section-title">Track le plus streame</h2>
+        <div class="highlight-box">
+            <div class="highlight-label">N°1 toutes plateformes</div>
+            <div class="highlight-track">{{ digest.most_streamed_track.artist }} — {{ digest.most_streamed_track.title }}</div>
+            <div class="highlight-meta">{{ digest.most_streamed_track.streams | format_number }} streams sur {{ digest.most_streamed_track.platform.value }}</div>
+        </div>
+
+        {% if digest.fastest_rising %}
+        <div class="card">
+            <h3>Montee la plus rapide</h3>
+            <p><strong>{{ digest.fastest_rising.artist }}</strong> — {{ digest.fastest_rising.title }}</p>
+            <p style="color: var(--green); font-size: 0.9rem; margin-top: 4px;">Present sur plusieurs plateformes</p>
         </div>
         {% endif %}
 
-        {% macro chart_table(chart, badge_class, show_streams=false, show_views=false, show_shazams=false, show_creations=false, show_evo=false, limit=20) %}
+        {% if digest.most_used_on_snap %}
+        <div class="card">
+            <h3>Le plus utilise sur Snapchat</h3>
+            <p><strong>{{ digest.most_used_on_snap.artist }}</strong> — {{ digest.most_used_on_snap.title }}</p>
+            {% if digest.most_used_on_snap.snap_creations %}
+            <p style="color: var(--accent2); font-size: 0.9rem; margin-top: 4px;">{{ digest.most_used_on_snap.snap_creations | format_number }} creations</p>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% endif %}
+
+        <!-- ════ CHARTS ════ -->
+        {% macro chart_section(num, chart, badge_class, show_streams=false, show_views=false, show_shazams=false, show_creations=false, show_evo=false, limit=20) %}
         {% if chart and chart.entries %}
-        <div class="section">
-            <h2><span class="platform-badge {{ badge_class }}">{{ chart.platform.value }}</span> {{ chart.chart_name }}</h2>
+        <div class="section-divider">
+            <span class="section-num">{{ num }}</span>
+            <div class="section-line"></div>
+        </div>
+        <div class="chart-card">
+            <div class="chart-header">
+                <span class="platform-badge {{ badge_class }}">{{ chart.platform.value }}</span>
+                <span class="chart-title">{{ chart.chart_name }}</span>
+            </div>
             <table>
                 <thead>
                     <tr>
                         <th>#</th>
                         <th>Artiste</th>
                         <th>Titre</th>
-                        {% if show_streams %}<th>Streams</th>{% endif %}
-                        {% if show_views %}<th>Vues</th>{% endif %}
-                        {% if show_shazams %}<th>Shazams</th>{% endif %}
-                        {% if show_creations %}<th>Creations</th>{% endif %}
+                        {% if show_streams %}<th style="text-align:right">Streams</th>{% endif %}
+                        {% if show_views %}<th style="text-align:right">Vues</th>{% endif %}
+                        {% if show_shazams %}<th style="text-align:right">Shazams</th>{% endif %}
+                        {% if show_creations %}<th style="text-align:right">Creations</th>{% endif %}
                         {% if show_evo %}<th>Evol.</th><th>Sem.</th>{% endif %}
                     </tr>
                 </thead>
@@ -179,7 +565,7 @@
                     <tr>
                         <td class="rank {% if e.rank == 1 %}rank-1{% elif e.rank == 2 %}rank-2{% elif e.rank == 3 %}rank-3{% endif %}">{{ e.rank }}</td>
                         <td class="artist">{{ e.artist }}</td>
-                        <td>{{ e.title }}</td>
+                        <td class="title-cell">{{ e.title }}</td>
                         {% if show_streams %}<td class="streams">{{ e.streams | format_streams }}</td>{% endif %}
                         {% if show_views %}<td class="streams">{{ e.views | format_streams }}</td>{% endif %}
                         {% if show_shazams %}<td class="streams">{{ e.shazams | format_number }}</td>{% endif %}
@@ -192,7 +578,7 @@
                             {% elif '-' in evo %}<span class="evo-down">{{ evo }}</span>
                             {% else %}<span class="evo-stable">{{ evo }}</span>{% endif %}
                         </td>
-                        <td>{{ e.weeks_on_chart or '-' }}</td>
+                        <td style="color: var(--muted)">{{ e.weeks_on_chart or '-' }}</td>
                         {% endif %}
                     </tr>
                     {% endfor %}
@@ -202,62 +588,112 @@
         {% endif %}
         {% endmacro %}
 
-        {{ chart_table(digest.spotify_top_50, "badge-spotify", show_streams=true) }}
-        {{ chart_table(digest.apple_music_top_25, "badge-apple", limit=15) }}
-        {{ chart_table(digest.deezer_top_50, "badge-deezer") }}
-        {{ chart_table(digest.shazam_top_20, "badge-shazam", show_shazams=true, limit=15) }}
-        {{ chart_table(digest.youtube_trending, "badge-youtube", show_views=true, limit=15) }}
-        {{ chart_table(digest.snep_top_singles, "badge-snep", show_evo=true) }}
-        {{ chart_table(digest.snap_top_sounds, "badge-snap", show_creations=true, limit=15) }}
+        {% set ns = namespace(n=3) %}
 
-        {% if digest.viral_tracks %}
-        <div class="section">
-            <h2>TRACKS VIRAUX</h2>
-            <table>
-                <thead><tr><th>Artiste</th><th>Titre</th><th>Status</th></tr></thead>
-                <tbody>
-                {% for t in digest.viral_tracks %}
-                <tr>
-                    <td class="artist">{{ t.artist }}</td>
-                    <td>{{ t.title }}</td>
-                    <td><span class="viral-tag">VIRAL</span></td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
+        {% if digest.spotify_top_50 and digest.spotify_top_50.entries %}
+        {{ chart_section('%02d' % ns.n, digest.spotify_top_50, "badge-spotify", show_streams=true) }}
+        {% set ns.n = ns.n + 1 %}
         {% endif %}
 
-        {% if digest.new_releases %}
-        <div class="section">
-            <h2>SORTIES DE LA SEMAINE</h2>
-            {% for r in digest.new_releases %}
-            <div class="milestone">
-                <strong>{{ r.artist }} - {{ r.title }}</strong> ({{ r.release_type }})
-                {% if r.label %} | Label: {{ r.label }}{% endif %}
-                {% if r.first_day_streams %} | J1: {{ r.first_day_streams | format_streams }}{% endif %}
+        {% if digest.apple_music_top_25 and digest.apple_music_top_25.entries %}
+        {{ chart_section('%02d' % ns.n, digest.apple_music_top_25, "badge-apple", limit=15) }}
+        {% set ns.n = ns.n + 1 %}
+        {% endif %}
+
+        {% if digest.deezer_top_50 and digest.deezer_top_50.entries %}
+        {{ chart_section('%02d' % ns.n, digest.deezer_top_50, "badge-deezer") }}
+        {% set ns.n = ns.n + 1 %}
+        {% endif %}
+
+        {% if digest.shazam_top_20 and digest.shazam_top_20.entries %}
+        {{ chart_section('%02d' % ns.n, digest.shazam_top_20, "badge-shazam", show_shazams=true, limit=15) }}
+        {% set ns.n = ns.n + 1 %}
+        {% endif %}
+
+        {% if digest.youtube_trending and digest.youtube_trending.entries %}
+        {{ chart_section('%02d' % ns.n, digest.youtube_trending, "badge-youtube", show_views=true, limit=15) }}
+        {% set ns.n = ns.n + 1 %}
+        {% endif %}
+
+        {% if digest.snep_top_singles and digest.snep_top_singles.entries %}
+        {{ chart_section('%02d' % ns.n, digest.snep_top_singles, "badge-snep", show_evo=true) }}
+        {% set ns.n = ns.n + 1 %}
+        {% endif %}
+
+        {% if digest.snap_top_sounds and digest.snap_top_sounds.entries %}
+        {{ chart_section('%02d' % ns.n, digest.snap_top_sounds, "badge-snap", show_creations=true, limit=15) }}
+        {% set ns.n = ns.n + 1 %}
+        {% endif %}
+
+        <!-- ════ TRACKS VIRAUX ════ -->
+        {% if digest.viral_tracks %}
+        <div class="section-divider">
+            <span class="section-num">{{ '%02d' % ns.n }}</span>
+            <div class="section-line"></div>
+        </div>
+        <h2 class="section-title">Tracks Viraux</h2>
+        <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 16px;">Presents sur 3+ plateformes simultanement</p>
+        <div class="viral-grid">
+            {% for t in digest.viral_tracks %}
+            <div class="viral-item">
+                <span class="viral-tag">VIRAL</span>
+                <div class="artist">{{ t.artist }}</div>
+                <div class="title-cell">{{ t.title }}</div>
             </div>
             {% endfor %}
         </div>
+        {% set ns.n = ns.n + 1 %}
+        {% endif %}
+
+        <!-- ════ SORTIES ════ -->
+        {% if digest.new_releases %}
+        <div class="section-divider">
+            <span class="section-num">{{ '%02d' % ns.n }}</span>
+            <div class="section-line"></div>
+        </div>
+        <h2 class="section-title">Sorties de la Semaine</h2>
+        {% for r in digest.new_releases %}
+        <div class="release-item">
+            <span class="release-type">{{ r.release_type }}</span>
+            <div class="release-info">
+                <strong>{{ r.artist }} — {{ r.title }}</strong>
+                <div class="release-meta">
+                    {% if r.label %}Label: {{ r.label }}{% endif %}
+                    {% if r.first_day_streams %} &middot; J1: {{ r.first_day_streams | format_streams }}{% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% set ns.n = ns.n + 1 %}
         {% endif %}
 
         {% if digest.yesterday_releases %}
-        <div class="section">
-            <h2>SORTIES D'HIER</h2>
-            {% for r in digest.yesterday_releases %}
-            <div class="milestone">
-                <strong>{{ r.artist }} - {{ r.title }}</strong> ({{ r.release_type }})
-                {% if r.label %} | Label: {{ r.label }}{% endif %}
-            </div>
-            {% endfor %}
+        <div class="section-divider">
+            <span class="section-num">{{ '%02d' % ns.n }}</span>
+            <div class="section-line"></div>
         </div>
+        <h2 class="section-title">Sorties d'Hier</h2>
+        {% for r in digest.yesterday_releases %}
+        <div class="release-item">
+            <span class="release-type">{{ r.release_type }}</span>
+            <div class="release-info">
+                <strong>{{ r.artist }} — {{ r.title }}</strong>
+                {% if r.label %}<div class="release-meta">Label: {{ r.label }}</div>{% endif %}
+            </div>
+        </div>
+        {% endfor %}
         {% endif %}
 
+        <!-- ════ FOOTER ════ -->
         <div class="footer">
-            <p>Music Weekly FR - Newsletter generee automatiquement</p>
-            <p>Sources: Spotify, Apple Music, Deezer, Shazam, YouTube, SNEP, Snapchat, Genius, Soundcharts</p>
-            <p>{{ generated_at.strftime('%d/%m/%Y %H:%M') }}</p>
+            <div class="footer-brand">MUSIC WEEKLY FR</div>
+            <div class="footer-sub">La Revue Musique — Newsletter generee automatiquement</div>
+            <div class="footer-sub">{{ generated_at.strftime('%d/%m/%Y %H:%M') }}</div>
+            <div class="footer-sources">
+                Sources : Spotify &middot; Apple Music &middot; Deezer &middot; Shazam &middot; YouTube &middot; SNEP &middot; Snapchat &middot; Genius &middot; Soundcharts
+            </div>
         </div>
+
     </div>
 </body>
 </html>
