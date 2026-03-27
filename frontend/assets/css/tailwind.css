@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-5 py-3 bg-black text-white rounded-2xl font-medium text-sm
+           active:scale-[0.98] transition-all duration-150
+           focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2;
+  }
+
+  .btn-secondary {
+    @apply px-5 py-3 bg-white text-gray-700 border border-gray-200 rounded-2xl font-medium text-sm
+           active:scale-[0.98] transition-all duration-150
+           focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl border border-gray-100;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3.5 bg-gray-50 border-0 rounded-2xl text-[15px]
+           placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/5 focus:bg-white
+           transition-all duration-200;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide;
+  }
+
+  .badge-blue {
+    @apply badge bg-blue-50 text-blue-600;
+  }
+
+  .badge-green {
+    @apply badge bg-emerald-50 text-emerald-600;
+  }
+
+  .badge-purple {
+    @apply badge bg-purple-50 text-purple-600;
+  }
+
+  .badge-orange {
+    @apply badge bg-amber-50 text-amber-600;
+  }
+
+  .badge-pink {
+    @apply badge bg-pink-50 text-pink-600;
+  }
+
+  .section-label {
+    @apply text-[11px] font-semibold text-gray-400 uppercase tracking-widest;
+  }
+}
+
+/* Streaming cursor */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.cursor-blink::after {
+  content: '|';
+  animation: blink 1s infinite;
+  @apply text-black/40 ml-0.5 font-light;
+}
+
+/* Minimal scrollbar */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { @apply bg-transparent; }
+::-webkit-scrollbar-thumb { @apply bg-gray-200 rounded-full; }
+
+/* Remove tap highlight on mobile */
+* { -webkit-tap-highlight-color: transparent; }
