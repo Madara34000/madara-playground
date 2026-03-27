@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Weekly FR - 20/03/2026</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        :root {
+            --bg: #06060b;
+            --bg2: #0c0c14;
+            --card: #111119;
+            --card-hover: #16161f;
+            --accent: #7c3aed;
+            --accent2: #06b6d4;
+            --accent-glow: rgba(124, 58, 237, 0.15);
+            --text: #e2e8f0;
+            --text-bright: #f8fafc;
+            --muted: #64748b;
+            --muted-light: #94a3b8;
+            --border: #1e1e2e;
+            --border-light: #2a2a3d;
+            --gold: #f59e0b;
+            --silver: #94a3b8;
+            --bronze: #d97706;
+            --green: #22c55e;
+            --red: #ef4444;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+        .container { max-width: 780px; margin: 0 auto; padding: 0 20px; }
+
+        /* ── HERO ── */
+        .hero {
+            text-align: center;
+            padding: 50px 20px 40px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, #1a0a2e 0%, #0f0620 40%, var(--bg) 100%);
+            border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+            margin-bottom: 8px;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -100px; left: 50%;
+            transform: translateX(-50%);
+            width: 800px; height: 800px;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.25) 0%, rgba(99, 25, 210, 0.08) 40%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+        .hero-logo {
+            margin: 0 auto 20px;
+            width: 80px;
+            height: 80px;
+            filter: drop-shadow(0 0 20px rgba(124, 58, 237, 0.4));
+        }
+        .hero-character {
+            position: absolute;
+            bottom: 0;
+            opacity: 0.12;
+            pointer-events: none;
+        }
+        .hero-character-left {
+            left: -20px;
+            width: 200px;
+            height: 300px;
+        }
+        .hero-character-right {
+            right: -20px;
+            width: 180px;
+            height: 280px;
+            transform: scaleX(-1);
+        }
+        .hero-edition {
+            display: inline-block;
+            padding: 4px 16px;
+            border: 1px solid rgba(124, 58, 237, 0.5);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #a78bfa;
+            margin-bottom: 20px;
+            background: rgba(124, 58, 237, 0.1);
+        }
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #fff 0%, #c4b5fd 40%, var(--accent) 70%, var(--accent2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-subtitle {
+            color: #c4b5fd;
+            font-size: 1rem;
+            margin-top: 12px;
+            font-weight: 300;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-date {
+            color: var(--muted-light);
+            font-size: 0.85rem;
+            margin-top: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 24px;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-tag {
+            padding: 4px 12px;
+            background: rgba(124, 58, 237, 0.15);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 6px;
+            font-size: 0.7rem;
+            color: #c4b5fd;
+            font-weight: 500;
+        }
+
+        /* ── SOMMAIRE ── */
+        .sommaire {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px 32px;
+            margin: 0 0 40px;
+        }
+        .sommaire h2 {
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+        .sommaire-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 24px;
+        }
+        .sommaire-item {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            padding: 4px 0;
+            font-size: 0.85rem;
+            color: var(--muted-light);
+        }
+        .sommaire-num {
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 0.75rem;
+            min-width: 18px;
+        }
+
+        /* ── SECTIONS ── */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 48px 0 24px;
+        }
+        .section-num {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: 2px;
+            white-space: nowrap;
+        }
+        .section-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-bright);
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+        }
+        .card:hover { border-color: var(--border-light); }
+        .card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-bright);
+            margin-bottom: 12px;
+        }
+
+        /* ── HIGHLIGHT BOX ── */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(6, 182, 212, 0.08));
+            border: 1px solid var(--accent);
+            border-radius: 16px;
+            padding: 28px;
+            margin: 16px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .highlight-box::after {
+            content: '';
+            position: absolute;
+            top: -50%; right: -50%;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.1), transparent 70%);
+            pointer-events: none;
+        }
+        .highlight-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 8px;
+        }
+        .highlight-track {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-bright);
+        }
+        .highlight-meta {
+            color: var(--accent2);
+            font-size: 1rem;
+            margin-top: 4px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ── MILESTONES ── */
+        .milestone {
+            padding: 12px 16px;
+            margin: 8px 0;
+            background: rgba(124, 58, 237, 0.06);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        /* ── STATS ROW ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .stat-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        /* ── PLATFORM BADGES ── */
+        .platform-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .badge-spotify { background: #1db954; color: #000; }
+        .badge-apple { background: #fc3c44; color: #fff; }
+        .badge-deezer { background: #a238ff; color: #fff; }
+        .badge-shazam { background: #08f; color: #fff; }
+        .badge-youtube { background: #f00; color: #fff; }
+        .badge-snep { background: #002395; color: #fff; }
+        .badge-snap { background: #fffc00; color: #000; }
+        .badge-genius { background: #ffff64; color: #000; }
+
+        /* ── CHART TABLES ── */
+        .chart-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 0;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .chart-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .chart-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-bright);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        th {
+            text-align: left;
+            padding: 10px 12px;
+            color: var(--muted);
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: var(--bg2);
+        }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(30, 30, 46, 0.5);
+        }
+        tr:hover td { background: rgba(124, 58, 237, 0.03); }
+        .rank {
+            font-weight: 800;
+            width: 36px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .rank-1 { color: var(--gold); }
+        .rank-2 { color: var(--silver); }
+        .rank-3 { color: var(--bronze); }
+        .artist { font-weight: 600; color: var(--text-bright); }
+        .title-cell { color: var(--muted-light); }
+        .streams {
+            color: var(--accent2);
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            text-align: right;
+        }
+        .evo-new { color: var(--green); font-weight: 700; font-size: 0.75rem; }
+        .evo-up { color: var(--green); }
+        .evo-down { color: var(--red); }
+        .evo-stable { color: var(--muted); }
+
+        /* ── VIRAL SECTION ── */
+        .viral-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+        }
+        .viral-item {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+        }
+        .viral-item .artist { font-size: 0.9rem; }
+        .viral-item .title-cell { font-size: 0.8rem; margin-top: 2px; }
+        .viral-tag {
+            display: inline-block;
+            padding: 2px 10px;
+            background: var(--green);
+            color: #000;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            position: absolute;
+            top: 12px;
+            right: 12px;
+        }
+
+        /* ── RELEASES ── */
+        .release-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 16px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin: 8px 0;
+        }
+        .release-type {
+            padding: 2px 10px;
+            border-radius: 6px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: var(--accent);
+            color: #fff;
+            white-space: nowrap;
+        }
+        .release-info { flex: 1; }
+        .release-info strong { color: var(--text-bright); }
+        .release-info .release-meta {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        /* ── FOOTER ── */
+        .footer {
+            text-align: center;
+            padding: 48px 20px 40px;
+            margin-top: 48px;
+            border-top: 1px solid var(--border);
+        }
+        .footer-brand {
+            font-size: 1.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        .footer-sub {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+        .footer-sources {
+            font-size: 0.7rem;
+            color: var(--muted);
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 640px) {
+            .hero h1 { font-size: 2rem; }
+            .sommaire-grid { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: 1fr 1fr; }
+            .viral-grid { grid-template-columns: 1fr; }
+            .card, .chart-card { border-radius: 12px; }
+            .hero { padding: 40px 16px 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ════ HERO ════ -->
+        <div class="hero">
+            <!-- Character silhouette left -->
+            <svg class="hero-character hero-character-left" viewBox="0 0 200 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="charGrad" x1="100" y1="0" x2="100" y2="300" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#7c3aed"/>
+                        <stop offset="100%" stop-color="#1a0a2e"/>
+                    </linearGradient>
+                </defs>
+                <!-- Hooded figure with headphones -->
+                <ellipse cx="100" cy="60" rx="35" ry="38" fill="url(#charGrad)"/>
+                <!-- Hood -->
+                <path d="M55 55 Q60 10 100 8 Q140 10 145 55 Q145 70 140 80 L60 80 Q55 70 55 55Z" fill="url(#charGrad)"/>
+                <!-- Headphones band -->
+                <path d="M58 45 Q60 20 100 18 Q140 20 142 45" stroke="#a78bfa" stroke-width="3" fill="none"/>
+                <!-- Headphone ear pieces -->
+                <rect x="50" y="42" width="14" height="22" rx="7" fill="#a78bfa"/>
+                <rect x="136" y="42" width="14" height="22" rx="7" fill="#a78bfa"/>
+                <!-- Body -->
+                <path d="M65 80 L55 180 Q50 200 60 210 L80 300 L120 300 L140 210 Q150 200 145 180 L135 80Z" fill="url(#charGrad)"/>
+                <!-- Jacket detail -->
+                <line x1="100" y1="80" x2="100" y2="200" stroke="#a78bfa" stroke-width="1" opacity="0.5"/>
+                <!-- Arms -->
+                <path d="M65 90 Q30 130 40 170 L50 165 Q45 135 70 100Z" fill="url(#charGrad)"/>
+                <path d="M135 90 Q170 130 160 170 L150 165 Q155 135 130 100Z" fill="url(#charGrad)"/>
+                <!-- Music notes floating -->
+                <text x="25" y="130" font-size="16" fill="#a78bfa" opacity="0.6">&#9835;</text>
+                <text x="160" y="100" font-size="12" fill="#7c3aed" opacity="0.4">&#9834;</text>
+                <text x="15" y="170" font-size="10" fill="#a78bfa" opacity="0.3">&#9833;</text>
+            </svg>
+
+            <!-- Character silhouette right -->
+            <svg class="hero-character hero-character-right" viewBox="0 0 200 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="charGrad2" x1="100" y1="0" x2="100" y2="300" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#6d28d9"/>
+                        <stop offset="100%" stop-color="#0f0620"/>
+                    </linearGradient>
+                </defs>
+                <ellipse cx="100" cy="60" rx="33" ry="36" fill="url(#charGrad2)"/>
+                <path d="M58 55 Q62 12 100 10 Q138 12 142 55 Q142 68 138 78 L62 78 Q58 68 58 55Z" fill="url(#charGrad2)"/>
+                <path d="M60 45 Q62 22 100 20 Q138 22 140 45" stroke="#8b5cf6" stroke-width="3" fill="none"/>
+                <rect x="52" y="42" width="13" height="20" rx="6.5" fill="#8b5cf6"/>
+                <rect x="135" y="42" width="13" height="20" rx="6.5" fill="#8b5cf6"/>
+                <path d="M67 78 L58 175 Q54 195 62 205 L82 300 L118 300 L138 205 Q146 195 142 175 L133 78Z" fill="url(#charGrad2)"/>
+                <line x1="100" y1="78" x2="100" y2="195" stroke="#8b5cf6" stroke-width="1" opacity="0.4"/>
+                <path d="M67 88 Q35 125 42 165 L52 160 Q48 130 72 98Z" fill="url(#charGrad2)"/>
+                <path d="M133 88 Q165 125 158 165 L148 160 Q152 130 128 98Z" fill="url(#charGrad2)"/>
+                <text x="30" y="120" font-size="14" fill="#8b5cf6" opacity="0.5">&#9835;</text>
+                <text x="155" y="90" font-size="11" fill="#6d28d9" opacity="0.3">&#9834;</text>
+            </svg>
+
+            <!-- Logo -->
+            <div class="hero-logo">
+                <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="logoGrad" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#a78bfa"/>
+                            <stop offset="50%" stop-color="#7c3aed"/>
+                            <stop offset="100%" stop-color="#06b6d4"/>
+                        </linearGradient>
+                        <linearGradient id="logoInner" x1="20" y1="20" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#c4b5fd"/>
+                            <stop offset="100%" stop-color="#7c3aed"/>
+                        </linearGradient>
+                    </defs>
+                    <!-- Outer ring -->
+                    <circle cx="40" cy="40" r="38" stroke="url(#logoGrad)" stroke-width="2.5" fill="none"/>
+                    <!-- Inner hexagonal shape -->
+                    <path d="M40 8 L67 22 L67 58 L40 72 L13 58 L13 22Z" stroke="url(#logoGrad)" stroke-width="1.5" fill="rgba(124,58,237,0.08)"/>
+                    <!-- M letter stylized -->
+                    <path d="M22 55 L22 30 L32 45 L40 28 L48 45 L58 30 L58 55" stroke="url(#logoInner)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <!-- Music wave under M -->
+                    <path d="M22 58 Q28 54 34 58 Q40 62 46 58 Q52 54 58 58" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+                    <!-- Dot accents -->
+                    <circle cx="40" cy="18" r="2.5" fill="#a78bfa"/>
+                    <circle cx="22" cy="26" r="1.5" fill="#7c3aed" opacity="0.6"/>
+                    <circle cx="58" cy="26" r="1.5" fill="#06b6d4" opacity="0.6"/>
+                </svg>
+            </div>
+
+            <div class="hero-edition">MUSIC WEEKLY FR</div>
+            <h1>La Revue<br>Musique FR</h1>
+            <p class="hero-subtitle">Charts, tendances & analyse de la scene musicale francaise</p>
+            <p class="hero-date">Semaine du 13/03 au 20/03/2026</p>
+            <div class="hero-tags">
+                <span class="hero-tag">PLK domine les charts avec 25 entrees sur l'ensemble des pla</span>
+            </div>
+        </div>
+
+        <!-- ════ SOMMAIRE ════ -->
+        <div class="sommaire">
+            <h2>Sommaire</h2>
+            <div class="sommaire-grid">
+                <div class="sommaire-item"><span class="sommaire-num">01</span> Faits marquants</div>
+                <div class="sommaire-item"><span class="sommaire-num">02</span> Track le plus streame</div>
+                <div class="sommaire-item"><span class="sommaire-num">03</span> Top Spotify France</div>
+                <div class="sommaire-item"><span class="sommaire-num">04</span> Top Apple Music</div>
+                <div class="sommaire-item"><span class="sommaire-num">05</span> Top Deezer</div>
+                <div class="sommaire-item"><span class="sommaire-num">06</span> Top YouTube</div>
+                <div class="sommaire-item"><span class="sommaire-num">07</span> Tracks viraux</div>
+            </div>
+        </div>
+
+        <!-- ════ 01 — FAITS MARQUANTS ════ -->
+        <div class="section-divider">
+            <span class="section-num">01</span>
+            <div class="section-line"></div>
+        </div>
+        <h2 class="section-title">Faits Marquants</h2>
+        <div class="milestone">PLK domine les charts avec 25 entrees sur l'ensemble des plateformes</div>
+
+        <!-- ════ 02 — TRACK LE PLUS STREAME ════ -->
+        <div class="section-divider">
+            <span class="section-num">02</span>
+            <div class="section-line"></div>
+        </div>
+        <h2 class="section-title">Track le plus streame</h2>
+        <div class="highlight-box">
+            <div class="highlight-label">N°1 toutes plateformes</div>
+            <div class="highlight-track">disiz — melodrama(w/Theodora)</div>
+            <div class="highlight-meta">2 988 753 streams sur spotify</div>
+        </div>
+
+        <div class="card">
+            <h3>Montee la plus rapide</h3>
+            <p><strong>RnBoi</strong> — MON BÉBÉ</p>
+            <p style="color: var(--green); font-size: 0.9rem; margin-top: 4px;">Present sur plusieurs plateformes</p>
+        </div>
+
+
+        <!-- ════ CHARTS ════ -->
+
+
+                <div class="section-divider">
+            <span class="section-num">03</span>
+            <div class="section-line"></div>
+        </div>
+        <div class="chart-card">
+            <div class="chart-header">
+                <span class="platform-badge badge-spotify">spotify</span>
+                <span class="chart-title">Top 50 France</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Artiste</th>
+                        <th>Titre</th>
+<th style="text-align:right">Streams</th>                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="rank rank-1">1</td>
+                        <td class="artist">disiz</td>
+                        <td class="title-cell">melodrama(w/Theodora)</td>
+<td class="streams">3.0M</td>                    </tr>
+                    <tr>
+                        <td class="rank rank-2">2</td>
+                        <td class="artist">PLK</td>
+                        <td class="title-cell">Pocahontas</td>
+<td class="streams">2.8M</td>                    </tr>
+                    <tr>
+                        <td class="rank rank-3">3</td>
+                        <td class="artist">Rambo goyard</td>
+                        <td class="title-cell">B.M.S (by my side)</td>
+<td class="streams">2.3M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">4</td>
+                        <td class="artist">PLK</td>
+                        <td class="title-cell">Sex Model(w/Theodora)</td>
+<td class="streams">2.3M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">5</td>
+                        <td class="artist">WIXO & LA2S</td>
+                        <td class="title-cell">GMK</td>
+<td class="streams">2.2M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">6</td>
+                        <td class="artist">Nono La Grinta</td>
+                        <td class="title-cell">LOVE YOU</td>
+<td class="streams">2.1M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">7</td>
+                        <td class="artist">PLK</td>
+                        <td class="title-cell">Jamie Bynoe-Gittens(w/La Rvfleuze)</td>
+<td class="streams">1.9M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">8</td>
+                        <td class="artist">RnBoi</td>
+                        <td class="title-cell">MON BÉBÉ</td>
+<td class="streams">1.8M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">9</td>
+                        <td class="artist">RnBoi</td>
+                        <td class="title-cell">AVEC MOI(w/Nono La Grinta)</td>
+<td class="streams">1.7M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">10</td>
+                        <td class="artist">GIMS</td>
+                        <td class="title-cell">SPA(w/Theodora)</td>
+<td class="streams">1.7M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">11</td>
+                        <td class="artist">Franglish</td>
+                        <td class="title-cell">Génération impolie(w/KeBlack)</td>
+<td class="streams">1.6M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">12</td>
+                        <td class="artist">La Rvfleuze</td>
+                        <td class="title-cell">Argent Sale - A COLORS SHOW(w/COLORS)</td>
+<td class="streams">1.6M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">13</td>
+                        <td class="artist">Genezio</td>
+                        <td class="title-cell">OG(w/Niska)</td>
+<td class="streams">1.5M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">14</td>
+                        <td class="artist">PLK</td>
+                        <td class="title-cell">Façon d'penser</td>
+<td class="streams">1.4M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">15</td>
+                        <td class="artist">Bad Bunny</td>
+                        <td class="title-cell">NUEVAYoL</td>
+<td class="streams">1.4M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">16</td>
+                        <td class="artist">PLK</td>
+                        <td class="title-cell">Tu dors ?</td>
+<td class="streams">1.4M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">17</td>
+                        <td class="artist">PLK</td>
+                        <td class="title-cell">Le cœur des hommes</td>
+<td class="streams">1.4M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">18</td>
+                        <td class="artist">PLK</td>
+                        <td class="title-cell">Toi</td>
+<td class="streams">1.4M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">19</td>
+                        <td class="artist">R2</td>
+                        <td class="title-cell">RUINART</td>
+<td class="streams">1.4M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">20</td>
+                        <td class="artist">GIMS</td>
+                        <td class="title-cell">PARISIENNE(w/La Mano 1.9)</td>
+<td class="streams">1.4M</td>                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+                <div class="section-divider">
+            <span class="section-num">04</span>
+            <div class="section-line"></div>
+        </div>
+        <div class="chart-card">
+            <div class="chart-header">
+                <span class="platform-badge badge-apple">apple_music</span>
+                <span class="chart-title">Top 25 France</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Artiste</th>
+                        <th>Titre</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="rank rank-1">1</td>
+                        <td class="artist">PLK</td>
+                        <td class="title-cell">Pocahontas</td>
+                    </tr>
+                    <tr>
+                        <td class="rank rank-2">2</td>
+                        <td class="artist">PLK & Theodora</td>
+                        <td class="title-cell">Sex Model</td>
+                    </tr>
+                    <tr>
+                        <td class="rank rank-3">3</td>
+                        <td class="artist">disiz & Theodora</td>
+                        <td class="title-cell">melodrama</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">4</td>
+                        <td class="artist">PLK & La Rvfleuze</td>
+                        <td class="title-cell">Jamie Bynoe-Gittens</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">5</td>
+                        <td class="artist">La Rvfleuze</td>
+                        <td class="title-cell">Argent Sale - A COLORS SHOW</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">6</td>
+                        <td class="artist">PLK</td>
+                        <td class="title-cell">Tu dors ?</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">7</td>
+                        <td class="artist">RnBoi & Nono La Grinta</td>
+                        <td class="title-cell">AVEC MOI</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">8</td>
+                        <td class="artist">GIMS & Theodora</td>
+                        <td class="title-cell">SPA</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">9</td>
+                        <td class="artist">PLK</td>
+                        <td class="title-cell">Façon d'penser</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">10</td>
+                        <td class="artist">PLK & Jolagreen23</td>
+                        <td class="title-cell">Porte d'Orléans</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">11</td>
+                        <td class="artist">PLK</td>
+                        <td class="title-cell">Toi</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">12</td>
+                        <td class="artist">Nono La Grinta</td>
+                        <td class="title-cell">LOVE YOU</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">13</td>
+                        <td class="artist">Jul</td>
+                        <td class="title-cell">Triste everyday</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">14</td>
+                        <td class="artist">PLK</td>
+                        <td class="title-cell">Le cœur des hommes</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">15</td>
+                        <td class="artist">RnBoi</td>
+                        <td class="title-cell">MON BÉBÉ</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+                <div class="section-divider">
+            <span class="section-num">05</span>
+            <div class="section-line"></div>
+        </div>
+        <div class="chart-card">
+            <div class="chart-header">
+                <span class="platform-badge badge-deezer">deezer</span>
+                <span class="chart-title">Top 50 France</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Artiste</th>
+                        <th>Titre</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="rank rank-1">1</td>
+                        <td class="artist">HUNTR/X</td>
+                        <td class="title-cell">Golden</td>
+                    </tr>
+                    <tr>
+                        <td class="rank rank-2">2</td>
+                        <td class="artist">Djo</td>
+                        <td class="title-cell">End of Beginning</td>
+                    </tr>
+                    <tr>
+                        <td class="rank rank-3">3</td>
+                        <td class="artist">sombr</td>
+                        <td class="title-cell">back to friends</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">4</td>
+                        <td class="artist">Ella Langley</td>
+                        <td class="title-cell">Choosin' Texas</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">5</td>
+                        <td class="artist">Bruno Mars</td>
+                        <td class="title-cell">I Just Might</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">6</td>
+                        <td class="artist">Kehlani</td>
+                        <td class="title-cell">Folded</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">7</td>
+                        <td class="artist">Olivia Dean</td>
+                        <td class="title-cell">Man I Need</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">8</td>
+                        <td class="artist">Harry Styles</td>
+                        <td class="title-cell">American Girls</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">9</td>
+                        <td class="artist">Taylor Swift</td>
+                        <td class="title-cell">Opalite</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">10</td>
+                        <td class="artist">Myles Smith</td>
+                        <td class="title-cell">Stargazing</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">11</td>
+                        <td class="artist">Bad Bunny</td>
+                        <td class="title-cell">DtMF</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">12</td>
+                        <td class="artist">Taylor Swift</td>
+                        <td class="title-cell">The Fate of Ophelia</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">13</td>
+                        <td class="artist">Max McNown</td>
+                        <td class="title-cell">Better Me For You (Brown Eyes)</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">14</td>
+                        <td class="artist">LISA</td>
+                        <td class="title-cell">Moonlit Floor (Kiss Me)</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">15</td>
+                        <td class="artist">Mariah The Scientist</td>
+                        <td class="title-cell">Burning Blue</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">16</td>
+                        <td class="artist">SZA</td>
+                        <td class="title-cell">Sweet November</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">17</td>
+                        <td class="artist">Tame Impala</td>
+                        <td class="title-cell">Dracula (JENNIE Remix)</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">18</td>
+                        <td class="artist">The Marías</td>
+                        <td class="title-cell">No One Noticed</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">19</td>
+                        <td class="artist">Harry Styles</td>
+                        <td class="title-cell">Aperture</td>
+                    </tr>
+                    <tr>
+                        <td class="rank ">20</td>
+                        <td class="artist">Mergui</td>
+                        <td class="title-cell">3 Tears</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+
+                <div class="section-divider">
+            <span class="section-num">06</span>
+            <div class="section-line"></div>
+        </div>
+        <div class="chart-card">
+            <div class="chart-header">
+                <span class="platform-badge badge-youtube">youtube</span>
+                <span class="chart-title">Top YouTube Music France</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Artiste</th>
+                        <th>Titre</th>
+<th style="text-align:right">Vues</th>                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="rank rank-1">1</td>
+                        <td class="artist">GIMS</td>
+                        <td class="title-cell">PARISIENNE</td>
+<td class="streams">1.7M</td>                    </tr>
+                    <tr>
+                        <td class="rank rank-2">2</td>
+                        <td class="artist">disiz</td>
+                        <td class="title-cell">melodrama</td>
+<td class="streams">1.4M</td>                    </tr>
+                    <tr>
+                        <td class="rank rank-3">3</td>
+                        <td class="artist">GIMS</td>
+                        <td class="title-cell">SPA</td>
+<td class="streams">1.3M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">4</td>
+                        <td class="artist">RnBoi</td>
+                        <td class="title-cell">MON BÉBÉ</td>
+<td class="streams">1.1M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">5</td>
+                        <td class="artist">ZXKAI</td>
+                        <td class="title-cell">NO BATIDÃO</td>
+<td class="streams">1.1M</td>                    </tr>
+                    <tr>
+                        <td class="rank ">6</td>
+                        <td class="artist">Bleu Soleil</td>
+                        <td class="title-cell">Soleil Bleu</td>
+<td class="streams">919K</td>                    </tr>
+                    <tr>
+                        <td class="rank ">7</td>
+                        <td class="artist">HUNTR/X</td>
+                        <td class="title-cell">Golden</td>
+<td class="streams">909K</td>                    </tr>
+                    <tr>
+                        <td class="rank ">8</td>
+                        <td class="artist">Rambo Goyard</td>
+                        <td class="title-cell">B.M.S (by my side)</td>
+<td class="streams">863K</td>                    </tr>
+                    <tr>
+                        <td class="rank ">9</td>
+                        <td class="artist">KeBlack</td>
+                        <td class="title-cell">Melrose Place (feat. Guy2Bezbar)</td>
+<td class="streams">818K</td>                    </tr>
+                    <tr>
+                        <td class="rank ">10</td>
+                        <td class="artist">La Rvfleuze</td>
+                        <td class="title-cell">Argent Sale - A COLORS SHOW</td>
+<td class="streams">772K</td>                    </tr>
+                    <tr>
+                        <td class="rank ">11</td>
+                        <td class="artist">R2</td>
+                        <td class="title-cell">RUINART</td>
+<td class="streams">736K</td>                    </tr>
+                    <tr>
+                        <td class="rank ">12</td>
+                        <td class="artist">Nono La Grinta</td>
+                        <td class="title-cell">LOVE YOU</td>
+<td class="streams">724K</td>                    </tr>
+                    <tr>
+                        <td class="rank ">13</td>
+                        <td class="artist">WIXO & LA2S</td>
+                        <td class="title-cell">GMK</td>
+<td class="streams">711K</td>                    </tr>
+                    <tr>
+                        <td class="rank ">14</td>
+                        <td class="artist">Franglish</td>
+                        <td class="title-cell">Génération impolie</td>
+<td class="streams">685K</td>                    </tr>
+                    <tr>
+                        <td class="rank ">15</td>
+                        <td class="artist">JECK</td>
+                        <td class="title-cell">La recette</td>
+<td class="streams">634K</td>                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+
+
+        <!-- ════ TRACKS VIRAUX ════ -->
+        <div class="section-divider">
+            <span class="section-num">07</span>
+            <div class="section-line"></div>
+        </div>
+        <h2 class="section-title">Tracks Viraux</h2>
+        <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 16px;">Presents sur 3+ plateformes simultanement</p>
+        <div class="viral-grid">
+            <div class="viral-item">
+                <span class="viral-tag">VIRAL</span>
+                <div class="artist">Rambo goyard</div>
+                <div class="title-cell">B.M.S (by my side)</div>
+            </div>
+            <div class="viral-item">
+                <span class="viral-tag">VIRAL</span>
+                <div class="artist">WIXO & LA2S</div>
+                <div class="title-cell">GMK</div>
+            </div>
+            <div class="viral-item">
+                <span class="viral-tag">VIRAL</span>
+                <div class="artist">Nono La Grinta</div>
+                <div class="title-cell">LOVE YOU</div>
+            </div>
+            <div class="viral-item">
+                <span class="viral-tag">VIRAL</span>
+                <div class="artist">RnBoi</div>
+                <div class="title-cell">MON BÉBÉ</div>
+            </div>
+            <div class="viral-item">
+                <span class="viral-tag">VIRAL</span>
+                <div class="artist">Taylor Swift</div>
+                <div class="title-cell">The Fate of Ophelia</div>
+            </div>
+            <div class="viral-item">
+                <span class="viral-tag">VIRAL</span>
+                <div class="artist">Bad Bunny</div>
+                <div class="title-cell">DtMF</div>
+            </div>
+        </div>
+
+        <!-- ════ SORTIES ════ -->
+
+
+        <!-- ════ FOOTER ════ -->
+        <div class="footer">
+            <div style="margin: 0 auto 16px; width: 48px; height: 48px; opacity: 0.5;">
+                <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="40" cy="40" r="38" stroke="#7c3aed" stroke-width="2" fill="none" opacity="0.4"/>
+                    <path d="M40 8 L67 22 L67 58 L40 72 L13 58 L13 22Z" stroke="#7c3aed" stroke-width="1" fill="none" opacity="0.2"/>
+                    <path d="M22 55 L22 30 L32 45 L40 28 L48 45 L58 30 L58 55" stroke="#7c3aed" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.5"/>
+                </svg>
+            </div>
+            <div class="footer-brand">MUSIC WEEKLY FR</div>
+            <div class="footer-sub">La Revue Musique — Newsletter generee automatiquement</div>
+            <div class="footer-sub">21/03/2026 01:02</div>
+            <div class="footer-sources">
+                Sources : Spotify &middot; Apple Music &middot; Deezer &middot; Shazam &middot; YouTube &middot; SNEP &middot; Snapchat &middot; Genius &middot; Soundcharts
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,172 @@
+# MUSIC WEEKLY FR - Semaine du {{ digest.week_start.strftime('%d/%m') }} au {{ digest.week_end.strftime('%d/%m/%Y') }}
+
+> *Genere le {{ generated_at.strftime('%d/%m/%Y a %H:%M') }}*
+
+---
+
+{% if digest.milestones %}
+## FAITS MARQUANTS DE LA SEMAINE
+
+{% for milestone in digest.milestones %}
+- {{ milestone }}
+{% endfor %}
+
+---
+{% endif %}
+
+{% if digest.most_streamed_track %}
+## TRACK LE PLUS STREAME
+
+**{{ digest.most_streamed_track.artist }} - {{ digest.most_streamed_track.title }}**
+- Streams : {{ digest.most_streamed_track.streams | format_number }}
+- Plateforme : {{ digest.most_streamed_track.platform.value }}
+{% endif %}
+
+{% if digest.fastest_rising %}
+## MONTEE LA PLUS RAPIDE
+
+**{{ digest.fastest_rising.artist }} - {{ digest.fastest_rising.title }}**
+{% endif %}
+
+---
+
+## CLASSEMENTS PAR PLATEFORME
+
+{% if digest.spotify_top_50 and digest.spotify_top_50.entries %}
+### SPOTIFY - Top 50 France
+
+| # | Artiste | Titre | Streams |
+|---|---------|-------|---------|
+{% for entry in digest.spotify_top_50.entries[:20] %}
+| {{ entry.rank | rank_emoji }} | {{ entry.artist }} | {{ entry.title }} | {{ entry.streams | format_streams }} |
+{% endfor %}
+
+> Source: {{ digest.spotify_top_50.source_url or 'Spotify Charts' }}
+{% endif %}
+
+{% if digest.apple_music_top_25 and digest.apple_music_top_25.entries %}
+### APPLE MUSIC - Top 25 France
+
+| # | Artiste | Titre |
+|---|---------|-------|
+{% for entry in digest.apple_music_top_25.entries[:15] %}
+| {{ entry.rank | rank_emoji }} | {{ entry.artist }} | {{ entry.title }} |
+{% endfor %}
+
+> Source: {{ digest.apple_music_top_25.source_url or 'Apple Music Charts' }}
+{% endif %}
+
+{% if digest.deezer_top_50 and digest.deezer_top_50.entries %}
+### DEEZER - Top France
+
+| # | Artiste | Titre |
+|---|---------|-------|
+{% for entry in digest.deezer_top_50.entries[:20] %}
+| {{ entry.rank | rank_emoji }} | {{ entry.artist }} | {{ entry.title }} |
+{% endfor %}
+
+> Source: {{ digest.deezer_top_50.source_url or 'Deezer Charts' }}
+{% endif %}
+
+{% if digest.shazam_top_20 and digest.shazam_top_20.entries %}
+### SHAZAM - Top France
+
+| # | Artiste | Titre | Shazams |
+|---|---------|-------|---------|
+{% for entry in digest.shazam_top_20.entries[:15] %}
+| {{ entry.rank | rank_emoji }} | {{ entry.artist }} | {{ entry.title }} | {{ entry.shazams | format_number }} |
+{% endfor %}
+
+> Source: {{ digest.shazam_top_20.source_url or 'Shazam Charts' }}
+{% endif %}
+
+{% if digest.youtube_trending and digest.youtube_trending.entries %}
+### YOUTUBE - Tendances France
+
+| # | Artiste | Titre | Vues |
+|---|---------|-------|------|
+{% for entry in digest.youtube_trending.entries[:15] %}
+| {{ entry.rank | rank_emoji }} | {{ entry.artist }} | {{ entry.title }} | {{ entry.views | format_streams }} |
+{% endfor %}
+
+> Source: {{ digest.youtube_trending.source_url or 'YouTube Charts' }}
+{% endif %}
+
+{% if digest.snep_top_singles and digest.snep_top_singles.entries %}
+### SNEP - Top Singles Officiel
+
+| # | Artiste | Titre | Evol. | Sem. |
+|---|---------|-------|-------|------|
+{% for entry in digest.snep_top_singles.entries[:20] %}
+| {{ entry.rank | rank_emoji }} | {{ entry.artist }} | {{ entry.title }} | {{ entry.evolution | evolution_display }} | {{ entry.weeks_on_chart or '-' }} |
+{% endfor %}
+
+> Source: {{ digest.snep_top_singles.source_url or 'SNEP' }}
+{% endif %}
+
+---
+
+## SNAPCHAT - SONS TENDANCE & CREATIONS
+
+{% if digest.snap_top_sounds and digest.snap_top_sounds.entries %}
+| # | Artiste | Titre | Creations |
+|---|---------|-------|-----------|
+{% for entry in digest.snap_top_sounds.entries[:15] %}
+| {{ entry.rank | rank_emoji }} | {{ entry.artist }} | {{ entry.title }} | {{ entry.snap_creations | format_number }} |
+{% endfor %}
+{% endif %}
+
+{% if digest.most_used_on_snap %}
+**Son le plus utilise sur Snap:** {{ digest.most_used_on_snap.artist }} - {{ digest.most_used_on_snap.title }}
+{% if digest.most_used_on_snap.snap_creations %} ({{ digest.most_used_on_snap.snap_creations | format_number }} creations){% endif %}
+{% endif %}
+
+---
+
+## TRACKS VIRAUX (3+ plateformes)
+
+{% if digest.viral_tracks %}
+{% for track in digest.viral_tracks %}
+- **{{ track.artist }} - {{ track.title }}** — present sur plusieurs plateformes
+{% endfor %}
+{% else %}
+*Aucun track viral detecte cette semaine.*
+{% endif %}
+
+---
+
+{% if digest.new_releases %}
+## SORTIES DE LA SEMAINE
+
+{% for release in digest.new_releases %}
+- **{{ release.artist }} - {{ release.title }}** ({{ release.release_type }})
+  {% if release.label %}Label: {{ release.label }}{% endif %}
+  {% if release.first_day_streams %}Premier jour: {{ release.first_day_streams | format_streams }} streams{% endif %}
+{% endfor %}
+{% endif %}
+
+{% if digest.yesterday_releases %}
+## SORTIES D'HIER
+
+{% for release in digest.yesterday_releases %}
+- **{{ release.artist }} - {{ release.title }}** ({{ release.release_type }})
+  {% if release.label %}Label: {{ release.label }}{% endif %}
+{% endfor %}
+{% endif %}
+
+{% if digest.snep_top_albums and digest.snep_top_albums.entries %}
+---
+
+## SNEP - Top Albums
+
+| # | Artiste | Album |
+|---|---------|-------|
+{% for entry in digest.snep_top_albums.entries[:10] %}
+| {{ entry.rank | rank_emoji }} | {{ entry.artist }} | {{ entry.title }} |
+{% endfor %}
+{% endif %}
+
+---
+
+*Newsletter generee automatiquement par Music Weekly FR Bot*
+*Sources: Spotify, Apple Music, Deezer, Shazam, YouTube, SNEP, Snapchat, Genius, Soundcharts*
