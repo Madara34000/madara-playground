@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#0A0E1A" />
+<title>C&D Motors · Le Centre Auto · Marly</title>
+<meta name="description" content="Garage automobile à Marly · Devis IA instantané · RDV en ligne · Ouvert du lundi au samedi" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" />
+<link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+
+<!-- ============ DESKTOP PHONE FRAME ============ -->
+<div class="desktop-bg" aria-hidden="true">
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="desktop-side">
+    <div class="brand">
+      <div class="brand-logo">C&amp;D</div>
+      <div class="brand-name">Motors <span>· V1 démo</span></div>
+    </div>
+    <h1 class="desktop-title">Le garage,<br/><span class="accent">repensé.</span></h1>
+    <p class="desktop-sub">Voici la V1 interactive du nouveau le-centre-auto.fr. Cliquez, scannez, discutez avec l'IA — exactement comme le feront vos clients en 2026.</p>
+    <div class="desktop-features">
+      <div class="dfeat"><span class="dfeat-ic">⚡</span><div><strong>Devis IA instantané</strong><span>Réponse en 2 secondes</span></div></div>
+      <div class="dfeat"><span class="dfeat-ic">💬</span><div><strong>Assistant 24h/24</strong><span>Chatbot entraîné maison</span></div></div>
+      <div class="dfeat"><span class="dfeat-ic">📅</span><div><strong>RDV en 3 taps</strong><span>Calendrier temps réel</span></div></div>
+      <div class="dfeat"><span class="dfeat-ic">🚗</span><div><strong>Espace client</strong><span>Carnet entretien numérique</span></div></div>
+    </div>
+    <p class="desktop-footer">📱 Pour la vraie expérience, ouvrez ce lien sur votre téléphone.</p>
+  </div>
+</div>
+
+<!-- ============ APP CONTAINER (phone frame on desktop, fullscreen on mobile) ============ -->
+<div class="app" id="app">
+
+  <!-- Status bar (decorative on desktop) -->
+  <div class="statusbar">
+    <span class="time" id="status-time">09:41</span>
+    <span class="status-right">
+      <span class="signal"></span>
+      <span class="wifi"></span>
+      <span class="battery"><span class="battery-fill"></span></span>
+    </span>
+  </div>
+
+  <!-- ============ VIEWS ============ -->
+  <main class="views">
+
+    <!-- ===== VIEW: HOME ===== -->
+    <section class="view view-home" data-view="home">
+      <header class="topbar">
+        <div class="logo">
+          <svg width="36" height="36" viewBox="0 0 40 40" aria-hidden="true">
+            <defs>
+              <linearGradient id="logoG" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#FFCC00"/>
+                <stop offset="1" stop-color="#FF6B35"/>
+              </linearGradient>
+            </defs>
+            <rect width="40" height="40" rx="10" fill="#0A0E1A"/>
+            <path d="M11 26 L15 14 H25 L29 26 H25 L24 23 H16 L15 26 Z M17 20 H23 L21.5 17 H18.5 Z" fill="url(#logoG)"/>
+          </svg>
+          <div class="logo-text">
+            <strong>C&amp;D</strong>
+            <span>Motors</span>
+          </div>
+        </div>
+        <button class="icon-btn" aria-label="Menu" id="menu-btn">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </header>
+
+      <!-- Promo banner -->
+      <div class="promo-banner">
+        <span class="promo-tag">🔥 OFFRE MAI</span>
+        <span>-20% sur la révision + montage pneus offert</span>
+      </div>
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-bg">
+          <div class="hero-glow"></div>
+        </div>
+        <h1 class="hero-title">
+          Votre garage à Marly,<br/>
+          <span class="accent">plus simple.</span>
+        </h1>
+        <p class="hero-sub">Devis IA · RDV en ligne · 24h/24</p>
+
+        <!-- AI PLATE CARD -->
+        <div class="plate-card glass-card">
+          <div class="ai-badge">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 L14 9 L21 10 L16 14.5 L17.5 21.5 L12 18 L6.5 21.5 L8 14.5 L3 10 L10 9 Z"/></svg>
+            IA · Devis instantané
+          </div>
+          <h3>Tapez votre plaque</h3>
+          <div class="plate-input-wrap">
+            <input
+              type="text"
+              class="plate-input"
+              id="plate-input"
+              placeholder="AB-123-CD"
+              maxlength="9"
+              autocomplete="off"
+              autocapitalize="characters"
+              spellcheck="false"
+            />
+          </div>
+          <button class="btn btn-primary btn-lg" id="get-quote-btn">
+            <span>Obtenir mon devis</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+          <button class="btn btn-ghost" id="scan-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/></svg>
+            Scanner ma carte grise
+          </button>
+        </div>
+      </div>
+
+      <!-- SERVICES -->
+      <div class="section">
+        <div class="section-head">
+          <h2 class="section-title">Services rapides</h2>
+          <a class="section-link" href="#services">Tout voir →</a>
+        </div>
+        <div class="services-grid">
+          <button class="service-card" data-service="vidange">
+            <div class="service-ic">🔧</div>
+            <div class="service-name">Vidange</div>
+            <div class="service-price">dès 49€</div>
+          </button>
+          <button class="service-card" data-service="pneus">
+            <div class="service-ic">🛞</div>
+            <div class="service-name">Pneus</div>
+            <div class="service-price">dès 35€/pneu</div>
+          </button>
+          <button class="service-card" data-service="freins">
+            <div class="service-ic">🛑</div>
+            <div class="service-name">Freins</div>
+            <div class="service-price">dès 119€</div>
+          </button>
+          <button class="service-card" data-service="clim">
+            <div class="service-ic">❄️</div>
+            <div class="service-name">Climatisation</div>
+            <div class="service-price">59€</div>
+          </button>
+          <button class="service-card" data-service="distribution">
+            <div class="service-ic">⚙️</div>
+            <div class="service-name">Distribution</div>
+            <div class="service-price">sur devis</div>
+          </button>
+          <button class="service-card" data-service="diagnostic">
+            <div class="service-ic">🔍</div>
+            <div class="service-name">Diagnostic</div>
+            <div class="service-price">39€</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- TRUST SECTION -->
+      <div class="section trust-section">
+        <div class="trust-grid">
+          <div class="trust-item">
+            <div class="trust-num">15+</div>
+            <div class="trust-lbl">ans d'expérience</div>
+          </div>
+          <div class="trust-item">
+            <div class="trust-num">4.8★</div>
+            <div class="trust-lbl">sur Google</div>
+          </div>
+          <div class="trust-item">
+            <div class="trust-num">3 200</div>
+            <div class="trust-lbl">clients satisfaits</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TESTIMONIAL -->
+      <div class="section">
+        <div class="section-head">
+          <h2 class="section-title">Avis Google</h2>
+          <div class="reviews-meta">
+            <span class="stars">★★★★★</span>
+            <span class="rating">4.8</span>
+            <span class="count">· 87 avis</span>
+          </div>
+        </div>
+        <div class="reviews-scroll">
+          <article class="review">
+            <header>
+              <div class="avatar avatar-blue">M</div>
+              <div>
+                <strong>Marie L.</strong>
+                <span class="stars-sm">★★★★★</span>
+              </div>
+              <span class="review-time">il y a 3 jours</span>
+            </header>
+            <p>"Service top, prix transparents, RDV en ligne hyper pratique. Mieux que Norauto où j'allais avant."</p>
+          </article>
+          <article class="review">
+            <header>
+              <div class="avatar avatar-orange">K</div>
+              <div>
+                <strong>Karim B.</strong>
+                <span class="stars-sm">★★★★★</span>
+              </div>
+              <span class="review-time">il y a 1 semaine</span>
+            </header>
+            <p>"Devis IA reçu en 30 sec, RDV confirmé direct par SMS. Les plaquettes étaient prêtes en 1h. Bluffant."</p>
+          </article>
+          <article class="review">
+            <header>
+              <div class="avatar avatar-teal">J</div>
+              <div>
+                <strong>Jean-Luc P.</strong>
+                <span class="stars-sm">★★★★★</span>
+              </div>
+              <span class="review-time">il y a 2 semaines</span>
+            </header>
+            <p>"Je gère 4 utilitaires, l'espace client me prévient avant chaque entretien. Un gain de temps énorme."</p>
+          </article>
+        </div>
+      </div>
+
+      <!-- INFO BAR -->
+      <div class="section">
+        <div class="info-grid">
+          <div class="info-card">
+            <div class="info-ic">📍</div>
+            <div>
+              <strong>14 rue de la Liberté</strong>
+              <span>57155 Marly</span>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-ic">🕐</div>
+            <div>
+              <strong>Ouvert · ferme à 18h30</strong>
+              <span>Lun-Ven 8h-18h30 · Sam 9h-12h</span>
+            </div>
+          </div>
+          <div class="info-card info-card-link">
+            <div class="info-ic">📞</div>
+            <div>
+              <strong>03 65 67 06 70</strong>
+              <span>Appeler le garage →</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-spacer"></div>
+    </section>
+
+    <!-- ===== VIEW: DEVIS LOADING ===== -->
+    <section class="view view-devis-loading hidden" data-view="devis-loading">
+      <div class="topbar">
+        <button class="icon-btn" data-nav="home" aria-label="Retour">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <span class="topbar-title">Analyse IA</span>
+        <span style="width:42px"></span>
+      </div>
+
+      <div class="loading-container">
+        <div class="loading-orb">
+          <div class="orb-ring orb-ring-1"></div>
+          <div class="orb-ring orb-ring-2"></div>
+          <div class="orb-ring orb-ring-3"></div>
+          <div class="orb-core">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 L14 9 L21 10 L16 14.5 L17.5 21.5 L12 18 L6.5 21.5 L8 14.5 L3 10 L10 9 Z"/></svg>
+          </div>
+        </div>
+        <h2 class="loading-title">L'IA analyse votre véhicule</h2>
+        <p class="loading-plate" id="loading-plate">AB-123-CD</p>
+        <div class="loading-steps">
+          <div class="lstep" data-step="1">
+            <div class="lstep-dot"></div>
+            <span>Consultation base véhicule SIV</span>
+          </div>
+          <div class="lstep" data-step="2">
+            <div class="lstep-dot"></div>
+            <span>Identification du modèle</span>
+          </div>
+          <div class="lstep" data-step="3">
+            <div class="lstep-dot"></div>
+            <span>Estimation tarifaire</span>
+          </div>
+          <div class="lstep" data-step="4">
+            <div class="lstep-dot"></div>
+            <span>Vérification disponibilité pièces</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== VIEW: DEVIS RESULT ===== -->
+    <section class="view view-devis hidden" data-view="devis">
+      <div class="topbar topbar-dark">
+        <button class="icon-btn" data-nav="home" aria-label="Retour">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <span class="topbar-title">Votre devis</span>
+        <button class="icon-btn" aria-label="Partager">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
+        </button>
+      </div>
+
+      <div class="devis-content">
+        <!-- Vehicle card -->
+        <div class="vehicle-card reveal-anim" data-delay="100">
+          <div class="vehicle-success">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            VÉHICULE TROUVÉ
+          </div>
+          <div class="vehicle-plate" id="vehicle-plate">AB-123-CD</div>
+          <h2 class="vehicle-name">Renault Clio 4</h2>
+          <p class="vehicle-meta">1.5 dCi · Diesel · 2018 · 128 450 km</p>
+          <div class="vehicle-car">🚗</div>
+        </div>
+
+        <!-- Service selection -->
+        <div class="section section-dark reveal-anim" data-delay="200">
+          <p class="section-label">PRESTATION DEMANDÉE</p>
+          <div class="service-pills" id="service-pills">
+            <button class="pill pill-active" data-prest="freins-av">Plaquettes avant</button>
+            <button class="pill" data-prest="vidange">Vidange complète</button>
+            <button class="pill" data-prest="pneus">4 pneus été</button>
+            <button class="pill" data-prest="distribution">Distribution</button>
+            <button class="pill" data-prest="clim">Recharge clim</button>
+          </div>
+        </div>
+
+        <!-- Price card -->
+        <div class="price-card reveal-anim" data-delay="300">
+          <h3 class="price-title" id="price-title">Plaquettes de frein avant</h3>
+          <div class="conf-badge">
+            <span class="conf-ic">🤖</span>
+            <span>IA · Confiance <strong>94%</strong></span>
+          </div>
+          <div class="price-range">
+            <span class="price-from" id="price-from">119€</span>
+            <span class="price-dash">—</span>
+            <span class="price-to" id="price-to">145€</span>
+          </div>
+          <p class="price-brk" id="price-brk">Pièces OE · Main d'œuvre · 45 min</p>
+        </div>
+
+        <!-- Detail breakdown -->
+        <div class="section section-dark reveal-anim" data-delay="400">
+          <p class="section-label">DÉTAIL ESTIMATION</p>
+          <div class="detail-list" id="detail-list">
+            <div class="detail-row">
+              <span class="detail-name">Plaquettes Bosch (jeu)</span>
+              <span class="detail-price">62€ — 78€</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-name">Main d'œuvre · 45 min</span>
+              <span class="detail-price">45€ — 55€</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-name">Liquide de frein (test)</span>
+              <span class="detail-price">12€</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-stack reveal-anim" data-delay="500">
+          <button class="btn btn-primary btn-xl" data-nav="rdv">
+            <span>Réserver mon créneau</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+          <button class="btn btn-ghost btn-ghost-dark" data-nav="chat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Parler à un conseiller
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== VIEW: CHAT ===== -->
+    <section class="view view-chat hidden" data-view="chat">
+      <div class="chat-header">
+        <button class="icon-btn icon-btn-light" data-nav="home" aria-label="Retour">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="chat-avatar">
+          <span>🤖</span>
+        </div>
+        <div class="chat-id">
+          <strong>Assistant C&amp;D</strong>
+          <span class="chat-status"><span class="status-dot"></span>En ligne · répond en ~2s</span>
+        </div>
+      </div>
+
+      <div class="chat-messages" id="chat-messages">
+        <div class="chat-day">Aujourd'hui</div>
+
+        <div class="msg msg-bot">
+          <div class="msg-bubble">Bonjour 👋 Je suis l'assistant IA de C&amp;D Motors. Je peux vous donner un devis instantané, prendre un RDV, ou répondre à vos questions sur l'entretien.</div>
+          <span class="msg-time">09:38</span>
+        </div>
+      </div>
+
+      <div class="chat-suggestions" id="chat-suggestions">
+        <button class="suggestion" data-msg="Combien pour une vidange sur ma Clio 4 ?">💰 Prix d'une vidange</button>
+        <button class="suggestion" data-msg="Vous êtes ouverts samedi ?">🕐 Horaires samedi</button>
+        <button class="suggestion" data-msg="Mes freins grincent, c'est grave ?">🛑 Mes freins grincent</button>
+        <button class="suggestion" data-msg="J'aimerais prendre un RDV jeudi">📅 RDV jeudi</button>
+      </div>
+
+      <form class="chat-input" id="chat-form">
+        <button type="button" class="icon-btn-mini" aria-label="Pièce jointe">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 11.5 12 20a5 5 0 0 1-7-7l9-9a3 3 0 0 1 4 4l-9 9a1 1 0 0 1-1-1l8-8"/></svg>
+        </button>
+        <input type="text" class="chat-field" id="chat-field" placeholder="Posez votre question…" autocomplete="off" />
+        <button type="submit" class="chat-send" id="chat-send" aria-label="Envoyer">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M2 21l21-9L2 3l0 7l15 2l-15 2z"/></svg>
+        </button>
+      </form>
+    </section>
+
+    <!-- ===== VIEW: RDV ===== -->
+    <section class="view view-rdv hidden" data-view="rdv">
+      <div class="topbar">
+        <button class="icon-btn" data-nav="devis" aria-label="Retour">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <span class="topbar-title">Choisir un créneau</span>
+        <span style="width:42px"></span>
+      </div>
+
+      <div class="rdv-content">
+        <div class="rdv-info reveal-anim">
+          <div class="rdv-prest">Plaquettes de frein avant · ~45 min</div>
+          <div class="progress-wrap">
+            <div class="progress-bar"><div class="progress-fill" style="width:67%"></div></div>
+            <div class="progress-label">ÉTAPE 2 SUR 3</div>
+          </div>
+        </div>
+
+        <!-- Calendar -->
+        <div class="calendar reveal-anim" data-delay="100">
+          <div class="cal-head">
+            <h3>MAI 2026</h3>
+            <div class="cal-nav">
+              <button class="cal-arrow" aria-label="Mois précédent">‹</button>
+              <button class="cal-arrow" aria-label="Mois suivant">›</button>
+            </div>
+          </div>
+          <div class="cal-grid">
+            <div class="cal-day-hdr">L</div>
+            <div class="cal-day-hdr">M</div>
+            <div class="cal-day-hdr">M</div>
+            <div class="cal-day-hdr">J</div>
+            <div class="cal-day-hdr">V</div>
+            <div class="cal-day-hdr">S</div>
+            <div class="cal-day-hdr">D</div>
+            <button class="cal-day cal-day-out">25</button>
+            <button class="cal-day cal-day-today">26</button>
+            <button class="cal-day">27</button>
+            <button class="cal-day cal-day-selected" data-cal>28</button>
+            <button class="cal-day">29</button>
+            <button class="cal-day">30</button>
+            <button class="cal-day cal-day-closed">31</button>
+          </div>
+        </div>
+
+        <!-- Slots -->
+        <div class="section section-dark reveal-anim" data-delay="200">
+          <p class="section-label">JEUDI 28 MAI · CRÉNEAUX</p>
+          <div class="slots-grid" id="slots-grid">
+            <button class="slot">08h00</button>
+            <button class="slot">10h00</button>
+            <button class="slot slot-disabled">11h30 ✕</button>
+            <button class="slot">13h30</button>
+            <button class="slot slot-selected">14h30 ✓</button>
+            <button class="slot">16h00</button>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-card reveal-anim" data-delay="300">
+          <p class="section-label" style="color:#6b7280;">RÉCAPITULATIF</p>
+          <div class="sum-row"><span>Date</span><strong>Jeudi 28 mai 2026</strong></div>
+          <div class="sum-row"><span>Heure</span><strong>14h30 — 15h15</strong></div>
+          <div class="sum-row"><span>Intervention</span><strong>Plaquettes frein avant</strong></div>
+          <div class="sum-row sum-row-h"><span>Estimation</span><strong class="price-hl">119€ - 145€</strong></div>
+        </div>
+
+        <button class="btn btn-primary btn-xl reveal-anim" data-delay="400" id="confirm-rdv-btn">
+          <span>Confirmer mon RDV</span>
+          <span style="font-size:18px">🎉</span>
+        </button>
+
+        <p class="reassurance reveal-anim" data-delay="500">📲 SMS de confirmation envoyé en 30 sec · Annulable gratuitement jusqu'à 24h avant</p>
+      </div>
+    </section>
+
+    <!-- ===== VIEW: COMPTE ===== -->
+    <section class="view view-compte hidden" data-view="compte">
+      <div class="topbar">
+        <div>
+          <p class="hi">Bonjour Karim 👋</p>
+          <h1 class="page-title">Mon garage</h1>
+        </div>
+        <div class="profile-avatar">K</div>
+      </div>
+
+      <div class="compte-content">
+        <!-- Vehicle -->
+        <div class="vehicle-big reveal-anim">
+          <div class="vehicle-big-bg"></div>
+          <div class="vehicle-big-plate">AB-123-CD</div>
+          <span class="vehicle-big-car">🚗</span>
+          <h2 class="vehicle-big-name">Renault Clio 4</h2>
+          <div class="vehicle-big-meta">
+            <span class="vehicle-big-sub">Diesel · 2018</span>
+            <span class="vehicle-big-km">128 450 km</span>
+          </div>
+          <div class="vehicle-cta">
+            <button class="btn-mini">Voir le détail →</button>
+          </div>
+        </div>
+
+        <!-- Alert -->
+        <div class="alert-card reveal-anim" data-delay="100">
+          <div class="alert-ic">⚠️</div>
+          <div class="alert-body">
+            <strong>Distribution à prévoir</strong>
+            <span>Dans ~6 000 km · L'IA estime fin juillet</span>
+            <button class="alert-cta">Prendre RDV →</button>
+          </div>
+        </div>
+
+        <!-- Next RDV -->
+        <div class="section">
+          <p class="section-label">PROCHAIN RENDEZ-VOUS</p>
+          <div class="next-card reveal-anim" data-delay="150">
+            <div class="next-date">
+              <span class="next-day">28</span>
+              <span class="next-month">MAI</span>
+            </div>
+            <div class="next-info">
+              <strong>Plaquettes de frein</strong>
+              <span>Jeudi 28 · 14h30 · 119€ - 145€</span>
+              <span class="confirmed-badge">✓ CONFIRMÉ</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Historique -->
+        <div class="section">
+          <p class="section-label">DERNIERS PASSAGES</p>
+          <div class="hist-row reveal-anim" data-delay="200">
+            <div class="hist-d">12 MARS</div>
+            <div class="hist-t">Vidange + filtres</div>
+            <div class="hist-p">89€</div>
+            <button class="hist-pdf">PDF ↓</button>
+          </div>
+          <div class="hist-row reveal-anim" data-delay="250">
+            <div class="hist-d">08 JAN</div>
+            <div class="hist-t">Pneus hiver (×4)</div>
+            <div class="hist-p">320€</div>
+            <button class="hist-pdf">PDF ↓</button>
+          </div>
+          <div class="hist-row reveal-anim" data-delay="300">
+            <div class="hist-d">14 NOV</div>
+            <div class="hist-t">Distribution + galets</div>
+            <div class="hist-p">487€</div>
+            <button class="hist-pdf">PDF ↓</button>
+          </div>
+        </div>
+
+        <div class="footer-spacer"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ BOTTOM TAB BAR ============ -->
+  <nav class="tabbar" id="tabbar">
+    <button class="tab active" data-nav="home" aria-label="Accueil">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Accueil</span>
+    </button>
+    <button class="tab" data-nav="rdv" aria-label="Rendez-vous">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>RDV</span>
+    </button>
+    <button class="tab" data-nav="chat" aria-label="Assistant">
+      <span class="tab-badge">IA</span>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>Chat</span>
+    </button>
+    <button class="tab" data-nav="compte" aria-label="Mon compte">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+      <span>Compte</span>
+    </button>
+  </nav>
+
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <div class="toast-ic">✓</div>
+  <div class="toast-text">RDV confirmé · SMS envoyé</div>
+</div>
+
+<script src="assets/app.js"></script>
+</body>
+</html>
