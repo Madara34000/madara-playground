@@ -16,6 +16,8 @@
     plate: 'AB-123-CD',
     selectedPrest: 'freins-av',
     chatBusy: false,
+    chatHistory: [], // {role, content} pairs sent to Claude
+    aiEnabled: true, // toggled off if API fails
   };
 
   // ============ Tariff knowledge ============
@@ -410,41 +412,92 @@
     };
   };
 
+  // Format Claude's markdown-ish reply into HTML
+  const formatReply = (text) => {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/&lt;br&gt;/gi, '<br>') // un-escape <br> from Claude
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+  };
+
+  // Detect a price range in the assistant's reply to render a CTA card
+  const extractQuote = (text) => {
+    // Match "119€ — 145€", "119€ - 145€", "119€-145€", etc.
+    const m = text.match(/(\d{2,4})\s*€\s*[—\-–]\s*(\d{2,4})\s*€/);
+    if (!m) return null;
+    return { from: parseInt(m[1]), to: parseInt(m[2]) };
+  };
+
+  // Call the real Claude API via Vercel function
+  const callClaudeAPI = async (history) => {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: history }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'API_ERROR');
+    }
+    const data = await res.json();
+    return data.reply || '';
+  };
+
   const sendMessage = async (text) => {
     if (!text || state.chatBusy) return;
     state.chatBusy = true;
     appendMessage(text, 'user');
     chatField.value = '';
     checkChatSuggestions();
+    state.chatHistory.push({ role: 'user', content: text });
 
-    await sleep(400);
+    await sleep(300);
     showTyping();
-    await sleep(900 + Math.random() * 600);
+
+    let replyText = '';
+    try {
+      if (state.aiEnabled) {
+        replyText = await callClaudeAPI(state.chatHistory);
+      } else {
+        throw new Error('FALLBACK');
+      }
+    } catch (err) {
+      // Fallback to scripted responses if API key not set or network fails
+      if (state.aiEnabled && String(err.message).includes('API_KEY_MISSING')) {
+        state.aiEnabled = false;
+      }
+      await sleep(800);
+      const fallback = getAIResponse(text);
+      replyText = fallback.msg;
+      // Convert old fallback HTML format
+      replyText = replyText.replace(/<br>/g, '\n');
+    }
     hideTyping();
 
-    const response = getAIResponse(text);
+    // Push to history for context continuity
+    state.chatHistory.push({ role: 'assistant', content: replyText });
+
+    // Build extras (quote card if a price was detected in the reply)
     let extraHTML = '';
-    if (response.quote) {
-      const q = response.quote;
+    const quote = extractQuote(replyText);
+    if (quote) {
       extraHTML = `
         <div class="msg-quote">
           <span class="quote-badge">🤖 DEVIS IA</span>
           <div class="quote-price">
-            <span class="quote-from">${q.from}€</span>
+            <span class="quote-from">${quote.from}€</span>
             <span class="quote-dash">—</span>
-            <span class="quote-to">${q.to}€</span>
+            <span class="quote-to">${quote.to}€</span>
           </div>
-          <p class="quote-brk">${q.brk}</p>
           <button class="quote-cta" data-nav="rdv">Réserver un créneau →</button>
         </div>
       `;
     }
-    if (response.slots) {
-      extraHTML = `<div class="msg-quote" style="border-color:var(--teal)"><span class="quote-badge" style="background:linear-gradient(135deg,#2a5298,#4ecdc4)">📅 CRÉNEAUX</span>` +
-        response.slots.map(s => `<button class="quote-cta" style="margin-top:6px;background:#1E3A5F;color:#fff" data-nav="rdv">${s}</button>`).join('') +
-        `</div>`;
-    }
-    appendMessage(response.msg, 'bot', extraHTML);
+
+    appendMessage(formatReply(replyText), 'bot', extraHTML);
 
     // Re-bind nav buttons created dynamically
     $$('.msg-quote [data-nav]').forEach(b => {
