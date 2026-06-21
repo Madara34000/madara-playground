@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#000000" />
+<title>MATRIX // TODO</title>
+<meta name="description" content="Fond d'écran interactif — todo list au design Matrix code rain." />
+<style>
+  :root {
+    --green:      #00ff41;
+    --green-dim:  #00b32d;
+    --green-fade: #0a3d1c;
+    --bg:         #000000;
+    --glow:       0 0 8px rgba(0,255,65,.6);
+    --mono: "SFMono-Regular", "Courier New", Consolas, Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--green);
+    font-family: var(--mono);
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ---------- Matrix rain canvas (fond) ---------- */
+  #matrix {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    display: block;
+  }
+
+  /* léger voile pour la lisibilité du panneau */
+  #scanlines {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(0,0,0,0) 0px,
+      rgba(0,0,0,0) 2px,
+      rgba(0,0,0,.18) 3px,
+      rgba(0,0,0,0) 4px
+    );
+    mix-blend-mode: multiply;
+    opacity: .55;
+  }
+
+  /* ---------- Panneau Todo ---------- */
+  .panel {
+    position: fixed;
+    z-index: 2;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(560px, 92vw);
+    max-height: 86vh;
+    display: flex;
+    flex-direction: column;
+    background: rgba(0, 12, 4, .82);
+    border: 1px solid var(--green-dim);
+    border-radius: 10px;
+    box-shadow: var(--glow), inset 0 0 40px rgba(0,255,65,.06);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    overflow: hidden;
+    animation: bootIn .6s ease-out both;
+  }
+
+  @keyframes bootIn {
+    from { opacity: 0; transform: translate(-50%, -46%) scale(.98); filter: blur(4px); }
+    to   { opacity: 1; transform: translate(-50%, -50%) scale(1);   filter: blur(0); }
+  }
+
+  /* barre de titre style terminal */
+  .titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--green-fade);
+    background: rgba(0, 25, 8, .6);
+    user-select: none;
+  }
+  .dot { width: 11px; height: 11px; border-radius: 50%; box-shadow: var(--glow); }
+  .dot.r { background: #ff5f56; box-shadow: 0 0 6px #ff5f56; }
+  .dot.y { background: #ffbd2e; box-shadow: 0 0 6px #ffbd2e; }
+  .dot.g { background: var(--green); }
+  .titlebar h1 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-left: 6px;
+    text-shadow: var(--glow);
+  }
+  .titlebar .blink { animation: blink 1s steps(2,start) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .clock {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--green-dim);
+    letter-spacing: 1px;
+  }
+
+  /* zone de saisie */
+  .prompt {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--green-fade);
+  }
+  .prompt .chev { color: var(--green); text-shadow: var(--glow); font-weight: 700; }
+  .prompt input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--green);
+    font-family: var(--mono);
+    font-size: 15px;
+    caret-color: var(--green);
+    text-shadow: 0 0 4px rgba(0,255,65,.5);
+  }
+  .prompt input::placeholder { color: var(--green-fade); }
+  .prompt button {
+    background: transparent;
+    border: 1px solid var(--green-dim);
+    color: var(--green);
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .prompt button:hover { background: var(--green); color: #000; box-shadow: var(--glow); }
+
+  /* liste */
+  .list {
+    list-style: none;
+    overflow-y: auto;
+    padding: 6px 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--green-dim) transparent;
+  }
+  .list::-webkit-scrollbar { width: 8px; }
+  .list::-webkit-scrollbar-thumb { background: var(--green-dim); border-radius: 4px; }
+
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 16px;
+    border-bottom: 1px solid rgba(10,61,28,.5);
+    cursor: pointer;
+    transition: background .15s;
+    animation: rowIn .35s ease-out both;
+  }
+  @keyframes rowIn { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: none; } }
+  .item:hover { background: rgba(0,255,65,.06); }
+
+  .box {
+    flex: 0 0 18px;
+    width: 18px; height: 18px;
+    border: 1px solid var(--green-dim);
+    border-radius: 3px;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    color: var(--green);
+    text-shadow: var(--glow);
+  }
+  .item.done .box { background: var(--green); color: #000; box-shadow: var(--glow); }
+
+  .text { flex: 1; font-size: 15px; line-height: 1.35; word-break: break-word; }
+  .item.done .text {
+    color: var(--green-dim);
+    text-decoration: line-through;
+    text-decoration-color: var(--green);
+    opacity: .65;
+  }
+
+  .del {
+    flex: 0 0 auto;
+    background: transparent;
+    border: none;
+    color: var(--green-fade);
+    font-family: var(--mono);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: all .15s;
+  }
+  .item:hover .del { opacity: 1; }
+  .del:hover { color: #ff5f56; text-shadow: 0 0 6px #ff5f56; }
+
+  .empty {
+    padding: 28px 16px;
+    text-align: center;
+    color: var(--green-fade);
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
+
+  /* footer / stats */
+  .footer {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 14px;
+    border-top: 1px solid var(--green-fade);
+    background: rgba(0, 25, 8, .5);
+    font-size: 12px;
+    color: var(--green-dim);
+    letter-spacing: 1px;
+  }
+  .footer .bar {
+    flex: 1;
+    height: 6px;
+    border: 1px solid var(--green-fade);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .footer .bar span {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--green);
+    box-shadow: var(--glow);
+    transition: width .4s cubic-bezier(.34,1.56,.64,1);
+  }
+  .footer .clearDone {
+    background: transparent;
+    border: none;
+    color: var(--green-dim);
+    font-family: var(--mono);
+    font-size: 12px;
+    cursor: pointer;
+    letter-spacing: 1px;
+  }
+  .footer .clearDone:hover { color: var(--green); text-shadow: var(--glow); }
+
+  /* effet glitch sur le titre au boot */
+  .glitch { position: relative; }
+  .glitch::before, .glitch::after {
+    content: attr(data-text);
+    position: absolute; left: 0; top: 0;
+    width: 100%; overflow: hidden;
+    clip-path: inset(0 0 0 0);
+  }
+  .glitch::before { color: #ff00c1; transform: translate(-1px, 0); animation: g1 2.6s infinite linear alternate; }
+  .glitch::after  { color: #00fff9; transform: translate( 1px, 0); animation: g2 2.2s infinite linear alternate; }
+  @keyframes g1 { 0%,92%{clip-path:inset(0 0 100% 0)} 94%{clip-path:inset(20% 0 40% 0)} 96%{clip-path:inset(60% 0 10% 0)} 100%{clip-path:inset(0 0 100% 0)} }
+  @keyframes g2 { 0%,90%{clip-path:inset(100% 0 0 0)} 93%{clip-path:inset(40% 0 30% 0)} 97%{clip-path:inset(10% 0 70% 0)} 100%{clip-path:inset(100% 0 0 0)} }
+
+  @media (max-width: 480px) {
+    .clock { display: none; }
+    .del { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+  <div id="scanlines"></div>
+
+  <section class="panel" role="application" aria-label="Liste de tâches Matrix">
+    <header class="titlebar">
+      <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      <h1 class="glitch" data-text="MATRIX // TODO">MATRIX // TODO<span class="blink">_</span></h1>
+      <span class="clock" id="clock">--:--:--</span>
+    </header>
+
+    <form class="prompt" id="form" autocomplete="off">
+      <span class="chev">&gt;</span>
+      <input id="input" type="text" maxlength="120" placeholder="ajouter une tâche..." aria-label="Nouvelle tâche" />
+      <button type="submit">EXEC</button>
+    </form>
+
+    <ul class="list" id="list" aria-live="polite"></ul>
+
+    <footer class="footer">
+      <span id="count">0 / 0</span>
+      <div class="bar"><span id="progress"></span></div>
+      <button class="clearDone" id="clearDone">[ purger ✓ ]</button>
+    </footer>
+  </section>
+
+<script>
+(function () {
+  "use strict";
+
+  /* =========================================================
+     1. MATRIX CODE RAIN
+     ========================================================= */
+  const canvas = document.getElementById("matrix");
+  const ctx = canvas.getContext("2d");
+  const GLYPHS = "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎ0123456789ｦｧｨｩｪｫｬｭｮ".split("");
+  const FONT_SIZE = 16;
+  let columns, drops;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    columns = Math.floor(canvas.width / FONT_SIZE);
+    drops = new Array(columns).fill(0).map(() => Math.random() * -50);
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  function drawMatrix() {
+    // traînée (fond semi-transparent => effet de fondu)
+    ctx.fillStyle = "rgba(0, 0, 0, 0.06)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.font = FONT_SIZE + "px monospace";
+    for (let i = 0; i < drops.length; i++) {
+      const char = GLYPHS[(Math.random() * GLYPHS.length) | 0];
+      const x = i * FONT_SIZE;
+      const y = drops[i] * FONT_SIZE;
+
+      // tête de colonne plus claire
+      if (Math.random() > 0.975) {
+        ctx.fillStyle = "#cfffd6";
+        ctx.shadowColor = "#00ff41";
+        ctx.shadowBlur = 8;
+      } else {
+        ctx.fillStyle = "#00ff41";
+        ctx.shadowBlur = 0;
+      }
+      ctx.fillText(char, x, y);
+      ctx.shadowBlur = 0;
+
+      if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i] += 0.6;
+    }
+  }
+
+  let rafId;
+  let last = 0;
+  function loop(t) {
+    rafId = requestAnimationFrame(loop);
+    if (t - last < 45) return;   // ~22 fps : effet "code rain" fluide + léger
+    last = t;
+    drawMatrix();
+  }
+  rafId = requestAnimationFrame(loop);
+
+  // pause quand l'onglet est masqué (économie batterie)
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) cancelAnimationFrame(rafId);
+    else rafId = requestAnimationFrame(loop);
+  });
+
+  /* =========================================================
+     2. TODO LIST + persistance localStorage
+     ========================================================= */
+  const STORE_KEY = "matrix_todo_v1";
+  const listEl     = document.getElementById("list");
+  const formEl     = document.getElementById("form");
+  const inputEl    = document.getElementById("input");
+  const countEl    = document.getElementById("count");
+  const progressEl = document.getElementById("progress");
+  const clearDoneEl= document.getElementById("clearDone");
+
+  let todos = load();
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
+    catch (e) { return []; }
+  }
+  function save() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(todos)); } catch (e) {}
+  }
+
+  function render() {
+    listEl.innerHTML = "";
+
+    if (todos.length === 0) {
+      const li = document.createElement("li");
+      li.className = "empty";
+      li.textContent = "// aucune tâche — le système est vide";
+      listEl.appendChild(li);
+    } else {
+      todos.forEach(function (todo) {
+        const li = document.createElement("li");
+        li.className = "item" + (todo.done ? " done" : "");
+        li.dataset.id = todo.id;
+
+        const box = document.createElement("span");
+        box.className = "box";
+        box.textContent = todo.done ? "✓" : "";
+
+        const text = document.createElement("span");
+        text.className = "text";
+        text.textContent = todo.text;
+
+        const del = document.createElement("button");
+        del.className = "del";
+        del.setAttribute("aria-label", "Supprimer");
+        del.textContent = "✕";
+
+        li.appendChild(box);
+        li.appendChild(text);
+        li.appendChild(del);
+        listEl.appendChild(li);
+      });
+    }
+
+    const done = todos.filter(function (t) { return t.done; }).length;
+    countEl.textContent = done + " / " + todos.length;
+    progressEl.style.width = (todos.length ? (done / todos.length) * 100 : 0) + "%";
+  }
+
+  function addTodo(text) {
+    text = text.trim();
+    if (!text) return;
+    todos.unshift({ id: Date.now() + "-" + Math.random().toString(36).slice(2, 7), text: text, done: false });
+    save(); render();
+  }
+
+  function toggle(id) {
+    const t = todos.find(function (t) { return t.id === id; });
+    if (t) { t.done = !t.done; save(); render(); }
+  }
+
+  function remove(id) {
+    todos = todos.filter(function (t) { return t.id !== id; });
+    save(); render();
+  }
+
+  formEl.addEventListener("submit", function (e) {
+    e.preventDefault();
+    addTodo(inputEl.value);
+    inputEl.value = "";
+    inputEl.focus();
+  });
+
+  // délégation : clic sur une ligne => toggle, clic sur ✕ => supprime
+  listEl.addEventListener("click", function (e) {
+    const li = e.target.closest(".item");
+    if (!li) return;
+    const id = li.dataset.id;
+    if (e.target.classList.contains("del")) remove(id);
+    else toggle(id);
+  });
+
+  clearDoneEl.addEventListener("click", function () {
+    todos = todos.filter(function (t) { return !t.done; });
+    save(); render();
+  });
+
+  // amorçage de démo si vide au tout premier lancement
+  if (todos.length === 0 && !localStorage.getItem(STORE_KEY)) {
+    todos = [
+      { id: "demo1", text: "Suivre le lapin blanc 🐇", done: false },
+      { id: "demo2", text: "Choisir la pilule rouge", done: true  },
+      { id: "demo3", text: "Apprendre le kung-fu", done: false }
+    ];
+    save();
+  }
+  render();
+  inputEl.focus();
+
+  /* =========================================================
+     3. Horloge terminal
+     ========================================================= */
+  const clockEl = document.getElementById("clock");
+  function tick() {
+    const d = new Date();
+    const p = function (n) { return String(n).padStart(2, "0"); };
+    clockEl.textContent = p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds());
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
+</body>
+</html>
