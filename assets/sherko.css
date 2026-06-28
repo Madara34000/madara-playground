@@ -319,6 +319,7 @@ a { color: inherit; }
 .person-id { flex: 1; min-width: 0; }
 .person-id h3 { font-size: 17px; font-weight: 800; line-height: 1.1; }
 .person-id .role { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--role, var(--ink-2)); }
+.perm-tag { display: inline-block; vertical-align: middle; font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--gold); background: rgba(255,201,60,.14); border: 1px solid rgba(255,201,60,.35); padding: 2px 7px; border-radius: 999px; margin-left: 6px; }
 .person .tagline { font-size: 13px; color: var(--ink-2); margin-top: 12px; line-height: 1.5; min-height: 38px; }
 .person .contact { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .person-actions { display: flex; gap: 8px; margin-top: 16px; }

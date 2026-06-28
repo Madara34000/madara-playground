@@ -35,21 +35,23 @@
   }
 
   // ============ Seed: team roster ============
+  // permanent: présent par défaut sur chaque live. active: proposé par défaut au casting.
+  // Seul SHERKO est permanent (100%). Les autres sont occasionnels → on les active / invite par live.
   const SEED_TEAM = [
-    { id: 'm_sherko', name: 'SHERKO', role: 'Host', tag: 'Host, relances, questions et interaction chat.',
-      color: 'var(--c-sherko)', av: 'S', contact: { handle: '@sherko', phone: '', email: '' }, active: true },
-    { id: 'm_benjay', name: 'BENJAY', role: 'Invité principal', tag: 'Playlist, BOTA, parcours, process, Brésil.',
-      color: 'var(--c-benjay)', av: 'B', contact: { handle: '@benjay', phone: '', email: '' }, active: true },
-    { id: 'm_jdos', name: 'JDOS', role: 'Chronique art', tag: 'JDOSCOPE + débat meilleure œuvre.',
-      color: 'var(--c-jdos)', av: 'J', contact: { handle: '@jdos', phone: '', email: '' }, active: true },
-    { id: 'm_diwiid', name: 'DiWiiD', role: 'Cuisine', tag: 'Passage cuisine + retour dessert : La Cuisine du Di.',
-      color: 'var(--c-diwiid)', av: 'D', contact: { handle: '@diwiid', phone: '', email: '' }, active: true },
+    { id: 'm_sherko', name: 'SHERKO', role: 'Host', tag: 'Host, relances, questions et interaction chat. Présence 100%.',
+      color: 'var(--c-sherko)', av: 'S', photo: null, contact: { handle: '@sherko', phone: '', email: '' }, permanent: true, active: true },
     { id: 'm_madara', name: 'MADARA', role: 'Régie générale', tag: 'Transitions, OBS, audio, zéro bug — présent tout le live.',
-      color: 'var(--c-madara)', av: 'M', contact: { handle: '@madara', phone: '', email: 'madara@madara-community.com' }, active: true },
-    { id: 'm_dope', name: 'DOPE', role: 'Chroniqueur', tag: 'Twitcheur invité, chroniques et réactions chat.',
-      color: '#FF6B9D', av: 'Do', photo: null, contact: { handle: '@dope', phone: '', email: '' }, active: true },
-    { id: 'm_olb', name: 'OLB', role: 'Chroniqueur', tag: 'Twitcheur invité, ambiance et débats.',
-      color: '#5BC8FF', av: 'O', photo: null, contact: { handle: '@olb', phone: '', email: '' }, active: true },
+      color: 'var(--c-madara)', av: 'M', photo: null, contact: { handle: '@madara', phone: '', email: 'madara@madara-community.com' }, permanent: false, active: true },
+    { id: 'm_jdos', name: 'JDOS', role: 'Chronique art', tag: 'JDOSCOPE + débat meilleure œuvre. Invité occasionnel.',
+      color: 'var(--c-jdos)', av: 'J', photo: null, contact: { handle: '@jdos', phone: '', email: '' }, permanent: false, active: false },
+    { id: 'm_diwiid', name: 'DiWiiD', role: 'Cuisine', tag: 'Passage cuisine + retour dessert : La Cuisine du Di. Occasionnel.',
+      color: 'var(--c-diwiid)', av: 'D', photo: null, contact: { handle: '@diwiid', phone: '', email: '' }, permanent: false, active: false },
+    { id: 'm_dope', name: 'DOPE', role: 'Chroniqueur', tag: 'Twitcheur invité, chroniques et réactions chat. Occasionnel.',
+      color: '#FF6B9D', av: 'Do', photo: null, contact: { handle: '@dope', phone: '', email: '' }, permanent: false, active: false },
+    { id: 'm_olb', name: 'OLB', role: 'Chroniqueur', tag: 'Twitcheur invité, ambiance et débats. Occasionnel.',
+      color: '#5BC8FF', av: 'O', photo: null, contact: { handle: '@olb', phone: '', email: '' }, permanent: false, active: false },
+    { id: 'm_benjay', name: 'BENJAY', role: 'Invité', tag: 'Invité du live BENJAY : playlist, BOTA, parcours, Brésil.',
+      color: 'var(--c-benjay)', av: 'B', photo: null, contact: { handle: '@benjay', phone: '', email: '' }, permanent: false, active: false },
   ];
 
   // ============ Seed: BENJAY live (from the official PDF) ============
@@ -190,7 +192,7 @@
   }
 
   // ============ Store ============
-  const KEY = 'sherkolive.v1';
+  const KEY = 'sherkolive.v2';
   let state = load();
 
   function load() {
@@ -516,7 +518,7 @@
         <div class="person-top">
           ${avatarHtml(m, 'avatar')}
           <div class="person-id">
-            <h3>${esc(m.name)}</h3>
+            <h3>${esc(m.name)}${m.permanent ? ' <span class="perm-tag">★ Permanent</span>' : ''}</h3>
             <div class="role">${esc(m.role)}</div>
           </div>
           ${toggle}
