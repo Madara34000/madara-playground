@@ -702,7 +702,7 @@
   // Call serverless Claude endpoint; returns {segments:[...]} or null
   async function aiGenerate(brief) {
     try {
-      const res = await fetch('/api/generate', {
+      const res = await fetch('api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(brief),
@@ -1260,7 +1260,7 @@
     if (!logins.length) { if (opts.toast) toast('Aucun pseudo Twitch renseigné', 'info'); return; }
     twitchSyncing = true; updateChanStatus();
     try {
-      const res = await fetch('/api/twitch', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      const res = await fetch('api/twitch', { method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ logins, want: ['status', 'schedule', 'clips'], channel: state.settings.channel }) });
       if (res.ok) {
         const data = await res.json();
@@ -1330,7 +1330,7 @@
     const webhook = state.settings.discordWebhook;
     if (!webhook) { openDiscordSetup(); return false; }
     try {
-      const res = await fetch('/api/discord', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      const res = await fetch('api/discord', { method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ webhook, type, payload, content }) });
       if (res.ok) { toast('Envoyé sur Discord ✓', 'ok'); return true; }
       const e = await res.json().catch(() => ({}));

@@ -2,12 +2,13 @@
   "name": "SHERKO LIVE · Studio",
   "short_name": "SHERKO LIVE",
   "description": "Studio de production pour les lives Twitch SHERKO LIVE : conducteurs, planning, casting, régie et intégrations Twitch/Discord.",
-  "start_url": "/",
+  "start_url": ".",
+  "scope": ".",
   "display": "standalone",
   "background_color": "#05060B",
   "theme_color": "#05060B",
   "orientation": "any",
   "icons": [
-    { "src": "/assets/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    { "src": "assets/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
   ]
 }

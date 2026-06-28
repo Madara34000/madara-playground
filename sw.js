@@ -1,12 +1,12 @@
 // SHERKO LIVE · Studio — Service Worker (offline shell)
 const CACHE = 'sherkolive-v3';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/assets/sherko.css',
-  '/assets/sherko.js',
-  '/assets/favicon.svg',
-  '/manifest.webmanifest',
+  './',
+  './index.html',
+  './assets/sherko.css',
+  './assets/sherko.js',
+  './assets/favicon.svg',
+  './manifest.webmanifest',
 ];
 
 self.addEventListener('install', e => {
@@ -24,7 +24,7 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   // Network-first for API + Twitch/Discord; never cache those
-  if (url.pathname.startsWith('/api/') || /decapi\.me|twitch|discord/.test(url.host)) {
+  if (url.pathname.includes('/api/') || /decapi\.me|twitch|discord/.test(url.host)) {
     e.respondWith(fetch(req).catch(() => new Response('{"error":"offline"}', { headers: { 'Content-Type': 'application/json' } })));
     return;
   }
