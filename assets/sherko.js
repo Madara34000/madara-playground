@@ -197,7 +197,27 @@
   const KEY = 'sherkolive.v3';
   let state = load();
 
-  function defaultSettings() { return { discordWebhook: '', channel: 'sherko27', twitchAuto: true }; }
+  function defaultSettings() {
+    return {
+      discordWebhook: '', channel: 'sherko27', twitchAuto: true,
+      profile: {
+        name: 'SHERKO',
+        tagline: 'Réalisateur Artistique · Producteur multi-disques · Host de SHERKO LIVE',
+        bio: "Réalisateur artistique et producteur. Je reçois des artistes en live sur Twitch (SHERKO LIVE), je fais du son, et je co-fonde la BSB League. Studio do Brasil 🇧🇷.",
+        city: 'Paris',
+        accent: '#9146FF',
+        avatar: '',
+        socials: {
+          twitch:    { handle: 'sherko27',       url: 'https://twitch.tv/sherko27',        followers: null },
+          instagram: { handle: 'sherkovie',      url: 'https://instagram.com/sherkovie',   followers: 32000 },
+          tiktok:    { handle: 'sherkovie',      url: 'https://tiktok.com/@sherkovie',     followers: null },
+          x:         { handle: 'sherkoberwary',  url: 'https://x.com/sherkoberwary',       followers: null },
+          youtube:   { handle: '',               url: '',                                   followers: null },
+          discord:   { handle: '',               url: '',                                   followers: null },
+        },
+      },
+    };
+  }
   function load() {
     try {
       const raw = localStorage.getItem(KEY);
@@ -222,7 +242,7 @@
   function liveById(id) { return state.lives.find(l => l.id === id); }
 
   // ============ Router ============
-  const view = { name: 'lives', liveId: null, tab: 'conducteur' };
+  const view = { name: 'home', liveId: null, tab: 'conducteur' };
 
   function navigate(name, opts = {}) {
     view.name = name;
@@ -287,14 +307,105 @@
   function render() {
     let html = '';
     switch (view.name) {
+      case 'home':       html = renderHome(); break;
       case 'lives':      html = renderLives(); break;
       case 'live':       html = renderLive(); break;
       case 'equipe':     html = renderEquipe(); break;
       case 'generateur': html = renderGenerator(); break;
-      default:           html = renderLives();
+      default:           html = renderHome();
     }
     app.innerHTML = `<div class="view">${html}</div>`;
     if (view.name === 'generateur') wireGenerator();
+  }
+
+  // ---------- View: Home (HUB SHERKO) ----------
+  const SOCIALS = [
+    { k: 'twitch',    label: 'Twitch',    ico: '🟣', brand: '#9146FF', pre: '' },
+    { k: 'instagram', label: 'Instagram', ico: '📸', brand: '#E1306C', pre: '@' },
+    { k: 'tiktok',    label: 'TikTok',    ico: '🎵', brand: '#25F4EE', pre: '@' },
+    { k: 'x',         label: 'X',         ico: '𝕏',  brand: '#1d9bf0', pre: '@' },
+    { k: 'youtube',   label: 'YouTube',   ico: '▶️', brand: '#FF0000', pre: '' },
+    { k: 'discord',   label: 'Discord',   ico: '💬', brand: '#5865F2', pre: '' },
+  ];
+  function fmtCount(n) {
+    if (n == null) return '';
+    if (n >= 1e6) return (n / 1e6).toFixed(n % 1e6 ? 1 : 0).replace('.0', '') + 'M';
+    if (n >= 1e3) return (n / 1e3).toFixed(n % 1e3 >= 100 ? 1 : 0).replace('.0', '') + 'K';
+    return String(n);
+  }
+  function profileAvatar() {
+    const p = state.settings.profile;
+    if (p.avatar) return p.avatar;
+    const tw = p.socials?.twitch?.handle;
+    if (tw) { const d = twData(tw); if (d && d.avatar) return d.avatar; return `https://decapi.me/twitch/avatar/${encodeURIComponent(tw)}`; }
+    return '';
+  }
+  function renderHome() {
+    const p = state.settings.profile;
+    const tw = p.socials?.twitch?.handle ? twData(p.socials.twitch.handle) : null;
+    const isLive = tw && tw.live;
+    const av = profileAvatar();
+    const accent = p.accent || '#9146FF';
+
+    // total community
+    let total = 0; let known = false;
+    SOCIALS.forEach(s => { const f = (p.socials[s.k]||{}).followers; if (f) { total += f; known = true; } });
+    if (tw && tw.followers) { total += tw.followers; known = true; }
+
+    const socialCards = SOCIALS.map(s => {
+      const data = p.socials[s.k] || {};
+      if (!data.handle && !data.url) return '';
+      const url = data.url || '#';
+      let count = data.followers;
+      if (s.k === 'twitch' && tw && tw.followers != null) count = tw.followers;
+      const sub = (s.k === 'twitch' && isLive) ? `<span style="color:var(--magenta);font-weight:700">🔴 EN LIVE${tw.viewers?` · ${tw.viewers}`:''}</span>` : (count != null ? `${fmtCount(count)} abonnés` : 'Voir le profil');
+      return `
+        <a class="social-card" href="${esc(url)}" target="_blank" rel="noopener" style="--brand:${s.brand}">
+          <span class="sc-ico">${s.ico}</span>
+          <div class="sc-body">
+            <div class="sc-name">${s.label}</div>
+            <div class="sc-sub">${sub}</div>
+          </div>
+          <span class="sc-handle">${data.handle ? esc(s.pre + data.handle) : '↗'}</span>
+        </a>`;
+    }).join('');
+
+    const next = [...state.lives].filter(l => l.status !== 'termine').sort((a, b) => (liveDate(a)||0) - (liveDate(b)||0))[0];
+
+    return `
+      <section class="hub-hero" style="--accent:${accent}">
+        <div class="hub-glow"></div>
+        <div class="hub-avatar ${isLive?'is-live':''}">
+          ${av ? `<img src="${esc(av)}" alt="${esc(p.name)}" onerror="this.style.display='none';this.parentNode.classList.add('noimg')">` : ''}
+          <span class="hub-initial">${esc((p.name||'S')[0])}</span>
+          ${isLive ? '<span class="hub-livebadge">🔴 LIVE</span>' : ''}
+        </div>
+        <h1 class="hub-name">${esc(p.name)}</h1>
+        <p class="hub-tagline">${esc(p.tagline)}</p>
+        ${p.city ? `<div class="hub-city">📍 ${esc(p.city)}</div>` : ''}
+        <p class="hub-bio">${esc(p.bio)}</p>
+        <div class="hub-stats">
+          ${known ? `<div class="hub-stat"><b>${fmtCount(total)}</b><span>communauté</span></div>` : ''}
+          ${tw && tw.followers!=null ? `<div class="hub-stat"><b>${fmtCount(tw.followers)}</b><span>Twitch</span></div>` : ''}
+          <div class="hub-stat"><b>${state.lives.length}</b><span>lives</span></div>
+        </div>
+        <div class="hub-cta">
+          ${p.socials?.twitch?.handle ? `<a class="btn btn-twitch btn-lg" href="https://twitch.tv/${esc(p.socials.twitch.handle)}" target="_blank" rel="noopener">${isLive?'🔴 Rejoindre le live':'🟣 Voir la chaîne'}</a>` : ''}
+          <button class="btn btn-lg" data-nav="lives" type="button">🎬 Le Studio</button>
+          <button class="btn btn-ghost btn-lg" data-action="edit-profile" type="button">✎ Éditer le profil</button>
+        </div>
+      </section>
+
+      <div class="hub-section-title">Mes réseaux</div>
+      <div class="social-grid">${socialCards || '<p class="muted">Ajoute tes réseaux via « Éditer le profil ».</p>'}</div>
+
+      ${next ? `<div class="hub-section-title">Prochain live</div>${nextLiveStrip(next)}` : ''}
+
+      <div class="hub-section-title">Le Studio</div>
+      <div class="grid grid-lives">
+        ${state.lives.slice(0, 3).map(l => liveCard(l)).join('')}
+        <button class="add-card" data-action="new-live" type="button"><span class="plus">＋</span><span>Créer un live</span></button>
+      </div>`;
   }
 
   // ---------- View: Lives ----------
@@ -876,6 +987,7 @@
       case 'print': window.print(); break;
       case 'new-member': openMemberModal(); break;
       case 'edit-member': openMemberModal(memberById(id)); break;
+      case 'edit-profile': openProfileModal(); break;
       case 'invite': openInvite(memberById(id), node.dataset.live); break;
       case 'invite-all': openInviteAll(id); break;
       // Twitch
@@ -1052,6 +1164,81 @@
         navigate('live', { liveId: nl.id, tab: 'conducteur' }); return;
       }
       closeModal(); save(); render();
+    });
+  }
+
+  // ---------- Profile modal (HUB SHERKO) ----------
+  function openProfileModal() {
+    const p = state.settings.profile;
+    const socialFields = SOCIALS.map(s => {
+      const d = p.socials[s.k] || {};
+      return `<div class="field-row cols-2" style="margin-bottom:10px">
+        <div class="field" style="margin:0"><label>${s.label} — pseudo</label><input class="input" data-soc="${s.k}" data-f="handle" value="${esc(d.handle||'')}" placeholder="${s.pre}pseudo"></div>
+        <div class="field" style="margin:0"><label>${s.label} — abonnés</label><input class="input" data-soc="${s.k}" data-f="followers" value="${d.followers!=null?esc(d.followers):''}" placeholder="ex : 32000" inputmode="numeric"></div>
+      </div>`;
+    }).join('');
+    openModal(`
+      <div class="modal-head"><h2>Profil de ${esc(p.name)}</h2><button class="icon-btn" data-close type="button">✕</button></div>
+      <div class="modal-body">
+        <div class="field"><label>Photo (sinon photo Twitch auto)</label>
+          <div class="photo-edit">
+            <span class="photo-preview" id="pfPrev">${profileAvatar()?`<img src="${esc(profileAvatar())}" alt="">`:`<span class="avatar" style="background:${esc(p.accent)};border-radius:14px">${esc((p.name||'S')[0])}</span>`}</span>
+            <div class="photo-edit-actions">
+              <label class="btn btn-sm" style="cursor:pointer">📷 Importer<input type="file" id="pfFile" accept="image/*" hidden></label>
+              <input class="input" id="pfUrl" placeholder="…ou URL d'image" value="${p.avatar&&/^https?:/.test(p.avatar)?esc(p.avatar):''}">
+            </div>
+          </div>
+        </div>
+        <div class="field-row cols-2">
+          <div class="field"><label>Nom</label><input class="input" id="pfName" value="${esc(p.name)}"></div>
+          <div class="field"><label>Ville</label><input class="input" id="pfCity" value="${esc(p.city||'')}"></div>
+        </div>
+        <div class="field"><label>Accroche</label><input class="input" id="pfTag" value="${esc(p.tagline||'')}"></div>
+        <div class="field"><label>Bio</label><textarea class="textarea" id="pfBio">${esc(p.bio||'')}</textarea></div>
+        <div class="field"><label>Couleur d'accent</label><input class="input" id="pfAccent" type="text" value="${esc(p.accent||'#9146FF')}" placeholder="#9146FF"></div>
+        <div class="panel-title" style="margin-top:8px">Réseaux</div>
+        ${socialFields}
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" data-close type="button">Annuler</button>
+        <button class="btn btn-primary" id="pfSave" type="button">Enregistrer</button>
+      </div>`);
+
+    let pfPhoto = p.avatar || null;
+    const prev = $('#pfPrev');
+    const refresh = () => { prev.innerHTML = pfPhoto ? `<img src="${pfPhoto}" alt="">` : `<span class="avatar" style="background:${$('#pfAccent').value||p.accent};border-radius:14px">${esc(($('#pfName').value||'S')[0])}</span>`; };
+    $('#pfFile').addEventListener('change', e => {
+      const f = e.target.files && e.target.files[0]; if (!f) return;
+      if (f.size > 3.5*1024*1024) { toast('Image trop lourde (max 3,5 Mo)', 'info'); return; }
+      const r = new FileReader(); r.onload = () => { pfPhoto = r.result; refresh(); }; r.readAsDataURL(f);
+    });
+    $('#pfUrl').addEventListener('change', () => { const v = $('#pfUrl').value.trim(); if (v && /^https?:\/\//.test(v)) { pfPhoto = v; refresh(); } });
+    $('#pfSave').addEventListener('click', () => {
+      p.name = $('#pfName').value.trim() || p.name;
+      p.city = $('#pfCity').value.trim();
+      p.tagline = $('#pfTag').value.trim();
+      p.bio = $('#pfBio').value.trim();
+      p.accent = $('#pfAccent').value.trim() || '#9146FF';
+      p.avatar = pfPhoto || null;
+      modalHost.querySelectorAll('[data-soc]').forEach(inp => {
+        const k = inp.dataset.soc, f = inp.dataset.f;
+        p.socials[k] = p.socials[k] || { handle: '', url: '', followers: null };
+        if (f === 'handle') {
+          const h = inp.value.trim().replace(/^@/, '');
+          p.socials[k].handle = h;
+          if (h) {
+            const base = { twitch: 'https://twitch.tv/', instagram: 'https://instagram.com/', tiktok: 'https://tiktok.com/@', x: 'https://x.com/', youtube: 'https://youtube.com/@', discord: '' }[k];
+            if (base) p.socials[k].url = base + h;
+          } else if (k !== 'discord') p.socials[k].url = '';
+        } else if (f === 'followers') {
+          const n = parseInt(inp.value.replace(/[^0-9]/g, ''), 10);
+          p.socials[k].followers = isNaN(n) ? null : n;
+        }
+      });
+      // keep twitch channel in sync for live status
+      if (p.socials.twitch?.handle) state.settings.channel = p.socials.twitch.handle;
+      save(); closeModal(); render(); syncTwitch({ rerender: true });
+      toast('Profil mis à jour ✓', 'ok');
     });
   }
 

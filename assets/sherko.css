@@ -375,6 +375,48 @@ a { color: inherit; text-decoration: none; }
 .muted { color: var(--ink-3); }
 .hidden { display: none !important; }
 
+/* ---------- HUB SHERKO (home) ---------- */
+.hub-hero { position: relative; text-align: center; padding: 36px 20px 30px; margin-bottom: 28px; overflow: hidden;
+  border-radius: var(--radius-lg); border: 1px solid var(--stroke); background: var(--glass); backdrop-filter: blur(var(--blur)); }
+.hub-glow { position: absolute; top: -40%; left: 50%; transform: translateX(-50%); width: 90%; height: 320px; pointer-events: none;
+  background: radial-gradient(circle, var(--accent, #9146FF), transparent 65%); opacity: .35; filter: blur(60px); }
+.hub-hero > * { position: relative; }
+.hub-avatar { width: 132px; height: 132px; margin: 0 auto 18px; border-radius: 36px; position: relative;
+  display: grid; place-items: center; overflow: visible;
+  background: linear-gradient(135deg, var(--accent, #9146FF), var(--magenta));
+  box-shadow: 0 0 0 4px rgba(255,255,255,.06), 0 20px 50px -16px var(--accent, #9146FF); }
+.hub-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 34px; z-index: 2; }
+.hub-avatar .hub-initial { font-family: 'Space Grotesk'; font-weight: 700; font-size: 54px; color: #fff; z-index: 1; }
+.hub-avatar.is-live { box-shadow: 0 0 0 4px var(--magenta), 0 0 40px -4px var(--magenta); animation: liveGlow 1.6s ease-in-out infinite; }
+@keyframes liveGlow { 50% { box-shadow: 0 0 0 5px var(--magenta), 0 0 60px 0 var(--magenta); } }
+.hub-livebadge { position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); z-index: 3;
+  font-size: 11px; font-weight: 800; letter-spacing: .06em; color: #fff; background: var(--magenta);
+  padding: 4px 12px; border-radius: 999px; box-shadow: 0 6px 16px -4px var(--magenta); white-space: nowrap; }
+.hub-name { font-size: clamp(34px, 8vw, 60px); font-weight: 700; letter-spacing: -.02em; line-height: 1;
+  background: linear-gradient(180deg, #fff, #cfc9ef); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hub-tagline { color: var(--accent, var(--purple-2)); font-weight: 600; font-size: 14.5px; margin-top: 10px; }
+.hub-city { display: inline-block; margin-top: 10px; font-size: 12.5px; color: var(--ink-2); background: var(--glass-2); border: 1px solid var(--stroke); padding: 5px 12px; border-radius: 999px; }
+.hub-bio { max-width: 56ch; margin: 16px auto 0; color: var(--ink-2); font-size: 14.5px; line-height: 1.6; }
+.hub-stats { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-top: 22px; }
+.hub-stat { background: var(--glass-2); border: 1px solid var(--stroke); border-radius: 14px; padding: 12px 22px; min-width: 92px; }
+.hub-stat b { display: block; font-family: 'Space Grotesk'; font-size: 24px; font-weight: 700; }
+.hub-stat span { font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; }
+.hub-cta { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 26px; }
+.hub-section-title { font-family: 'Space Grotesk'; font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); margin: 6px 4px 14px; }
+
+.social-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); margin-bottom: 30px; }
+.social-card { display: flex; align-items: center; gap: 13px; padding: 15px 16px; border-radius: var(--radius);
+  background: var(--glass); backdrop-filter: blur(14px); border: 1px solid var(--stroke); position: relative; overflow: hidden;
+  transition: transform .22s var(--spring), border-color .2s, box-shadow .2s; }
+.social-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--brand); }
+.social-card:hover { transform: translateY(-3px); border-color: var(--stroke-2); box-shadow: 0 18px 40px -20px var(--brand); }
+.social-card .sc-ico { width: 44px; height: 44px; flex: none; border-radius: 13px; display: grid; place-items: center; font-size: 21px;
+  background: color-mix(in srgb, var(--brand) 22%, transparent); border: 1px solid color-mix(in srgb, var(--brand) 40%, transparent); }
+.social-card .sc-body { flex: 1; min-width: 0; }
+.social-card .sc-name { font-weight: 700; font-size: 15px; }
+.social-card .sc-sub { font-size: 12.5px; color: var(--ink-2); margin-top: 1px; }
+.social-card .sc-handle { font-size: 12.5px; font-weight: 600; color: var(--ink-3); white-space: nowrap; }
+
 /* ---------- Channel / Twitch panel ---------- */
 .tw-channel { display: grid; gap: 14px; }
 .tw-live-banner { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-radius: var(--radius); border: 1px solid rgba(255,59,123,.4); background: linear-gradient(90deg, rgba(255,59,123,.16), rgba(145,70,255,.06)); }
