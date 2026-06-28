@@ -1,45 +1,68 @@
-# C&D Motors · Le Centre Auto · V1 démo
+# 🎬 SHERKO LIVE · Studio de production
 
-Prototype interactif du nouveau site **le-centre-auto.fr** pour démo client (Barek).
-Inclut une vraie IA conversationnelle branchée sur **Claude API**.
+App de production pour les lives Twitch **SHERKO LIVE**. Elle génère à la demande
+le **conducteur officiel** de chaque live (façon « Feuille De Route »), le
+**planning chronométré**, et gère le **casting** — avec boutons pour **activer**
+et **inviter** chaque agent.
+
+Pré-remplie avec le live **SHERKO LIVE × BENJAY** (28 juin 2026) issu du conducteur officiel.
+
+---
+
+## ✨ Ce que fait l'app
+
+| Vue | Fonctionnalité |
+|---|---|
+| **Lives** | Tableau de bord · statut · compte à rebours · prochain live · statut Twitch de la chaîne en direct |
+| **Conducteur** | Brief par segments (façon PDF) · **édition inline** · ajout/suppression · **export PDF** · copier |
+| **Planning** | Timeline chronométrée : crew → invité → live → segments minutés → clap de fin |
+| **Casting** | **Toggle Activer/au repos** · **Inviter** (WhatsApp/Email/Discord) · **RSVP** (présent/peut-être/absent) · statut live + stats Twitch |
+| **Outils live** | **Checklist régie cochable** (progression) · banque de **sons à react** · **questions du chat** |
+| **Équipe** | Roster des twitcheurs · photos auto Twitch · contacts · activer/inviter/sync |
+| **Générateur IA** | Décris l'invité + l'angle → **Claude** propose questions & segments. Fallback gabarit local. |
+
+### 🟣 Intégration Twitch (vraie API)
+- **Statut live / offline + viewers + jeu + followers** en temps réel (rafraîchi toutes les 90 s)
+- **Photos de profil récupérées automatiquement** dès qu'un pseudo Twitch est renseigné
+- **Schedule** et **clips** de la chaîne (avec clés API Helix)
+- Marche en **zéro config** via decapi.me ; complet avec `TWITCH_CLIENT_ID` + `TWITCH_CLIENT_SECRET`
+
+### 💬 Intégration Discord (webhooks)
+Depuis chaque live : **annoncer le live**, notifier **« ON EST EN LIVE »** (avec `@everyone` + mentions des agents), envoyer le **conducteur**, le **planning**, ou **inviter le casting**. Configure une fois l'URL de webhook (ou `DISCORD_WEBHOOK_URL`).
+
+### 🎬 Mode production
+- **Mode Régie live** plein écran : horloge globale, segment en cours, **timer par segment + alerte dépassement**, checklist cochable, nav Préc./Suivant
+- **Téléprompteur** défilant pour le host (vitesse réglable)
+
+### 📲 PWA
+Installable sur mobile/desktop, **fonctionne hors-ligne** (service worker).
+
+### Les agents
+SHERKO (host, permanent 100%) · MADARA (régie) · JDOS · DiWiiD · DOPE · OLB · BENJAY (invité).
+Chaque agent : **photo** (auto Twitch ou import), rôle, mission, pseudo Twitch, ID Discord, contacts.
 
 ---
 
 ## 🚀 Déployer sur Vercel — 5 minutes
 
-### Étape 1 · Récupérer une clé Anthropic API
-1. Aller sur https://console.anthropic.com
-2. Se connecter (le compte qui sert déjà pour Claude Code)
-3. Menu → **API Keys** → **Create Key**
-4. Copier la clé `sk-ant-...`
+1. **Vercel** → *Add New… → Project* → importer `madara-playground` (branche `claude/sherko-app-live-briefs-hwagfs`).
+2. **Framework Preset** : « Other ».
+3. *(optionnel)* **Environment Variables** :
+   - `ANTHROPIC_API_KEY` — `sk-ant-…` → active le **Générateur IA** (console.anthropic.com)
+   - `TWITCH_CLIENT_ID` + `TWITCH_CLIENT_SECRET` → API Twitch **Helix** complète (viewers exacts, schedule, clips) — dev.twitch.tv/console
+   - `DISCORD_WEBHOOK_URL` — webhook par défaut (sinon configurable dans l'app)
+4. **Deploy** → l'URL `…vercel.app` est prête à partager.
 
-> 💡 La démo utilise `claude-haiku-4-5` (modèle ~10× moins cher). Coût estimé : **<1€ pour 1 000 conversations**.
-
-### Étape 2 · Déployer sur Vercel
-1. Aller sur https://vercel.com → **Add New… → Project**
-2. **Import Git Repository** : sélectionner `madara-playground`
-3. **Framework Preset** : « Other » (ne pas changer)
-4. Ouvrir **Environment Variables** :
-   - Name : `ANTHROPIC_API_KEY`
-   - Value : `sk-ant-...` (collée à l'étape 1)
-5. **Deploy** → attendre 30 secondes
-
-### Étape 3 · Partager
-Vercel donne une URL type `le-centre-auto-v1-xxxxx.vercel.app` → à envoyer à Barek par WhatsApp ou SMS.
-
----
+> Sans aucune clé : l'app marche, **Twitch en mode zéro-config** (photos + live via decapi.me), Discord se configure in-app, et le générateur retombe sur un gabarit local.
 
 ## 🏃 Lancer en local
 
 ```bash
-# Servir les fichiers statiques
 python3 -m http.server 8000
-# Ouvrir http://localhost:8000
+# http://localhost:8000
 ```
 
-⚠️ **En local, le chat IA fonctionne en mode fallback** (réponses scriptées) — la vraie API Claude ne marche qu'une fois déployée sur Vercel avec la clé configurée.
-
-Pour tester la vraie IA en local : utiliser `vercel dev` après avoir installé Vercel CLI (`npm i -g vercel`).
+La génération IA nécessite la fonction serverless → utiliser `vercel dev` avec la clé configurée.
 
 ---
 
@@ -47,50 +70,31 @@ Pour tester la vraie IA en local : utiliser `vercel dev` après avoir installé 
 
 ```
 .
-├── index.html              # SPA shell + 5 vues
+├── index.html            # Shell SPA + fond animé + PWA
+├── manifest.webmanifest  # PWA
+├── sw.js                 # Service worker (offline)
 ├── assets/
-│   ├── style.css           # Design system complet (41 Ko)
-│   ├── app.js              # Router · animations · chat client (19 Ko)
+│   ├── sherko.css        # Design system futuriste (glass · aurora · glow)
+│   ├── sherko.js         # App : routeur · vues · générateur · Twitch · Discord · régie · prompteur
 │   └── favicon.svg
 ├── api/
-│   └── chat.js             # Serverless Vercel → Claude API
-├── vercel.json             # Config headers sécurité
-└── package.json            # Métadonnées projet
+│   ├── generate.js       # Serverless → Claude API (conducteur JSON)
+│   ├── twitch.js         # Serverless → Twitch Helix (+ fallback decapi)
+│   └── discord.js        # Serverless → webhook Discord (embeds)
+└── vercel.json           # Headers sécurité
 ```
 
-Pas de framework · pas de build · pas de bundler.
+Pas de framework · pas de build · données persistées en **localStorage**.
 
 ---
 
-## ✨ Ce que la démo montre
+## 🎨 Identité
+- **Couleurs** : nuit `#0B0B12` · violet Twitch `#9146FF` · magenta `#FF3B7B` · or `#FFC93C` · cyan `#3CE0FF` · vert live `#1FE086`
+- **Typo** : Inter + Space Grotesk
+- **Couleur par rôle** : SHERKO violet · BENJAY or · JDOS cyan · DiWiiD vert · MADARA magenta
 
-| Vue | Fonctionnalité |
-|---|---|
-| **Accueil** | Hero animé · scan plaque · 6 services rapides · avis Google · infos pratiques |
-| **Devis IA** | Loading orbe 4 étapes · count-up des prix · breakdown détaillé · 5 prestations switchables |
-| **Chat IA** | **Vrai Claude API** entraîné sur le garage · tarifs · horaires · RDV · CTA dynamiques |
-| **RDV** | Calendrier interactif · créneaux · récap · toast confirmation SMS |
-| **Compte** | Dashboard véhicule · alerte maintenance prédictive · historique passages |
-
-## 🎨 Identité visuelle
-
-- **Couleurs** : `#0A0E1A` bleu nuit · `#FFCC00` jaune · `#FF6B35` orange · `#4ECDC4` teal
-- **Typo** : Inter (Google Fonts)
-- **Animations** : courbes spring `cubic-bezier(0.34, 1.56, 0.64, 1)` (style Framer Motion)
-- **Mobile-first** · Phone frame sur desktop ≥ 1024px
-
-## 🤖 Le chatbot
-
-- **Modèle** : Claude Haiku 4.5 (rapide + économique)
-- **Connaissance** : tarifs précis, horaires, adresse, infos garage — injectés dans le system prompt
-- **Mémoire conversationnelle** : 12 derniers messages conservés
-- **Détection de prix** : extrait automatiquement les fourchettes `XX€ — YY€` de la réponse pour afficher un quote-card cliquable vers le RDV
-- **Fallback gracieux** : si l'API n'est pas configurée, retombe sur des réponses scriptées
-
-## 🔜 Prochaines étapes (post-démo)
-
-- Brancher l'API SIV / HistoVec pour vraie reconnaissance de plaque
-- RAG sur base de données interne (historique clients réels)
-- Connecteur Google Calendar pour synchroniser les RDV en temps réel
-- Espace client : auth Supabase + carnet d'entretien persistant
-- Migrer vers Next.js 15 + React Server Components pour la prod
+## 🔜 Suite possible
+- Photos des twitcheurs en dur (les remplacer dans chaque fiche agent)
+- Backend partagé (Supabase) pour synchro multi-appareils
+- Génération automatique du planning depuis la durée réelle des segments
+- Export PNG du conducteur pour les stories
