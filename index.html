@@ -3,22 +3,35 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>SHERKO LIVE · Studio de production</title>
-  <meta name="description" content="Générateur de conducteurs, planning et casting pour les lives Twitch de SHERKO." />
-  <meta name="theme-color" content="#0B0B12" />
+  <title>SHERKO LIVE · Studio</title>
+  <meta name="description" content="Studio de production futuriste pour les lives Twitch SHERKO LIVE : conducteurs, planning, casting, mode régie et intégration Twitch en temps réel." />
+  <meta name="theme-color" content="#05060B" />
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/assets/favicon.svg" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/assets/sherko.css" />
 </head>
 <body>
 
+  <!-- ============ FUTURISTIC BACKGROUND ============ -->
+  <div class="bg-stage" aria-hidden="true">
+    <div class="aurora a1"></div>
+    <div class="aurora a2"></div>
+    <div class="aurora a3"></div>
+    <div class="bg-grid"></div>
+    <div class="bg-grain"></div>
+  </div>
+
   <!-- ============ TOP BAR ============ -->
   <header class="topbar">
     <button class="brand" data-nav="lives" type="button">
-      <span class="brand-mark">◢◤</span>
-      <span class="brand-txt">SHERKO<b>LIVE</b></span>
+      <span class="brand-mark"><span class="bm-core"></span></span>
+      <span class="brand-txt">SHERKO<b>LIVE</b><i>studio</i></span>
     </button>
     <nav class="topnav" id="topnav">
       <button class="topnav-btn" data-nav="lives" type="button">Lives</button>
@@ -26,6 +39,9 @@
       <button class="topnav-btn" data-nav="generateur" type="button">Générateur</button>
     </nav>
     <div class="topbar-right">
+      <button class="chan-status" id="chanStatus" data-action="open-channel" type="button" title="Statut de la chaîne">
+        <span class="cs-dot"></span><span class="cs-txt">Twitch</span>
+      </button>
       <span class="live-clock" id="liveClock">--:--</span>
       <button class="btn btn-primary btn-sm" data-action="new-live" type="button">＋ Live</button>
     </div>
@@ -36,10 +52,13 @@
 
   <!-- ============ BOTTOM NAV (mobile) ============ -->
   <nav class="botnav">
-    <button class="botnav-btn" data-nav="lives" type="button"><span>▤</span>Lives</button>
-    <button class="botnav-btn" data-nav="equipe" type="button"><span>☻</span>Équipe</button>
-    <button class="botnav-btn" data-nav="generateur" type="button"><span>✦</span>Générer</button>
+    <button class="botnav-btn" data-nav="lives" type="button"><span class="bi">▤</span>Lives</button>
+    <button class="botnav-btn" data-nav="equipe" type="button"><span class="bi">☻</span>Équipe</button>
+    <button class="botnav-btn" data-nav="generateur" type="button"><span class="bi">✦</span>Générer</button>
   </nav>
+
+  <!-- ============ FULLSCREEN OVERLAYS (régie live / téléprompteur) ============ -->
+  <div class="overlay-host" id="overlayHost" hidden></div>
 
   <!-- ============ MODAL HOST ============ -->
   <div class="modal-host" id="modalHost" hidden></div>
@@ -48,5 +67,10 @@
   <div class="toast-host" id="toastHost"></div>
 
   <script src="/assets/sherko.js" defer></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+    }
+  </script>
 </body>
 </html>

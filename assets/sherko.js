@@ -25,13 +25,15 @@
   };
   const roleColor = name => (ROLES[name] && ROLES[name].color) || 'var(--c-guest)';
 
-  // Avatar: photo if available, else colored initial. `extra` = extra classes/styles.
+  // Avatar: photo (uploaded > Twitch) if available, else colored initial.
   function avatarHtml(m, cls = 'avatar', styleExtra = '') {
-    if (m && m.photo) {
-      return `<span class="${cls} has-photo" style="${styleExtra}" title="${esc(m.name)}"><img src="${esc(m.photo)}" alt="${esc(m.name)}" loading="lazy"></span>`;
+    const ring = (cls.indexOf('avatar') !== -1 && memberLive(m)) ? ' live-ring' : '';
+    const photo = memberPhoto(m);
+    if (photo) {
+      return `<span class="${cls} has-photo${ring}" style="${styleExtra}" title="${esc(m && m.name || '')}"><img src="${esc(photo)}" alt="${esc(m && m.name || '')}" loading="lazy" onerror="this.parentNode.classList.remove('has-photo');this.parentNode.style.background='${(m&&m.color)||'var(--c-guest)'}';this.replaceWith(document.createTextNode('${esc(m&&m.av||'?')}'))"></span>`;
     }
     const color = (m && m.color) || 'var(--c-guest)';
-    return `<span class="${cls}" style="background:${color};${styleExtra}" title="${esc(m && m.name || '')}">${esc(m && m.av || '?')}</span>`;
+    return `<span class="${cls}${ring}" style="background:${color};${styleExtra}" title="${esc(m && m.name || '')}">${esc(m && m.av || '?')}</span>`;
   }
 
   // ============ Seed: team roster ============
@@ -39,19 +41,19 @@
   // Seul SHERKO est permanent (100%). Les autres sont occasionnels → on les active / invite par live.
   const SEED_TEAM = [
     { id: 'm_sherko', name: 'SHERKO', role: 'Host', tag: 'Host, relances, questions et interaction chat. Présence 100%.',
-      color: 'var(--c-sherko)', av: 'S', photo: null, contact: { handle: '@sherko', phone: '', email: '' }, permanent: true, active: true },
+      color: 'var(--c-sherko)', av: 'S', photo: null, twitch: 'sherko27', discord: '', contact: { handle: '@sherko', phone: '', email: '' }, permanent: true, active: true },
     { id: 'm_madara', name: 'MADARA', role: 'Régie générale', tag: 'Transitions, OBS, audio, zéro bug — présent tout le live.',
-      color: 'var(--c-madara)', av: 'M', photo: null, contact: { handle: '@madara', phone: '', email: 'madara@madara-community.com' }, permanent: false, active: true },
+      color: 'var(--c-madara)', av: 'M', photo: null, twitch: '', discord: '', contact: { handle: '@madara', phone: '', email: 'madara@madara-community.com' }, permanent: false, active: true },
     { id: 'm_jdos', name: 'JDOS', role: 'Chronique art', tag: 'JDOSCOPE + débat meilleure œuvre. Invité occasionnel.',
-      color: 'var(--c-jdos)', av: 'J', photo: null, contact: { handle: '@jdos', phone: '', email: '' }, permanent: false, active: false },
+      color: 'var(--c-jdos)', av: 'J', photo: null, twitch: '', discord: '', contact: { handle: '@jdos', phone: '', email: '' }, permanent: false, active: false },
     { id: 'm_diwiid', name: 'DiWiiD', role: 'Cuisine', tag: 'Passage cuisine + retour dessert : La Cuisine du Di. Occasionnel.',
-      color: 'var(--c-diwiid)', av: 'D', photo: null, contact: { handle: '@diwiid', phone: '', email: '' }, permanent: false, active: false },
+      color: 'var(--c-diwiid)', av: 'D', photo: null, twitch: '', discord: '', contact: { handle: '@diwiid', phone: '', email: '' }, permanent: false, active: false },
     { id: 'm_dope', name: 'DOPE', role: 'Chroniqueur', tag: 'Twitcheur invité, chroniques et réactions chat. Occasionnel.',
-      color: '#FF6B9D', av: 'Do', photo: null, contact: { handle: '@dope', phone: '', email: '' }, permanent: false, active: false },
+      color: '#FF6B9D', av: 'Do', photo: null, twitch: '', discord: '', contact: { handle: '@dope', phone: '', email: '' }, permanent: false, active: false },
     { id: 'm_olb', name: 'OLB', role: 'Chroniqueur', tag: 'Twitcheur invité, ambiance et débats. Occasionnel.',
-      color: '#5BC8FF', av: 'O', photo: null, contact: { handle: '@olb', phone: '', email: '' }, permanent: false, active: false },
+      color: '#5BC8FF', av: 'O', photo: null, twitch: '', discord: '', contact: { handle: '@olb', phone: '', email: '' }, permanent: false, active: false },
     { id: 'm_benjay', name: 'BENJAY', role: 'Invité', tag: 'Invité du live BENJAY : playlist, BOTA, parcours, Brésil.',
-      color: 'var(--c-benjay)', av: 'B', photo: null, contact: { handle: '@benjay', phone: '', email: '' }, permanent: false, active: false },
+      color: 'var(--c-benjay)', av: 'B', photo: null, twitch: '', discord: '', contact: { handle: '@benjay', phone: '', email: '' }, permanent: false, active: false },
   ];
 
   // ============ Seed: BENJAY live (from the official PDF) ============
@@ -192,16 +194,29 @@
   }
 
   // ============ Store ============
-  const KEY = 'sherkolive.v2';
+  const KEY = 'sherkolive.v3';
   let state = load();
 
+  function defaultSettings() { return { discordWebhook: '', channel: 'sherko27', twitchAuto: true }; }
   function load() {
     try {
       const raw = localStorage.getItem(KEY);
-      if (raw) { const d = JSON.parse(raw); if (d && d.team && d.lives) return d; }
+      if (raw) { const d = JSON.parse(raw); if (d && d.team && d.lives) { d.settings = { ...defaultSettings(), ...(d.settings || {}) }; return d; } }
     } catch (_) {}
-    return { team: SEED_TEAM.map(m => ({ ...m, contact: { ...m.contact } })), lives: [seedBenjayLive()] };
+    return { team: SEED_TEAM.map(m => ({ ...m, contact: { ...m.contact } })), lives: [seedBenjayLive()], settings: defaultSettings() };
   }
+
+  // ---- Runtime Twitch cache (login -> {avatar, live, viewers, game, followers, ...}) ----
+  const twitchCache = {};
+  function twData(login) { return login ? twitchCache[String(login).toLowerCase().replace(/^@/, '')] : null; }
+  function memberPhoto(m) {
+    if (m && m.photo) return m.photo;
+    const tw = m && m.twitch ? twData(m.twitch) : null;
+    if (tw && tw.avatar) return tw.avatar;
+    if (m && m.twitch) return `https://decapi.me/twitch/avatar/${encodeURIComponent(String(m.twitch).replace(/^@/, ''))}`;
+    return null;
+  }
+  function memberLive(m) { const tw = m && m.twitch ? twData(m.twitch) : null; return tw && tw.live; }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (_) {} }
   function memberById(id) { return state.team.find(m => m.id === id); }
   function liveById(id) { return state.lives.find(l => l.id === id); }
@@ -354,13 +369,14 @@
     const l = liveById(view.liveId);
     if (!l) { navigate('lives'); return ''; }
     const cast = (l.castIds || []).map(memberById).filter(Boolean);
-    const tabs = ['conducteur', 'planning', 'casting'];
-    const tabLabels = { conducteur: '📋 Conducteur', planning: '🗓️ Planning', casting: '🎭 Casting' };
+    const tabs = ['conducteur', 'planning', 'casting', 'tools'];
+    const tabLabels = { conducteur: '📋 Conducteur', planning: '🗓️ Planning', casting: '🎭 Casting', tools: '🎚️ Outils live' };
     const tabsHtml = tabs.map(t => `<button class="tab ${view.tab===t?'is-active':''}" data-tab="${t}" type="button">${tabLabels[t]}</button>`).join('');
 
     let body = '';
     if (view.tab === 'conducteur') body = renderConductor(l);
     else if (view.tab === 'planning') body = renderPlanning(l);
+    else if (view.tab === 'tools') body = renderTools(l);
     else body = renderCasting(l);
 
     return `
@@ -382,10 +398,13 @@
           <span><span class="k">Équipe</span>${cast.length} agent${cast.length>1?'s':''}</span>
         </div>
         <div class="lh-actions">
+          <button class="btn btn-sm btn-primary" data-action="open-regie" data-id="${l.id}" type="button">▶ Mode régie</button>
+          <button class="btn btn-sm btn-twitch" data-action="open-prompter" data-id="${l.id}" type="button">📜 Téléprompteur</button>
+          <button class="btn btn-sm btn-discord" data-action="discord-menu" data-id="${l.id}" type="button">💬 Discord</button>
           <button class="btn btn-sm btn-ghost" data-action="edit-live" data-id="${l.id}" type="button">✎ Modifier</button>
           <button class="btn btn-sm btn-ghost" data-action="status-cycle" data-id="${l.id}" type="button">⟳ Statut</button>
           <button class="btn btn-sm btn-ghost" data-action="duplicate-live" data-id="${l.id}" type="button">⧉ Dupliquer</button>
-          <button class="btn btn-sm btn-ghost" data-action="invite-all" data-id="${l.id}" type="button">✉ Inviter l'équipe</button>
+          <button class="btn btn-sm btn-ghost" data-action="invite-all" data-id="${l.id}" type="button">✉ Inviter</button>
         </div>
       </div>
       <div class="tabs">${tabsHtml}</div>
@@ -513,20 +532,43 @@
            <span class="track"></span>${active?'Actif':'Inactif'}
          </label>`;
 
+    // Twitch live status + stats
+    const tw = m.twitch ? twData(m.twitch) : null;
+    const liveTag = tw && tw.live ? '<span class="live-tag"><span class="dot"></span>LIVE</span>' : '';
+    const stats = [];
+    if (tw && tw.live && tw.viewers != null) stats.push(`<span class="s">👁️ ${tw.viewers}</span>`);
+    if (tw && tw.game) stats.push(`<span class="s">🎮 ${esc(tw.game)}</span>`);
+    if (tw && tw.followers != null) stats.push(`<span class="s">❤️ ${tw.followers}</span>`);
+    if (m.twitch) stats.push(`<span class="s">🟣 ${esc(m.twitch)}</span>`);
+
+    // RSVP (only on a live)
+    let rsvpRow = '';
+    if (onLive && active) {
+      const cur = (ctx.live.rsvp || {})[m.id];
+      rsvpRow = `<div class="rsvp-row">
+        <button class="rsvp-btn ${cur==='yes'?'on-yes':''}" data-action="rsvp" data-live="${ctx.live.id}" data-id="${m.id}" data-v="yes" type="button">✅ Présent</button>
+        <button class="rsvp-btn ${cur==='maybe'?'on-maybe':''}" data-action="rsvp" data-live="${ctx.live.id}" data-id="${m.id}" data-v="maybe" type="button">🤔 Peut-être</button>
+        <button class="rsvp-btn ${cur==='no'?'on-no':''}" data-action="rsvp" data-live="${ctx.live.id}" data-id="${m.id}" data-v="no" type="button">❌ Absent</button>
+      </div>`;
+    }
+
     return `
       <div class="person ${active?'':'is-inactive'}" style="--role:${m.color}">
         <div class="person-top">
           ${avatarHtml(m, 'avatar')}
           <div class="person-id">
-            <h3>${esc(m.name)}${m.permanent ? ' <span class="perm-tag">★ Permanent</span>' : ''}</h3>
+            <h3>${esc(m.name)}${m.permanent ? ' <span class="perm-tag">★ Permanent</span>' : ''}${liveTag}</h3>
             <div class="role">${esc(m.role)}</div>
           </div>
           ${toggle}
         </div>
         <p class="tagline">${esc(m.tag || '')}</p>
+        ${stats.length ? `<div class="tw-stats">${stats.join('')}</div>` : ''}
         ${contactChips.length ? `<div class="contact">${contactChips.join('')}</div>` : ''}
+        ${rsvpRow}
         <div class="person-actions">
           <button class="btn btn-sm btn-green" data-action="invite" data-id="${m.id}" ${onLive?`data-live="${ctx.live.id}"`:''} type="button">✉ Inviter</button>
+          ${m.twitch ? `<a class="btn btn-sm btn-twitch" href="https://twitch.tv/${esc(m.twitch)}" target="_blank" rel="noopener">🟣</a>` : ''}
           <button class="btn btn-sm btn-ghost" data-action="edit-member" data-id="${m.id}" type="button">✎</button>
         </div>
       </div>`;
@@ -543,7 +585,9 @@
           <p>Active ou mets au repos chaque agent, gère leurs contacts et envoie les invitations. Les agents actifs sont proposés par défaut sur chaque nouveau live.</p>
         </div>
         <div class="page-head-actions">
-          <button class="btn btn-primary" data-action="new-member" type="button">＋ Ajouter un agent</button>
+          <button class="btn btn-twitch" data-action="sync-twitch" type="button">⟳ Sync Twitch</button>
+          <button class="btn btn-discord" data-action="discord-setup" type="button">💬 Discord</button>
+          <button class="btn btn-primary" data-action="new-member" type="button">＋ Agent</button>
         </div>
       </div>
       <div class="cast-grid">${cards}</div>`;
@@ -834,7 +878,47 @@
       case 'edit-member': openMemberModal(memberById(id)); break;
       case 'invite': openInvite(memberById(id), node.dataset.live); break;
       case 'invite-all': openInviteAll(id); break;
+      // Twitch
+      case 'open-channel': openChannelModal(); break;
+      case 'sync-twitch': syncTwitch({ toast: true }); break;
+      // Discord
+      case 'discord-setup': openDiscordSetup(); break;
+      case 'discord-menu': openDiscordMenu(id); break;
+      // Régie / prompteur
+      case 'open-regie': openRegie(id); break;
+      case 'open-prompter': openPrompter(id); break;
+      case 'close-overlay': closeOverlay(); break;
+      case 'regie-next': regieGo(regieState.cur + 1); break;
+      case 'regie-prev': regieGo(regieState.cur - 1); break;
+      case 'regie-set': regieGo(Number(node.dataset.i)); break;
+      // Outils live
+      case 'check-toggle': toggleCheck(id, node.dataset.key, !!node.dataset.regie); break;
+      case 'tool-add': toolAddItem(id, node.dataset.kind); break;
+      case 'tool-toggle': toolToggle(id, node.dataset.kind, Number(node.dataset.i)); break;
+      case 'tool-del': toolDel(id, node.dataset.kind, Number(node.dataset.i)); break;
+      // RSVP
+      case 'rsvp': setRsvp(node.dataset.live, node.dataset.id, node.dataset.v); break;
     }
+  }
+
+  // ---------- Outils / checklist / rsvp logic ----------
+  function toggleCheck(liveId, key, inRegie) {
+    const l = liveById(liveId); if (!l) return; ensureExtras(l);
+    l.checked[key] = !l.checked[key]; save();
+    if (inRegie && regieState) renderRegie(); else render();
+  }
+  function toolAddItem(liveId, kind) {
+    const l = liveById(liveId); if (!l) return; ensureExtras(l);
+    const inp = document.querySelector(`[data-tooladd="${kind}"][data-id="${liveId}"]`);
+    const v = inp && inp.value.trim(); if (!v) return;
+    l.tools[kind].push({ txt: v, done: false }); save(); render();
+  }
+  function toolToggle(liveId, kind, i) { const l = liveById(liveId); if (!l) return; ensureExtras(l); const it = l.tools[kind][i]; if (it) { it.done = !it.done; save(); render(); } }
+  function toolDel(liveId, kind, i) { const l = liveById(liveId); if (!l) return; ensureExtras(l); l.tools[kind].splice(i, 1); save(); render(); }
+  function setRsvp(liveId, memberId, v) {
+    const l = liveById(liveId); if (!l) return; ensureExtras(l);
+    l.rsvp[memberId] = l.rsvp[memberId] === v ? null : v; save(); render();
+    toast(`RSVP : ${v === 'yes' ? '✅ confirmé' : v === 'maybe' ? '🤔 peut-être' : '❌ absent'}`, 'info');
   }
 
   // ---------- Live CRUD ----------
@@ -1004,6 +1088,11 @@
             <div class="field"><label>Couleur</label><select class="select" name="color">${colorOpts}</select></div>
           </div>
           <div class="field"><label>Mission</label><textarea class="textarea" name="tag" placeholder="Ce que fait l'agent…">${esc(m.tag)}</textarea></div>
+          <div class="field-row cols-2">
+            <div class="field"><label>Pseudo Twitch</label><input class="input" name="twitch" value="${esc(m.twitch||'')}" placeholder="sherko27"></div>
+            <div class="field"><label>Discord (mention/ID)</label><input class="input" name="discord" value="${esc(m.discord||'')}" placeholder="123456789012345678"></div>
+          </div>
+          <p class="help" style="margin-top:-6px;margin-bottom:14px">Le pseudo Twitch récupère automatiquement la photo de profil et le statut live. L'ID Discord permet de mentionner l'agent dans les annonces.</p>
           <div class="field-row cols-3">
             <div class="field"><label>Pseudo</label><input class="input" name="handle" value="${esc(m.contact?.handle||'')}" placeholder="@…"></div>
             <div class="field"><label>Téléphone</label><input class="input" name="phone" value="${esc(m.contact?.phone||'')}" placeholder="06…"></div>
@@ -1051,6 +1140,8 @@
         av: (fd.get('av')||name[0]||'?').toString().trim(),
         color: fd.get('color'), tag: (fd.get('tag')||'').toString().trim(),
         photo: photoData || null,
+        twitch: (fd.get('twitch')||'').toString().trim().replace(/^@/, ''),
+        discord: (fd.get('discord')||'').toString().trim(),
         contact: { handle: (fd.get('handle')||'').toString().trim(), phone: (fd.get('phone')||'').toString().trim(), email: (fd.get('email')||'').toString().trim() },
       };
       if (isEdit) { Object.assign(member, data); toast('Agent mis à jour ✓', 'ok'); }
@@ -1140,7 +1231,7 @@
 
   const toastHost = $('#toastHost');
   function toast(msg, type = 'ok') {
-    const ico = type === 'ok' ? '✓' : 'ℹ';
+    const ico = type === 'ok' ? '✓' : type === 'err' ? '✕' : 'ℹ';
     const t = el('div', `toast ${type}`, `<span class="ico">${ico}</span><span>${esc(msg)}</span>`);
     toastHost.appendChild(t);
     setTimeout(() => { t.classList.add('is-out'); setTimeout(() => t.remove(), 320); }, 2600);
@@ -1154,7 +1245,371 @@
   }
   tickClock(); setInterval(tickClock, 30000);
 
+  // =================================================================
+  //  TWITCH — sync photos + statut live (vraie API)
+  // =================================================================
+  function twitchLogins() {
+    const set = new Set();
+    state.team.forEach(m => { if (m.twitch) set.add(String(m.twitch).toLowerCase().replace(/^@/, '')); });
+    if (state.settings.channel) set.add(String(state.settings.channel).toLowerCase().replace(/^@/, ''));
+    return [...set];
+  }
+  let twitchSyncing = false;
+  async function syncTwitch(opts = {}) {
+    const logins = twitchLogins();
+    if (!logins.length) { if (opts.toast) toast('Aucun pseudo Twitch renseigné', 'info'); return; }
+    twitchSyncing = true; updateChanStatus();
+    try {
+      const res = await fetch('/api/twitch', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ logins, want: ['status', 'schedule', 'clips'], channel: state.settings.channel }) });
+      if (res.ok) {
+        const data = await res.json();
+        Object.entries(data.users || {}).forEach(([k, v]) => { twitchCache[k.toLowerCase()] = v; });
+        twitchCache.__extra = { schedule: data.schedule, clips: data.clips, source: data.source };
+        if (opts.toast) toast(`Twitch synchronisé (${data.source})`, 'ok');
+      } else if (opts.toast) toast('Sync Twitch indisponible', 'info');
+    } catch (_) { if (opts.toast) toast('Twitch injoignable', 'info'); }
+    twitchSyncing = false; updateChanStatus();
+    if (opts.rerender !== false) render();
+  }
+  function channelData() { return twData(state.settings.channel); }
+  function updateChanStatus() {
+    const node = $('#chanStatus'); if (!node) return;
+    const c = channelData(); const txt = node.querySelector('.cs-txt');
+    if (twitchSyncing) { node.classList.remove('is-live'); if (txt) txt.textContent = 'Sync…'; return; }
+    if (c && c.live) { node.classList.add('is-live'); if (txt) txt.textContent = `LIVE · ${c.viewers || 0}`; }
+    else { node.classList.remove('is-live'); if (txt) txt.textContent = state.settings.channel || 'Twitch'; }
+  }
+
+  // ---------- Channel modal (Twitch live, schedule, clips, réglages) ----------
+  function openChannelModal() {
+    const c = channelData();
+    const extra = twitchCache.__extra || {};
+    const ch = state.settings.channel || '';
+    const liveBanner = ch ? (c && c.live
+      ? `<div class="tw-live-banner"><span class="av">${c.avatar ? `<img src="${esc(c.avatar)}">` : ''}</span>
+           <div style="flex:1"><div style="font-weight:800;color:var(--magenta)">🔴 EN LIVE — ${esc(c.viewers||0)} viewers</div>
+           <div style="font-size:13px;color:var(--ink-2)">${esc(c.title||'')}${c.game?' · '+esc(c.game):''}</div></div>
+           <a class="btn btn-sm btn-twitch" href="https://twitch.tv/${esc(ch)}" target="_blank" rel="noopener">Ouvrir</a></div>`
+      : `<div class="tw-live-banner off"><span class="av">${c && c.avatar ? `<img src="${esc(c.avatar)}">` : ''}</span>
+           <div style="flex:1"><div style="font-weight:700">${esc(c && c.display_name || ch)} · hors ligne</div>
+           <div style="font-size:13px;color:var(--ink-3)">${c && c.followers != null ? esc(c.followers)+' followers' : 'Lance une sync pour les infos'}</div></div>
+           <a class="btn btn-sm btn-ghost" href="https://twitch.tv/${esc(ch)}" target="_blank" rel="noopener">Ouvrir</a></div>`)
+      : '<p class="muted" style="font-size:13px">Renseigne le nom de la chaîne pour activer le suivi live.</p>';
+    const clips = (extra.clips || []).slice(0, 6).map(cl => `
+      <a class="clip" href="${esc(cl.url)}" target="_blank" rel="noopener">
+        <img src="${esc((cl.thumb||'').replace('%{width}','320').replace('%{height}','180'))}" alt="" loading="lazy">
+        <div class="meta"><h5>${esc(cl.title)}</h5><div class="v">▶ ${esc(cl.views||0)} vues</div></div>
+      </a>`).join('');
+    openModal(`
+      <div class="modal-head"><h2>Chaîne Twitch</h2><button class="icon-btn" data-close type="button">✕</button></div>
+      <div class="modal-body">
+        <div class="tw-channel">
+          ${liveBanner}
+          <div class="field" style="margin-top:6px"><label>Nom de la chaîne</label>
+            <input class="input" id="chanInput" value="${esc(ch)}" placeholder="sherko27"></div>
+          ${clips ? `<div><div class="panel-title">Derniers clips</div><div class="clip-grid">${clips}</div></div>` : ''}
+          ${extra.source === 'decapi' ? '<p class="help">Mode zéro-config (decapi.me). Pour viewers exacts, schedule et clips : ajoute <b>TWITCH_CLIENT_ID</b> + <b>TWITCH_CLIENT_SECRET</b> sur Vercel.</p>' : ''}
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-twitch" id="chanSync" type="button">⟳ Synchroniser</button>
+        <button class="btn btn-primary" id="chanSave" type="button">Enregistrer</button>
+      </div>`);
+    $('#chanSave').addEventListener('click', () => {
+      state.settings.channel = ($('#chanInput').value || '').trim().replace(/^@/, '');
+      save(); closeModal(); syncTwitch({ toast: true });
+    });
+    $('#chanSync').addEventListener('click', () => { state.settings.channel = ($('#chanInput').value || '').trim().replace(/^@/, ''); save(); closeModal(); syncTwitch({ toast: true }); });
+  }
+
+  // =================================================================
+  //  DISCORD — intégration webhook
+  // =================================================================
+  async function discordPost(type, payload, content) {
+    const webhook = state.settings.discordWebhook;
+    if (!webhook) { openDiscordSetup(); return false; }
+    try {
+      const res = await fetch('/api/discord', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ webhook, type, payload, content }) });
+      if (res.ok) { toast('Envoyé sur Discord ✓', 'ok'); return true; }
+      const e = await res.json().catch(() => ({}));
+      toast('Discord : ' + (e.message || e.error || 'échec'), 'err'); return false;
+    } catch (_) { toast('Discord injoignable (déploie sur Vercel)', 'err'); return false; }
+  }
+  function discordMentions(l) {
+    return (l.castIds || []).map(memberById).filter(Boolean)
+      .map(m => m.discord ? `<@${String(m.discord).replace(/[<@>!]/g, '')}>` : '').filter(Boolean).join(' ');
+  }
+  function liveAnnouncePayload(l) {
+    const cast = (l.castIds || []).map(memberById).filter(Boolean);
+    return { title: l.title, subtitle: l.subtitle, guest: l.guest, dateText: fmtDate(l),
+      liveTime: l.times?.live, location: l.location, cast: cast.map(m => m.name).join(' · '),
+      channelUrl: state.settings.channel ? `https://twitch.tv/${state.settings.channel}` : '' };
+  }
+  function conductorPayload(l) {
+    let clock = l.times?.live || '18:00';
+    const segments = (l.segments || []).map(seg => {
+      const start = clock; const end = addMinutes(clock, seg.dur || 0); clock = end;
+      const lines = [];
+      (seg.blocks || []).forEach(b => (b.items || []).slice(0, 3).forEach(it => lines.push(`${b.role}: ${it}`)));
+      return { num: seg.num, label: seg.label, time: `${start}–${end}`, lines: lines.slice(0, 6) };
+    });
+    return { title: l.title, dateText: fmtDate(l), location: l.location, segments };
+  }
+  function openDiscordSetup() {
+    const w = state.settings.discordWebhook || '';
+    openModal(`
+      <div class="modal-head"><h2>Connexion Discord</h2><button class="icon-btn" data-close type="button">✕</button></div>
+      <div class="modal-body">
+        <div class="field"><label>URL du webhook Discord</label>
+          <input class="input" id="dwHook" value="${esc(w)}" placeholder="https://discord.com/api/webhooks/…"></div>
+        <p class="help">Dans Discord : <b>Paramètres du salon → Intégrations → Webhooks → Nouveau webhook → Copier l'URL</b>. Tout reste local à cet appareil.</p>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" id="dwTest" type="button">Tester</button>
+        <button class="btn btn-discord" id="dwSave" type="button">Enregistrer</button>
+      </div>`);
+    const read = () => ($('#dwHook').value || '').trim();
+    $('#dwSave').addEventListener('click', () => {
+      state.settings.discordWebhook = read(); save(); closeModal();
+      toast(state.settings.discordWebhook ? 'Discord connecté ✓' : 'Webhook retiré', 'ok');
+    });
+    $('#dwTest').addEventListener('click', async () => {
+      state.settings.discordWebhook = read(); save();
+      await discordPost('test', {});
+    });
+  }
+  // Choix de l'action Discord pour un live
+  function openDiscordMenu(liveId) {
+    const l = liveById(liveId); if (!l) return;
+    if (!state.settings.discordWebhook) { openDiscordSetup(); return; }
+    openModal(`
+      <div class="modal-head"><h2>Discord — ${esc(l.title)}</h2><button class="icon-btn" data-close type="button">✕</button></div>
+      <div class="modal-body" style="display:grid;gap:10px">
+        <button class="btn btn-discord btn-block" data-dc="announce" type="button">📣 Annoncer le live</button>
+        <button class="btn btn-discord btn-block" data-dc="golive" type="button">🔴 Notifier « ON EST EN LIVE »</button>
+        <button class="btn btn-block" data-dc="conductor" type="button">📋 Envoyer le conducteur</button>
+        <button class="btn btn-block" data-dc="planning" type="button">🗓️ Envoyer le planning</button>
+        <button class="btn btn-block" data-dc="invite" type="button">✉️ Inviter le casting (avec mentions)</button>
+        <button class="btn btn-ghost btn-block" data-dc="setup" type="button">⚙️ Réglages webhook</button>
+      </div>`);
+    modalHost.querySelectorAll('[data-dc]').forEach(b => b.addEventListener('click', async () => {
+      const k = b.dataset.dc;
+      if (k === 'setup') { openDiscordSetup(); return; }
+      b.disabled = true; b.innerHTML = '<span class="spinner"></span>';
+      if (k === 'announce') await discordPost('announce', liveAnnouncePayload(l), discordMentions(l) || undefined);
+      else if (k === 'golive') await discordPost('golive', { ...liveAnnouncePayload(l), viewers: (channelData()||{}).viewers }, `@everyone ${discordMentions(l)}`.trim());
+      else if (k === 'conductor') await discordPost('conductor', conductorPayload(l));
+      else if (k === 'planning') await discordPost('planning', planningPayload(l));
+      else if (k === 'invite') await discordPost('invite', { liveTitle: l.title, dateText: fmtDate(l), message: `Casting du live ${l.title} — confirmez votre présence !` }, discordMentions(l) || undefined);
+      closeModal();
+    }));
+  }
+  function planningPayload(l) {
+    const items = [];
+    if (l.times?.crew) items.push({ time: l.times.crew, title: 'Arrivée crew' });
+    if (l.times?.guest) items.push({ time: l.times.guest, title: `Arrivée ${l.guest||'invité'}` });
+    if (l.times?.live) items.push({ time: l.times.live, title: 'DÉBUT DU LIVE' });
+    let clock = l.times?.live || '18:00';
+    (l.segments || []).forEach(s => { const st = clock; clock = addMinutes(clock, s.dur || 0); items.push({ time: st, title: `${s.num}. ${s.label}`, desc: `${s.dur||0} min` }); });
+    items.push({ time: clock, title: 'Clap de fin' });
+    return { title: l.title, items };
+  }
+
+  // =================================================================
+  //  OUTILS LIVE — checklist cochable · sons à react · questions chat
+  // =================================================================
+  function ensureExtras(l) { l.tools = l.tools || { sounds: [], questions: [] }; l.checked = l.checked || {}; l.rsvp = l.rsvp || {}; }
+  function checklistItems(l) {
+    const out = [];
+    (l.segments || []).forEach(seg => (seg.blocks || []).forEach((b, bi) => {
+      if (b.role === 'MADARA') (b.items || []).forEach((it, ii) => out.push({ key: `${seg.id}::${bi}::${ii}`, text: it, seg: seg.num }));
+    }));
+    return out;
+  }
+  function renderTools(l) {
+    ensureExtras(l);
+    const checks = checklistItems(l);
+    const done = checks.filter(c => l.checked[c.key]).length;
+    const pct = checks.length ? Math.round(done / checks.length * 100) : 0;
+    const checkRows = checks.map(c => `
+      <div class="tool-item ${l.checked[c.key]?'done':''}">
+        <button class="check ${l.checked[c.key]?'on':''}" data-action="check-toggle" data-id="${l.id}" data-key="${esc(c.key)}" type="button">✓</button>
+        <span class="t">${esc(c.text)}</span>
+      </div>`).join('') || '<p class="muted" style="font-size:13px">Aucune ligne MADARA dans le conducteur.</p>';
+    const soundRows = (l.tools.sounds||[]).map((s, i) => toolRow(l, 'sounds', i, s)).join('') || '<p class="muted" style="font-size:13px">Ajoute les sons à react avec le chat.</p>';
+    const qRows = (l.tools.questions||[]).map((s, i) => toolRow(l, 'questions', i, s)).join('') || '<p class="muted" style="font-size:13px">Collecte ici les questions du chat.</p>';
+    return `
+      <div class="panel">
+        <div class="panel-title">✅ Checklist régie · ${done}/${checks.length}</div>
+        <div class="progress"><i style="width:${pct}%"></i></div>
+        <div class="tool-list" style="margin-top:12px">${checkRows}</div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">🔊 Sons à react</div>
+        <div class="tool-list" id="soundsList">${soundRows}</div>
+        ${toolAdd(l,'sounds','Titre du son / artiste…')}
+      </div>
+      <div class="panel">
+        <div class="panel-title">💬 Questions du chat</div>
+        <div class="tool-list" id="qList">${qRows}</div>
+        ${toolAdd(l,'questions','Question remontée par le chat…')}
+      </div>`;
+  }
+  function toolRow(l, kind, i, item) {
+    return `<div class="tool-item ${item.done?'done':''}">
+      <button class="check ${item.done?'on':''}" data-action="tool-toggle" data-id="${l.id}" data-kind="${kind}" data-i="${i}" type="button">✓</button>
+      <span class="t">${esc(item.txt)}</span>
+      <button class="icon-btn" style="width:30px;height:30px" data-action="tool-del" data-id="${l.id}" data-kind="${kind}" data-i="${i}" type="button">✕</button>
+    </div>`;
+  }
+  function toolAdd(l, kind, ph) {
+    return `<div style="display:flex;gap:8px;margin-top:10px">
+      <input class="input" id="ta_${kind}" placeholder="${ph}" data-tooladd="${kind}" data-id="${l.id}">
+      <button class="btn btn-sm" data-action="tool-add" data-id="${l.id}" data-kind="${kind}" type="button">＋</button>
+    </div>`;
+  }
+
+  // =================================================================
+  //  RÉGIE LIVE (overlay plein écran)
+  // =================================================================
+  const overlayHost = $('#overlayHost');
+  let regieTimer = null, regieState = null;
+  function openRegie(liveId) {
+    const l = liveById(liveId); if (!l) return;
+    ensureExtras(l);
+    regieState = { liveId, cur: 0, segStart: Date.now(), globalStart: Date.now() };
+    renderRegie();
+    overlayHost.hidden = false;
+    if (regieTimer) clearInterval(regieTimer);
+    regieTimer = setInterval(updateRegieTimers, 1000);
+  }
+  function closeOverlay() {
+    overlayHost.hidden = true; overlayHost.innerHTML = '';
+    if (regieTimer) { clearInterval(regieTimer); regieTimer = null; }
+    if (prompterRaf) { cancelAnimationFrame(prompterRaf); prompterRaf = null; }
+    regieState = null; render();
+  }
+  function renderRegie() {
+    const l = liveById(regieState.liveId); if (!l) { closeOverlay(); return; }
+    const segs = l.segments || [];
+    const cur = segs[regieState.cur];
+    const items = cur ? (cur.blocks || []).flatMap((b, bi) => (b.items || []).map((it, ii) => ({ role: b.role, txt: it, key: `${cur.id}::${bi}::${ii}` }))) : [];
+    const list = segs.map((s, i) => `
+      <div class="rl ${i===regieState.cur?'is-current':''} ${i<regieState.cur?'is-done':''}" data-action="regie-set" data-i="${i}">
+        <span class="n">${s.num}</span><span class="lbl">${esc(s.label)}</span><span class="tm">${s.dur||0}′</span>
+      </div>`).join('');
+    const checks = items.map(it => `
+      <div class="tool-item ${l.checked[it.key]?'done':''}">
+        <button class="check ${l.checked[it.key]?'on':''}" data-action="check-toggle" data-id="${l.id}" data-key="${esc(it.key)}" data-regie="1" type="button">✓</button>
+        <span class="t"><b style="color:${roleColor(it.role)}">${esc(it.role)}</b> — ${esc(it.txt)}</span>
+      </div>`).join('');
+    overlayHost.innerHTML = `
+      <div class="regie-top">
+        <div><div class="clock" id="regieClock">00:00</div><div class="elapsed">total · <span id="regieTotal">00:00</span></div></div>
+        <div class="spacer"></div>
+        <span class="chip ${channelData()&&channelData().live?'live':''}">${channelData()&&channelData().live?`<span class="dot"></span>LIVE · ${channelData().viewers||0}`:'OFFLINE'}</span>
+        <button class="btn btn-sm btn-discord" data-action="discord-menu" data-id="${l.id}" type="button">Discord</button>
+        <button class="btn btn-sm btn-ghost" data-action="close-overlay" type="button">✕ Quitter</button>
+      </div>
+      <div class="regie-main">
+        <div class="regie-now">
+          <div class="nlabel">Segment en cours · ${regieState.cur+1}/${segs.length}</div>
+          <h2>${cur ? esc(cur.label) : 'Fin'}</h2>
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <div class="regie-seg-timer" id="regieSeg">00:00</div>
+            <div class="muted">prévu ${cur?cur.dur:0}′</div>
+            <div class="spacer" style="flex:1"></div>
+            <button class="btn btn-sm" data-action="regie-prev" type="button">◀ Préc.</button>
+            <button class="btn btn-sm btn-primary" data-action="regie-next" type="button">Suivant ▶</button>
+          </div>
+          <div class="tool-list" style="margin-top:16px">${checks || '<p class="muted">—</p>'}</div>
+        </div>
+        <div class="panel-title">Déroulé</div>
+        <div class="regie-list">${list}</div>
+      </div>`;
+    updateRegieTimers();
+  }
+  function updateRegieTimers() {
+    if (!regieState) return;
+    const fmt = ms => { const s = Math.max(0, Math.floor(ms/1000)); return `${pad(Math.floor(s/60))}:${pad(s%60)}`; };
+    const now = new Date();
+    const ck = $('#regieClock'); if (ck) ck.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    const tot = $('#regieTotal'); if (tot) tot.textContent = fmt(Date.now() - regieState.globalStart);
+    const seg = $('#regieSeg');
+    if (seg) {
+      const l = liveById(regieState.liveId); const cur = l && l.segments[regieState.cur];
+      const elapsed = Date.now() - regieState.segStart;
+      seg.textContent = fmt(elapsed);
+      seg.classList.toggle('over', cur && elapsed > (cur.dur || 0) * 60000);
+    }
+  }
+  function regieGo(idx) {
+    const l = liveById(regieState.liveId);
+    regieState.cur = Math.max(0, Math.min((l.segments||[]).length - 1, idx));
+    regieState.segStart = Date.now();
+    renderRegie();
+  }
+
+  // =================================================================
+  //  TÉLÉPROMPTEUR (overlay)
+  // =================================================================
+  let prompterRaf = null, prompterState = null;
+  function openPrompter(liveId) {
+    const l = liveById(liveId); if (!l) return;
+    const lines = [];
+    (l.segments || []).forEach(seg => {
+      lines.push({ role: true, txt: `${seg.num}. ${seg.label}` });
+      (seg.blocks || []).forEach(b => {
+        if (b.role === 'MADARA') return; // skip régie cues on host prompter
+        (b.items || []).forEach(it => lines.push({ role: false, txt: it }));
+      });
+    });
+    prompterState = { playing: true, speed: 36, y: 0 };
+    overlayHost.innerHTML = `
+      <div class="regie-top">
+        <div class="clock" style="font-size:22px">Téléprompteur</div>
+        <div class="spacer"></div>
+        <button class="btn btn-sm btn-ghost" data-action="close-overlay" type="button">✕ Quitter</button>
+      </div>
+      <div class="prompter"><div class="prompter-track" id="ptrack">
+        ${lines.map(l2 => `<p class="${l2.role?'role':''}">${esc(l2.txt)}</p>`).join('')}
+      </div></div>
+      <div class="prompter-controls">
+        <button class="btn btn-sm" id="ppPlay" type="button">⏸ Pause</button>
+        <button class="btn btn-sm btn-ghost" id="ppSlow" type="button">– vitesse</button>
+        <button class="btn btn-sm btn-ghost" id="ppFast" type="button">+ vitesse</button>
+        <button class="btn btn-sm btn-ghost" id="ppTop" type="button">⤒ Début</button>
+      </div>`;
+    overlayHost.hidden = false;
+    const track = $('#ptrack');
+    let last = null;
+    const step = (ts) => {
+      if (!prompterState) return;
+      if (last == null) last = ts;
+      const dt = (ts - last) / 1000; last = ts;
+      if (prompterState.playing) {
+        prompterState.y += prompterState.speed * dt;
+        const max = track.scrollHeight;
+        if (prompterState.y > max) prompterState.y = 0;
+        track.style.transform = `translateY(${-prompterState.y}px)`;
+      }
+      prompterRaf = requestAnimationFrame(step);
+    };
+    prompterRaf = requestAnimationFrame(step);
+    $('#ppPlay').addEventListener('click', e => { prompterState.playing = !prompterState.playing; e.target.textContent = prompterState.playing ? '⏸ Pause' : '▶ Lecture'; });
+    $('#ppSlow').addEventListener('click', () => { prompterState.speed = Math.max(10, prompterState.speed - 12); });
+    $('#ppFast').addEventListener('click', () => { prompterState.speed += 12; });
+    $('#ppTop').addEventListener('click', () => { prompterState.y = 0; });
+  }
+
   // ============ Boot ============
   render();
   syncNav();
+  updateChanStatus();
+  // Sync Twitch (photos + live) au démarrage, sans bloquer le rendu
+  if (state.settings.twitchAuto !== false) setTimeout(() => syncTwitch({ rerender: true }), 400);
+  // Rafraîchir le statut live toutes les 90 s
+  setInterval(() => { if (document.visibilityState === 'visible') syncTwitch({ rerender: true }); }, 90000);
 })();

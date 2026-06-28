@@ -13,16 +13,33 @@ Pré-remplie avec le live **SHERKO LIVE × BENJAY** (28 juin 2026) issu du condu
 
 | Vue | Fonctionnalité |
 |---|---|
-| **Lives** | Tableau de bord des lives · statut · compte à rebours · prochain live en avant |
-| **Conducteur** | Brief complet par segments (façon PDF) · **édition inline** · ajout/suppression de segments · **export PDF** · copier en texte |
-| **Planning** | Timeline chronométrée : arrivée crew → arrivée invité → live → segments minutés → clap de fin |
-| **Casting** | Liste des agents du live · **toggle Activer/au repos** · **bouton Inviter** (WhatsApp / Email / copier) |
-| **Équipe** | Roster permanent des twitcheurs · photos · contacts · activer/inviter |
-| **Générateur IA** | Décris l'invité + l'angle → **Claude** propose questions d'interview & segments. Fallback gabarit local sans clé API. |
+| **Lives** | Tableau de bord · statut · compte à rebours · prochain live · statut Twitch de la chaîne en direct |
+| **Conducteur** | Brief par segments (façon PDF) · **édition inline** · ajout/suppression · **export PDF** · copier |
+| **Planning** | Timeline chronométrée : crew → invité → live → segments minutés → clap de fin |
+| **Casting** | **Toggle Activer/au repos** · **Inviter** (WhatsApp/Email/Discord) · **RSVP** (présent/peut-être/absent) · statut live + stats Twitch |
+| **Outils live** | **Checklist régie cochable** (progression) · banque de **sons à react** · **questions du chat** |
+| **Équipe** | Roster des twitcheurs · photos auto Twitch · contacts · activer/inviter/sync |
+| **Générateur IA** | Décris l'invité + l'angle → **Claude** propose questions & segments. Fallback gabarit local. |
+
+### 🟣 Intégration Twitch (vraie API)
+- **Statut live / offline + viewers + jeu + followers** en temps réel (rafraîchi toutes les 90 s)
+- **Photos de profil récupérées automatiquement** dès qu'un pseudo Twitch est renseigné
+- **Schedule** et **clips** de la chaîne (avec clés API Helix)
+- Marche en **zéro config** via decapi.me ; complet avec `TWITCH_CLIENT_ID` + `TWITCH_CLIENT_SECRET`
+
+### 💬 Intégration Discord (webhooks)
+Depuis chaque live : **annoncer le live**, notifier **« ON EST EN LIVE »** (avec `@everyone` + mentions des agents), envoyer le **conducteur**, le **planning**, ou **inviter le casting**. Configure une fois l'URL de webhook (ou `DISCORD_WEBHOOK_URL`).
+
+### 🎬 Mode production
+- **Mode Régie live** plein écran : horloge globale, segment en cours, **timer par segment + alerte dépassement**, checklist cochable, nav Préc./Suivant
+- **Téléprompteur** défilant pour le host (vitesse réglable)
+
+### 📲 PWA
+Installable sur mobile/desktop, **fonctionne hors-ligne** (service worker).
 
 ### Les agents
-SHERKO (host) · BENJAY (invité) · JDOS · DiWiiD · MADARA (régie) · DOPE · OLB.
-Chaque agent a une **photo** (importée depuis l'appareil ou via URL), un rôle, une mission et des contacts.
+SHERKO (host, permanent 100%) · MADARA (régie) · JDOS · DiWiiD · DOPE · OLB · BENJAY (invité).
+Chaque agent : **photo** (auto Twitch ou import), rôle, mission, pseudo Twitch, ID Discord, contacts.
 
 ---
 
@@ -30,12 +47,13 @@ Chaque agent a une **photo** (importée depuis l'appareil ou via URL), un rôle,
 
 1. **Vercel** → *Add New… → Project* → importer `madara-playground` (branche `claude/sherko-app-live-briefs-hwagfs`).
 2. **Framework Preset** : « Other ».
-3. *(optionnel, pour le Générateur IA)* **Environment Variables** :
-   - Name : `ANTHROPIC_API_KEY`
-   - Value : `sk-ant-...` (console.anthropic.com → API Keys)
+3. *(optionnel)* **Environment Variables** :
+   - `ANTHROPIC_API_KEY` — `sk-ant-…` → active le **Générateur IA** (console.anthropic.com)
+   - `TWITCH_CLIENT_ID` + `TWITCH_CLIENT_SECRET` → API Twitch **Helix** complète (viewers exacts, schedule, clips) — dev.twitch.tv/console
+   - `DISCORD_WEBHOOK_URL` — webhook par défaut (sinon configurable dans l'app)
 4. **Deploy** → l'URL `…vercel.app` est prête à partager.
 
-> Sans clé API, tout marche **sauf** la génération IA, qui retombe sur un gabarit local.
+> Sans aucune clé : l'app marche, **Twitch en mode zéro-config** (photos + live via decapi.me), Discord se configure in-app, et le générateur retombe sur un gabarit local.
 
 ## 🏃 Lancer en local
 
@@ -52,13 +70,17 @@ La génération IA nécessite la fonction serverless → utiliser `vercel dev` a
 
 ```
 .
-├── index.html            # Shell SPA
+├── index.html            # Shell SPA + fond animé + PWA
+├── manifest.webmanifest  # PWA
+├── sw.js                 # Service worker (offline)
 ├── assets/
-│   ├── sherko.css        # Design system studio/streamer
-│   ├── sherko.js         # App : routeur · vues · générateur · invites · persistance
+│   ├── sherko.css        # Design system futuriste (glass · aurora · glow)
+│   ├── sherko.js         # App : routeur · vues · générateur · Twitch · Discord · régie · prompteur
 │   └── favicon.svg
 ├── api/
-│   └── generate.js       # Serverless Vercel → Claude API (conducteur JSON)
+│   ├── generate.js       # Serverless → Claude API (conducteur JSON)
+│   ├── twitch.js         # Serverless → Twitch Helix (+ fallback decapi)
+│   └── discord.js        # Serverless → webhook Discord (embeds)
 └── vercel.json           # Headers sécurité
 ```
 
