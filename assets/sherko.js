@@ -216,6 +216,14 @@
           discord:   { handle: '',               url: '',                                   followers: null },
         },
       },
+      music: {
+        tracks: [
+          { id: 'm1', title: 'SHERKO LIVE — VODs & sessions', sub: 'Sessions de prod en direct', platform: 'twitch', url: 'https://twitch.tv/sherko27/videos', color: '#9146FF' },
+          { id: 'm2', title: 'Ajoute ton dernier son', sub: 'Spotify · SoundCloud · YouTube', platform: 'spotify', url: '', color: '#1DB954' },
+          { id: 'm3', title: 'Ajoute un beat / clip', sub: 'Colle le lien', platform: 'soundcloud', url: '', color: '#FF5500' },
+        ],
+      },
+      reactions: {},
     };
   }
   function load() {
@@ -305,9 +313,11 @@
   const app = $('#app');
 
   function render() {
+    teardownMur();
     let html = '';
     switch (view.name) {
       case 'home':       html = renderHome(); break;
+      case 'mur':        html = renderMur(); break;
       case 'lives':      html = renderLives(); break;
       case 'live':       html = renderLive(); break;
       case 'equipe':     html = renderEquipe(); break;
@@ -316,6 +326,7 @@
     }
     app.innerHTML = `<div class="view">${html}</div>`;
     if (view.name === 'generateur') wireGenerator();
+    if (view.name === 'mur') wireMur();
   }
 
   // ---------- View: Home (HUB SHERKO) ----------
@@ -390,14 +401,21 @@
           <div class="hub-stat"><b>${state.lives.length}</b><span>lives</span></div>
         </div>
         <div class="hub-cta">
-          ${p.socials?.twitch?.handle ? `<a class="btn btn-twitch btn-lg" href="https://twitch.tv/${esc(p.socials.twitch.handle)}" target="_blank" rel="noopener">${isLive?'🔴 Rejoindre le live':'🟣 Voir la chaîne'}</a>` : ''}
+          <button class="btn btn-lg btn-mur" data-nav="mur" type="button">🔴 LE MUR — live chat</button>
+          ${p.socials?.twitch?.handle ? `<a class="btn btn-twitch btn-lg" href="https://twitch.tv/${esc(p.socials.twitch.handle)}" target="_blank" rel="noopener">${isLive?'Rejoindre le live':'Voir la chaîne'}</a>` : ''}
           <button class="btn btn-lg" data-nav="lives" type="button">🎬 Le Studio</button>
-          <button class="btn btn-ghost btn-lg" data-action="edit-profile" type="button">✎ Éditer le profil</button>
+          <button class="btn btn-ghost btn-lg" data-action="edit-profile" type="button">✎ Profil</button>
         </div>
       </section>
 
       <div class="hub-section-title">Mes réseaux</div>
       <div class="social-grid">${socialCards || '<p class="muted">Ajoute tes réseaux via « Éditer le profil ».</p>'}</div>
+
+      <div class="hub-section-title" style="display:flex;justify-content:space-between;align-items:center">
+        <span>Ma musique</span>
+        <button class="btn btn-sm btn-ghost" data-action="add-track" type="button">＋ Ajouter un son</button>
+      </div>
+      <div class="music-grid">${musicCards()}</div>
 
       ${next ? `<div class="hub-section-title">Prochain live</div>${nextLiveStrip(next)}` : ''}
 
@@ -406,6 +424,201 @@
         ${state.lives.slice(0, 3).map(l => liveCard(l)).join('')}
         <button class="add-card" data-action="new-live" type="button"><span class="plus">＋</span><span>Créer un live</span></button>
       </div>`;
+  }
+
+  const PLATFORMS = {
+    twitch:     { ico: '🟣', label: 'Twitch',     color: '#9146FF' },
+    spotify:    { ico: '🎧', label: 'Spotify',    color: '#1DB954' },
+    soundcloud: { ico: '☁️', label: 'SoundCloud', color: '#FF5500' },
+    youtube:    { ico: '▶️', label: 'YouTube',    color: '#FF0000' },
+    apple:      { ico: '', label: 'Apple Music', color: '#FA57C1' },
+    other:      { ico: '🔗', label: 'Lien',       color: '#8b7bd8' },
+  };
+  function reactCount(id) { return (state.settings.reactions && state.settings.reactions[id]) || 0; }
+  function musicCards() {
+    const tracks = state.settings.music?.tracks || [];
+    if (!tracks.length) return '<p class="muted">Ajoute tes sons avec « ＋ Ajouter un son ».</p>';
+    return tracks.map(t => {
+      const pf = PLATFORMS[t.platform] || PLATFORMS.other;
+      const col = t.color || pf.color;
+      const has = !!t.url;
+      const n = reactCount(t.id);
+      return `
+        <div class="track-card" style="--tc:${col}">
+          <div class="track-cover">${pf.ico}</div>
+          <div class="track-body">
+            <div class="track-title">${esc(t.title || 'Sans titre')}</div>
+            <div class="track-sub">${esc(t.sub || pf.label)}</div>
+          </div>
+          <div class="track-actions">
+            <button class="react-btn ${n?'has':''}" data-react="${t.id}" type="button" title="Kiffer ce son">🔥<span>${n||''}</span></button>
+            ${has ? `<a class="btn btn-sm track-play" href="${esc(t.url)}" target="_blank" rel="noopener">▶ Écouter</a>`
+                  : `<button class="btn btn-sm btn-ghost" data-action="edit-track" data-id="${t.id}" type="button">Ajouter le lien</button>`}
+            <button class="icon-btn sm" data-action="edit-track" data-id="${t.id}" type="button" title="Modifier">✎</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // =================================================================
+  //  LE MUR — interaction live via le chat Twitch (temps réel, sans backend)
+  // =================================================================
+  let murState = null;
+  function teardownMur() {
+    if (!murState) return;
+    try { murState.ws && murState.ws.close(); } catch (_) {}
+    (murState.timers || []).forEach(clearInterval);
+    document.querySelectorAll('.float-emoji.mur').forEach(n => n.remove());
+    murState = null;
+  }
+  function renderMur() {
+    const ch = (state.settings.channel || state.settings.profile?.socials?.twitch?.handle || '').replace(/^@/, '');
+    const c = twData(ch);
+    const live = c && c.live;
+    return `
+      <div class="mur" id="murRoot">
+        <div class="mur-top">
+          <button class="back" data-nav="home" type="button">← Accueil</button>
+          <div class="mur-title">LE MUR<span> · ${esc(ch || '—')}</span></div>
+          <div class="mur-conn" id="murConn"><span class="dot"></span><span id="murConnTxt">…</span></div>
+        </div>
+        <p class="mur-hint">Branché sur ton <b>chat Twitch en direct</b> — ton public tape dans le chat, ça réagit à l'écran. Montre-le en stream. ${ch ? '' : '<b style="color:var(--magenta)">Renseigne ta chaîne dans le profil.</b>'}</p>
+        <div class="mur-stage" id="murStage">
+          <div class="hype">
+            <div class="hype-num"><b id="hypeVal">0</b><span>HYPE</span></div>
+            <div class="hype-bar"><i id="hypeFill"></i></div>
+            <div class="hype-rate"><span id="hypeRate">0</span> msg/s · <span id="hypeViewers">${live ? (c.viewers || 0) + ' viewers' : 'hors live'}</span></div>
+          </div>
+        </div>
+        <div class="mur-vote panel">
+          <div class="panel-title">Vote en direct — le public tape le n° dans le chat</div>
+          <div id="voteBars" class="vote-bars"></div>
+          <div class="vote-edit" id="voteEdit">
+            <input class="input" data-vopt="0" placeholder="1 · ex : Drill" value="Track 1">
+            <input class="input" data-vopt="1" placeholder="2 · ex : Afro" value="Track 2">
+            <input class="input" data-vopt="2" placeholder="3 · (option)">
+            <input class="input" data-vopt="3" placeholder="4 · (option)">
+          </div>
+          <div class="vote-actions">
+            <button class="btn btn-primary" id="voteStart" type="button">▶ Lancer le vote</button>
+            <button class="btn btn-ghost" id="voteReset" type="button">↺ Reset</button>
+            <button class="btn btn-ghost" id="murDemo" type="button">▶ Démo</button>
+            <button class="btn btn-ghost" id="murFull" type="button">⛶ Plein écran</button>
+          </div>
+        </div>
+        <div class="mur-feed" id="murFeed"></div>
+      </div>`;
+  }
+  function wireMur() {
+    const ch = (state.settings.channel || state.settings.profile?.socials?.twitch?.handle || '').toLowerCase().replace(/^@/, '');
+    murState = { ws: null, timers: [], hype: 0, target: 0, stamps: [], votes: [], options: [], voteActive: false, demoOn: false, demoTimer: null };
+    const setConn = (txt, on) => { const t = $('#murConnTxt'), w = $('#murConn'); if (t) t.textContent = txt; if (w) w.classList.toggle('on', !!on); };
+
+    const loop = setInterval(() => {
+      if (!murState) return;
+      const now = Date.now();
+      murState.stamps = murState.stamps.filter(s => now - s < 3000);
+      const rate = murState.stamps.length / 3;
+      murState.target = Math.min(100, rate * 14);
+      murState.hype += (murState.target - murState.hype) * 0.25;
+      if (murState.hype < 0.5) murState.hype = 0;
+      const fill = $('#hypeFill'), val = $('#hypeVal'), rt = $('#hypeRate');
+      if (fill) fill.style.width = murState.hype + '%';
+      if (val) val.textContent = Math.round(murState.hype);
+      if (rt) rt.textContent = rate.toFixed(1);
+    }, 300);
+    murState.timers.push(loop);
+
+    const startBtn = $('#voteStart'), resetBtn = $('#voteReset'), demoBtn = $('#murDemo'), fullBtn = $('#murFull');
+    if (startBtn) startBtn.addEventListener('click', () => {
+      const opts = $$('[data-vopt]').map(i => i.value.trim()).filter(Boolean);
+      if (opts.length < 2) { toast('Mets au moins 2 options', 'info'); return; }
+      murState.options = opts; murState.votes = opts.map(() => 0); murState.voteActive = true;
+      renderVoteBars(); toast('Vote lancé — le public tape le numéro 🔥', 'ok');
+    });
+    if (resetBtn) resetBtn.addEventListener('click', () => { murState.votes = murState.options.map(() => 0); renderVoteBars(); });
+    if (demoBtn) demoBtn.addEventListener('click', () => toggleDemo(demoBtn));
+    if (fullBtn) fullBtn.addEventListener('click', () => { const r = $('#murRoot'); if (r && r.requestFullscreen) r.requestFullscreen().catch(() => {}); });
+
+    renderVoteBars();
+    if (ch) connectChat(ch); else setConn('pas de chaîne', false);
+
+    function connectChat(login) {
+      setConn('connexion…', false);
+      let ws;
+      try { ws = new WebSocket('wss://irc-ws.chat.twitch.tv:443'); } catch (_) { setConn('indispo — essaie Démo', false); return; }
+      murState.ws = ws;
+      ws.onopen = () => { try { ws.send('PASS SCHMOOPIIE'); ws.send('NICK justinfan' + Math.floor(Math.random() * 99999)); ws.send('JOIN #' + login); } catch (_) {} setConn('chat connecté', true); };
+      ws.onmessage = ev => String(ev.data).split('\r\n').forEach(handleLine);
+      ws.onerror = () => setConn('erreur — essaie Démo', false);
+      ws.onclose = () => { if (murState) setConn('déconnecté', false); };
+      function handleLine(line) {
+        if (!line) return;
+        if (line.indexOf('PING') === 0) { try { ws.send('PONG :tmi.twitch.tv'); } catch (_) {} return; }
+        const pi = line.indexOf('PRIVMSG'); if (pi === -1) return;
+        const name = (line.slice(0, pi).match(/:([^!]+)!/) || [])[1] || 'viewer';
+        const ci = line.indexOf(':', pi);
+        onChat(name, ci !== -1 ? line.slice(ci + 1) : '');
+      }
+    }
+    function onChat(name, text) {
+      if (!murState) return;
+      murState.stamps.push(Date.now());
+      const m = (text || '').trim();
+      if (murState.voteActive && /^[1-9]$/.test(m)) {
+        const idx = parseInt(m, 10) - 1;
+        if (idx >= 0 && idx < murState.votes.length) { murState.votes[idx]++; renderVoteBars(); }
+      }
+      const emoji = pickEmoji(text);
+      if (emoji && Math.random() < 0.6) floatOnStage(emoji);
+      pushFeed(name, text);
+    }
+    function pickEmoji(text) {
+      const found = ((text || '').match(/[\u{1F300}-\u{1FAFF}☀-➿]/u) || [])[0];
+      if (found) return found;
+      const t = (text || '').toLowerCase();
+      if (/(feu|fire|chaud|hot)/.test(t)) return '🔥';
+      if (/(love|c(?:œ|oe)ur|goat|best|incroyable)/.test(t)) return '❤️';
+      if (/(mdr|lol|haha|ptdr)/.test(t)) return '😂';
+      return ['🔥', '❤️', '🙌', '🎵', '⚡'][Math.floor(Math.random() * 5)];
+    }
+    function floatOnStage(emoji) {
+      const stage = $('#murStage'); if (!stage) return;
+      const r = stage.getBoundingClientRect();
+      const el = document.createElement('div');
+      el.className = 'float-emoji mur'; el.textContent = emoji;
+      el.style.left = (r.left + Math.random() * r.width) + 'px';
+      el.style.top = (r.bottom - 24) + 'px';
+      el.style.setProperty('--dx', (Math.random() * 80 - 40) + 'px');
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1600);
+    }
+    function pushFeed(name, text) {
+      const feed = $('#murFeed'); if (!feed) return;
+      const row = document.createElement('div'); row.className = 'fmsg';
+      row.innerHTML = `<b>${esc(name)}</b> ${esc((text || '').slice(0, 120))}`;
+      feed.prepend(row);
+      while (feed.children.length > 24) feed.lastChild.remove();
+    }
+    function renderVoteBars() {
+      const box = $('#voteBars'); if (!box) return;
+      if (!murState.voteActive) { box.innerHTML = '<p class="muted" style="margin:0">Configure 2 à 4 options puis « Lancer le vote ».</p>'; return; }
+      const total = murState.votes.reduce((a, b) => a + b, 0);
+      const max = Math.max.apply(null, murState.votes.concat([1]));
+      box.innerHTML = murState.options.map((o, i) => {
+        const v = murState.votes[i] || 0; const pct = total ? Math.round(v / total * 100) : 0;
+        const lead = v === max && v > 0;
+        return `<div class="vbar ${lead ? 'lead' : ''}"><div class="vbar-h"><span class="vn">${i + 1}</span><span class="vl">${esc(o)}</span><span class="vp">${pct}% · ${v}</span></div><div class="vbar-t"><i style="width:${pct}%"></i></div></div>`;
+      }).join('');
+    }
+    function toggleDemo(btn) {
+      if (murState.demoOn) { clearInterval(murState.demoTimer); murState.demoOn = false; if (btn) btn.textContent = '▶ Démo'; toast('Démo arrêtée', 'info'); return; }
+      murState.demoOn = true; if (btn) btn.textContent = '⏸ Démo'; toast('Démo — flux simulé', 'ok');
+      const names = ['Karim', 'Lea', 'BeatKilla', 'Nadia', 'Sofiane', 'Yuki', 'Momo', 'Zed', 'Ines', 'Rayan', 'Prod_JX', 'Maya'];
+      const msgs = ['🔥🔥🔥', 'ce son est fou', '1', '2', '1', 'goooo', '❤️', 'le beat!!', '2', 'trop chaud', '1', 'mdr 😂', 'feu', 'on veut le drop', '3', '⚡⚡'];
+      murState.demoTimer = setInterval(() => onChat(names[Math.floor(Math.random() * names.length)], msgs[Math.floor(Math.random() * msgs.length)]), 260);
+      murState.timers.push(murState.demoTimer);
+    }
   }
 
   // ---------- View: Lives ----------
@@ -933,9 +1146,34 @@
     const tabBtn = e.target.closest('[data-tab]');
     if (tabBtn) { view.tab = tabBtn.dataset.tab; render(); return; }
 
+    const reactBtn = e.target.closest('[data-react]');
+    if (reactBtn) { fireReaction(reactBtn.dataset.react, reactBtn); return; }
+
     const actEl = e.target.closest('[data-action]');
     if (actEl) { handleAction(actEl.dataset.action, actEl, e); }
   });
+
+  function fireReaction(id, btn) {
+    state.settings.reactions = state.settings.reactions || {};
+    state.settings.reactions[id] = (state.settings.reactions[id] || 0) + 1;
+    save();
+    if (btn) {
+      btn.classList.add('has', 'pop');
+      const span = btn.querySelector('span'); if (span) span.textContent = state.settings.reactions[id];
+      setTimeout(() => btn.classList.remove('pop'), 350);
+      floatEmoji('🔥', btn);
+    }
+  }
+  function floatEmoji(emoji, anchor) {
+    const r = anchor ? anchor.getBoundingClientRect() : { left: innerWidth/2, top: innerHeight/2, width: 0 };
+    const el = document.createElement('div');
+    el.className = 'float-emoji'; el.textContent = emoji;
+    el.style.left = (r.left + r.width/2) + 'px';
+    el.style.top = r.top + 'px';
+    el.style.setProperty('--dx', (Math.random()*60 - 30) + 'px');
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1400);
+  }
 
   document.addEventListener('change', e => {
     const t = e.target;
@@ -977,6 +1215,8 @@
   function handleAction(action, node, e) {
     const id = node.dataset.id;
     switch (action) {
+      case 'add-track': openTrackModal(); break;
+      case 'edit-track': openTrackModal(id); break;
       case 'new-live': openLiveModal(); break;
       case 'edit-live': openLiveModal(liveById(id)); break;
       case 'duplicate-live': duplicateLive(id); break;
@@ -1165,6 +1405,39 @@
       }
       closeModal(); save(); render();
     });
+  }
+
+  // ---------- Track modal (Ma Musique) ----------
+  function openTrackModal(id) {
+    const tracks = state.settings.music.tracks;
+    const t = id ? tracks.find(x => x.id === id) : { id: 'm' + Date.now(), title: '', sub: '', platform: 'spotify', url: '', color: '' };
+    const opts = Object.entries(PLATFORMS).map(([k, v]) => `<option value="${k}" ${t.platform===k?'selected':''}>${v.ico} ${v.label}</option>`).join('');
+    openModal(`
+      <div class="modal-head"><h2>${id?'Modifier le son':'Ajouter un son'}</h2><button class="icon-btn" data-close type="button">✕</button></div>
+      <div class="modal-body">
+        <div class="field"><label>Titre</label><input class="input" id="tkTitle" value="${esc(t.title||'')}" placeholder="Nom du son / projet"></div>
+        <div class="field"><label>Sous-titre</label><input class="input" id="tkSub" value="${esc(t.sub||'')}" placeholder="feat. · type de son · date"></div>
+        <div class="field-row cols-2">
+          <div class="field"><label>Plateforme</label><select class="input" id="tkPf">${opts}</select></div>
+          <div class="field"><label>Couleur (option)</label><input class="input" id="tkColor" value="${esc(t.color||'')}" placeholder="#1DB954"></div>
+        </div>
+        <div class="field"><label>Lien</label><input class="input" id="tkUrl" value="${esc(t.url||'')}" placeholder="https://open.spotify.com/…"></div>
+      </div>
+      <div class="modal-foot">
+        ${id?'<button class="btn btn-ghost" id="tkDel" type="button">Supprimer</button>':''}
+        <button class="btn btn-primary" id="tkSave" type="button">Enregistrer</button>
+      </div>`);
+    $('#tkSave').addEventListener('click', () => {
+      t.title = $('#tkTitle').value.trim() || 'Sans titre';
+      t.sub = $('#tkSub').value.trim();
+      t.platform = $('#tkPf').value;
+      t.color = $('#tkColor').value.trim();
+      t.url = $('#tkUrl').value.trim();
+      if (!id) tracks.push(t);
+      save(); closeModal(); render(); toast('Son enregistré ✓', 'ok');
+    });
+    const del = $('#tkDel');
+    if (del) del.addEventListener('click', () => { state.settings.music.tracks = tracks.filter(x => x.id !== id); save(); closeModal(); render(); toast('Son supprimé', 'info'); });
   }
 
   // ---------- Profile modal (HUB SHERKO) ----------
