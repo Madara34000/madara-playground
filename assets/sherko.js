@@ -56,6 +56,57 @@
       color: 'var(--c-benjay)', av: 'B', photo: null, twitch: '', discord: '', contact: { handle: '@benjay', phone: '', email: '' }, permanent: false, active: false },
   ];
 
+  // ============ Répertoire d'invités (sourcing) ============
+  const GUEST_STATUS = [
+    { k: 'idea',       label: 'Idée',        color: '#8b7bd8' },
+    { k: 'to_contact', label: 'À contacter', color: '#f0a020' },
+    { k: 'contacted',  label: 'Contacté',    color: '#3aa0ff' },
+    { k: 'confirmed',  label: 'Confirmé',    color: '#2ee6a6' },
+    { k: 'done',       label: 'Déjà passé',  color: '#7a7a90' },
+  ];
+  const GUEST_SOCIALS = [
+    { k: 'instagram', label: 'Instagram', ico: '📸', base: 'https://instagram.com/', brand: '#E1306C' },
+    { k: 'tiktok',    label: 'TikTok',    ico: '🎵', base: 'https://tiktok.com/@',   brand: '#25F4EE' },
+    { k: 'twitch',    label: 'Twitch',    ico: '🟣', base: 'https://twitch.tv/',     brand: '#9146FF' },
+    { k: 'youtube',   label: 'YouTube',   ico: '▶️', base: 'https://youtube.com/@',  brand: '#FF0000' },
+    { k: 'x',         label: 'X',         ico: '𝕏',  base: 'https://x.com/',         brand: '#1d9bf0' },
+  ];
+  const emptySocials = () => ({ instagram: '', tiktok: '', twitch: '', youtube: '', x: '' });
+  function seedGuests() {
+    return [
+      { id: 'g_benjay', name: 'BENJAY', genre: 'Producteur / Artiste', color: 'var(--c-benjay)', av: 'B', photo: null,
+        socials: { ...emptySocials(), instagram: 'benjay' }, status: 'done', notes: 'Live du 28/06 — parcours, BOTA, Brésil.' },
+      { id: 'g_jdos', name: 'JDOS', genre: 'Chroniqueur — JDOSCOPE', color: 'var(--c-jdos)', av: 'J', photo: null,
+        socials: emptySocials(), status: 'confirmed', notes: 'Chronique récurrente + débat meilleure œuvre.' },
+      { id: 'g_diwiid', name: 'DiWiiD', genre: 'Chroniqueur — La Cuisine du Di', color: 'var(--c-diwiid)', av: 'D', photo: null,
+        socials: emptySocials(), status: 'confirmed', notes: 'Passage cuisine + dessert.' },
+      { id: 'g_dope', name: 'DOPE', genre: 'Twitcheur / Chroniqueur', color: '#FF6B9D', av: 'Do', photo: null,
+        socials: emptySocials(), status: 'contacted', notes: 'Réactions chat, ambiance.' },
+      { id: 'g_olb', name: 'OLB', genre: 'Twitcheur / Chroniqueur', color: '#5BC8FF', av: 'O', photo: null,
+        socials: emptySocials(), status: 'contacted', notes: 'Débats, ambiance plateau.' },
+      { id: 'g_new', name: 'Artiste à sourcer', genre: 'Rappeur / Chanteur', color: '#9146FF', av: '?', photo: null,
+        socials: emptySocials(), status: 'to_contact', notes: 'Colle son Insta/TikTok pour le contacter en amont.' },
+    ];
+  }
+
+  // ============ Board de concepts ============
+  const CONCEPT_STATUS = [
+    { k: 'idea',  label: 'Idée',            color: '#8b7bd8' },
+    { k: 'dev',   label: 'À développer',    color: '#f0a020' },
+    { k: 'ready', label: 'Prêt à tourner',  color: '#2ee6a6' },
+    { k: 'used',  label: 'Déjà utilisé',    color: '#7a7a90' },
+  ];
+  function seedConcepts() {
+    return [
+      { id: 'c_talk', title: 'SHERKO LIVE — Le Talk', format: 'Talk show', color: '#9146FF', guestIds: ['g_benjay', 'g_jdos', 'g_diwiid'], status: 'used',
+        pitch: 'Interview d\'un artiste + chroniques (JDOSCOPE, Cuisine du Di) et react sons du chat.', notes: 'Format signature (ex : BENJAY).' },
+      { id: 'c_battle', title: 'Battle de sons', format: 'Battle', color: '#FF5C8A', guestIds: [], status: 'idea',
+        pitch: 'Deux artistes, le chat vote le meilleur son via LE MUR.', notes: 'Utilise le vote LE MUR en direct.' },
+      { id: 'c_cypher', title: 'Cypher / Freestyle', format: 'Live musique', color: '#2ee6a6', guestIds: [], status: 'dev',
+        pitch: 'Session freestyle des invités sur les prods de Sherko.', notes: '' },
+    ];
+  }
+
   // ============ Seed: BENJAY live (from the official PDF) ============
   function seedBenjayLive() {
     return {
@@ -229,9 +280,23 @@
   function load() {
     try {
       const raw = localStorage.getItem(KEY);
-      if (raw) { const d = JSON.parse(raw); if (d && d.team && d.lives) { d.settings = { ...defaultSettings(), ...(d.settings || {}) }; return d; } }
+      if (raw) {
+        const d = JSON.parse(raw);
+        if (d && d.team && d.lives) {
+          d.settings = { ...defaultSettings(), ...(d.settings || {}) };
+          if (!Array.isArray(d.guests)) d.guests = seedGuests();
+          if (!Array.isArray(d.concepts)) d.concepts = seedConcepts();
+          return d;
+        }
+      }
     } catch (_) {}
-    return { team: SEED_TEAM.map(m => ({ ...m, contact: { ...m.contact } })), lives: [seedBenjayLive()], settings: defaultSettings() };
+    return {
+      team: SEED_TEAM.map(m => ({ ...m, contact: { ...m.contact } })),
+      lives: [seedBenjayLive()],
+      guests: seedGuests(),
+      concepts: seedConcepts(),
+      settings: defaultSettings(),
+    };
   }
 
   // ---- Runtime Twitch cache (login -> {avatar, live, viewers, game, followers, ...}) ----
@@ -318,6 +383,8 @@
     switch (view.name) {
       case 'home':       html = renderHome(); break;
       case 'mur':        html = renderMur(); break;
+      case 'invites':    html = renderInvites(); break;
+      case 'concepts':   html = renderConcepts(); break;
       case 'lives':      html = renderLives(); break;
       case 'live':       html = renderLive(); break;
       case 'equipe':     html = renderEquipe(); break;
@@ -327,6 +394,7 @@
     app.innerHTML = `<div class="view">${html}</div>`;
     if (view.name === 'generateur') wireGenerator();
     if (view.name === 'mur') wireMur();
+    if (view.name === 'invites') wireInvites();
   }
 
   // ---------- View: Home (HUB SHERKO) ----------
@@ -458,6 +526,210 @@
           </div>
         </div>`;
     }).join('');
+  }
+
+  // =================================================================
+  //  RÉPERTOIRE D'INVITÉS (sourcing)
+  // =================================================================
+  let invitesFilter = '';
+  function guestById(id) { return (state.guests || []).find(g => g.id === id); }
+  function guestStatusMeta(k) { return GUEST_STATUS.find(s => s.k === k) || GUEST_STATUS[0]; }
+  function guestAvatarHtml(g, cls) {
+    cls = cls || 'avatar';
+    if (g.photo) return `<span class="${cls} has-photo" title="${esc(g.name)}"><img src="${esc(g.photo)}" alt="" loading="lazy" onerror="this.parentNode.classList.remove('has-photo');this.parentNode.style.background='${(g.color||'var(--c-guest)')}';this.replaceWith(document.createTextNode('${esc(g.av||'?')}'))"></span>`;
+    return `<span class="${cls}" style="background:${g.color || 'var(--c-guest)'}" title="${esc(g.name)}">${esc(g.av || '?')}</span>`;
+  }
+  function guestSocialChips(g) {
+    return GUEST_SOCIALS.map(s => {
+      const h = (g.socials || {})[s.k]; if (!h) return '';
+      return `<a class="gs-chip" href="${esc(s.base + h.replace(/^@/, ''))}" target="_blank" rel="noopener" style="--b:${s.brand}" title="${s.label}">${s.ico}<span>${esc(h)}</span></a>`;
+    }).join('');
+  }
+  function guestCard(g) {
+    const st = guestStatusMeta(g.status);
+    const chips = guestSocialChips(g);
+    return `
+      <div class="guest-card" style="--gc:${g.color || 'var(--c-guest)'}">
+        <div class="gc-top">
+          ${guestAvatarHtml(g, 'avatar lg')}
+          <div class="gc-id"><div class="gc-name">${esc(g.name)}</div><div class="gc-genre">${esc(g.genre || '')}</div></div>
+          <button class="status-pill" data-action="cycle-guest-status" data-id="${g.id}" style="--sc:${st.color}" title="Changer le statut">${st.label}</button>
+        </div>
+        ${chips ? `<div class="gc-socials">${chips}</div>` : '<div class="gc-nosoc">Pas encore d\'ID réseau — clique Modifier</div>'}
+        ${g.notes ? `<div class="gc-notes">${esc(g.notes)}</div>` : ''}
+        <div class="gc-actions"><button class="btn btn-sm btn-ghost" data-action="edit-guest" data-id="${g.id}" type="button">✎ Modifier</button></div>
+      </div>`;
+  }
+  function renderInvites() {
+    const all = state.guests || [];
+    const q = invitesFilter.trim().toLowerCase();
+    const filtered = q ? all.filter(g => (g.name + ' ' + (g.genre || '') + ' ' + Object.values(g.socials || {}).join(' ') + ' ' + (g.notes || '')).toLowerCase().includes(q)) : all;
+    const legend = GUEST_STATUS.map(s => `<span class="status-pill sm" style="--sc:${s.color}">${s.label} · ${all.filter(g => g.status === s.k).length}</span>`).join('');
+    const sections = GUEST_STATUS.map(s => {
+      const list = filtered.filter(g => g.status === s.k);
+      if (!list.length) return '';
+      return `<div class="guest-section"><div class="gsec-head"><span class="status-pill" style="--sc:${s.color}">${s.label}</span><span class="gsec-n">${list.length}</span></div><div class="guest-grid">${list.map(guestCard).join('')}</div></div>`;
+    }).join('');
+    return `
+      <div class="page-head">
+        <div><span class="eyebrow">Pré-production · sourcing</span><h1>Répertoire d'invités</h1>
+          <p>La base d'invités que Sherko enrichit avec les IDs réseaux — pour sourcer et prévoir les prochains lives.</p></div>
+        <div class="page-head-actions"><button class="btn btn-primary" data-action="add-guest" type="button">＋ Invité</button></div>
+      </div>
+      <div class="invites-bar"><input class="input" id="invSearch" placeholder="🔎 Rechercher un invité, un réseau, un genre…" value="${esc(invitesFilter)}"></div>
+      <div class="status-legend">${legend}</div>
+      ${sections || '<p class="muted">Aucun invité ne correspond à ta recherche.</p>'}`;
+  }
+  function wireInvites() {
+    const inp = $('#invSearch'); if (!inp) return;
+    inp.addEventListener('input', () => {
+      invitesFilter = inp.value; const pos = inp.selectionStart;
+      render();
+      const n = $('#invSearch'); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (_) {} }
+    });
+  }
+  function openGuestModal(id) {
+    const editing = !!id;
+    const g = editing ? guestById(id) : { id: uid('g'), name: '', genre: '', color: '#9146FF', av: '?', photo: null, socials: emptySocials(), status: 'to_contact', notes: '' };
+    const statusOpts = GUEST_STATUS.map(s => `<option value="${s.k}" ${g.status === s.k ? 'selected' : ''}>${s.label}</option>`).join('');
+    const socRows = GUEST_SOCIALS.map(s => `<div class="field" style="margin-bottom:8px"><label>${s.ico} ${s.label}</label><input class="input" data-gsoc="${s.k}" value="${esc((g.socials || {})[s.k] || '')}" placeholder="ID / pseudo (ex : ${s.base.replace('https://', '')}...)"></div>`).join('');
+    openModal(`
+      <div class="modal-head"><h2>${editing ? 'Modifier l\'invité' : 'Nouvel invité'}</h2><button class="icon-btn" data-close type="button">✕</button></div>
+      <div class="modal-body">
+        <div class="field"><label>Photo (option)</label>
+          <div class="photo-edit"><span class="photo-preview" id="gPrev">${g.photo ? `<img src="${esc(g.photo)}" alt="">` : `<span class="avatar" style="background:${g.color}">${esc(g.av || '?')}</span>`}</span>
+            <div class="photo-edit-actions"><label class="btn btn-sm" style="cursor:pointer">📷 Importer<input type="file" id="gFile" accept="image/*" hidden></label>
+              <input class="input" id="gUrl" placeholder="…ou URL d'image" value="${g.photo && /^https?:/.test(g.photo) ? esc(g.photo) : ''}"></div></div></div>
+        <div class="field-row cols-2">
+          <div class="field"><label>Nom</label><input class="input" id="gName" value="${esc(g.name)}" placeholder="Nom d'artiste"></div>
+          <div class="field"><label>Genre / rôle</label><input class="input" id="gGenre" value="${esc(g.genre || '')}" placeholder="Rappeur, danseur, chroniqueur…"></div>
+        </div>
+        <div class="field-row cols-2">
+          <div class="field"><label>Statut</label><select class="input" id="gStatus">${statusOpts}</select></div>
+          <div class="field"><label>Couleur</label><input class="input" id="gColor" value="${esc(g.color || '#9146FF')}" placeholder="#9146FF"></div>
+        </div>
+        <div class="panel-title" style="margin-top:4px">IDs réseaux (pour sourcer)</div>
+        ${socRows}
+        <div class="field"><label>Notes</label><textarea class="textarea" id="gNotes" placeholder="Pourquoi l'inviter, dispo, contact, angle…">${esc(g.notes || '')}</textarea></div>
+      </div>
+      <div class="modal-foot">
+        ${editing ? '<button class="btn btn-ghost" id="gDel" type="button">Supprimer</button>' : ''}
+        <button class="btn btn-primary" id="gSave" type="button">Enregistrer</button>
+      </div>`);
+    let photo = g.photo || null;
+    const prev = $('#gPrev');
+    const refresh = () => { prev.innerHTML = photo ? `<img src="${photo}" alt="">` : `<span class="avatar" style="background:${$('#gColor').value || g.color}">${esc(($('#gName').value || '?')[0] || '?')}</span>`; };
+    $('#gFile').addEventListener('change', e => { const f = e.target.files && e.target.files[0]; if (!f) return; if (f.size > 3.5 * 1024 * 1024) { toast('Image trop lourde (max 3,5 Mo)', 'info'); return; } const r = new FileReader(); r.onload = () => { photo = r.result; refresh(); }; r.readAsDataURL(f); });
+    $('#gUrl').addEventListener('change', () => { const v = $('#gUrl').value.trim(); if (v && /^https?:\/\//.test(v)) { photo = v; refresh(); } });
+    $('#gSave').addEventListener('click', () => {
+      g.name = $('#gName').value.trim() || 'Sans nom';
+      g.genre = $('#gGenre').value.trim();
+      g.status = $('#gStatus').value;
+      g.color = $('#gColor').value.trim() || '#9146FF';
+      g.notes = $('#gNotes').value.trim();
+      g.photo = photo || null;
+      g.av = (g.name[0] || '?').toUpperCase();
+      g.socials = g.socials || emptySocials();
+      modalHost.querySelectorAll('[data-gsoc]').forEach(inp => { g.socials[inp.dataset.gsoc] = inp.value.trim().replace(/^@/, ''); });
+      if (!editing) state.guests.push(g);
+      save(); closeModal(); render(); toast(editing ? 'Invité mis à jour ✓' : 'Invité ajouté ✓', 'ok');
+    });
+    const del = $('#gDel');
+    if (del) del.addEventListener('click', () => { state.guests = state.guests.filter(x => x.id !== id); save(); closeModal(); render(); toast('Invité supprimé', 'info'); });
+  }
+  function cycleGuestStatus(id) {
+    const g = guestById(id); if (!g) return;
+    const i = GUEST_STATUS.findIndex(s => s.k === g.status);
+    g.status = GUEST_STATUS[(i + 1) % GUEST_STATUS.length].k;
+    save(); render();
+  }
+
+  // =================================================================
+  //  BOARD DE CONCEPTS
+  // =================================================================
+  function conceptStatusMeta(k) { return CONCEPT_STATUS.find(s => s.k === k) || CONCEPT_STATUS[0]; }
+  function conceptCard(c) {
+    const guests = (c.guestIds || []).map(guestById).filter(Boolean);
+    const avs = guests.slice(0, 5).map(g => guestAvatarHtml(g, 'avatar xs')).join('');
+    return `
+      <div class="concept-card" style="--cc:${c.color || 'var(--purple)'}">
+        <div class="cc-bar"></div>
+        <div class="cc-body">
+          <div class="cc-format">${esc(c.format || 'Format')}</div>
+          <div class="cc-title">${esc(c.title)}</div>
+          ${c.pitch ? `<div class="cc-pitch">${esc(c.pitch)}</div>` : ''}
+          ${avs ? `<div class="cc-guests">${avs}${guests.length > 5 ? `<span class="more">+${guests.length - 5}</span>` : ''}</div>` : ''}
+          <div class="cc-actions">
+            <button class="btn btn-sm btn-ghost" data-action="edit-concept" data-id="${c.id}" type="button">✎</button>
+            <button class="btn btn-sm" data-action="concept-to-live" data-id="${c.id}" type="button">→ Live</button>
+          </div>
+        </div>
+      </div>`;
+  }
+  function renderConcepts() {
+    const all = state.concepts || [];
+    const cols = CONCEPT_STATUS.map(s => {
+      const list = all.filter(c => c.status === s.k);
+      return `<div class="kcol"><div class="kcol-head"><span class="status-pill" style="--sc:${s.color}">${s.label}</span><span class="gsec-n">${list.length}</span></div><div class="kcol-body">${list.map(conceptCard).join('') || '<div class="kcol-empty">—</div>'}</div></div>`;
+    }).join('');
+    return `
+      <div class="page-head">
+        <div><span class="eyebrow">Pré-production · idées</span><h1>Board de concepts</h1>
+          <p>Invente des concepts de live, range-les par statut, rattache des invités — puis transforme-les en live.</p></div>
+        <div class="page-head-actions"><button class="btn btn-primary" data-action="add-concept" type="button">＋ Concept</button></div>
+      </div>
+      <div class="kanban">${cols}</div>`;
+  }
+  function openConceptModal(id) {
+    const editing = !!id;
+    const c = editing ? state.concepts.find(x => x.id === id) : { id: uid('c'), title: '', format: '', color: '#9146FF', guestIds: [], status: 'idea', pitch: '', notes: '' };
+    const statusOpts = CONCEPT_STATUS.map(s => `<option value="${s.k}" ${c.status === s.k ? 'selected' : ''}>${s.label}</option>`).join('');
+    const guestChecks = (state.guests || []).map(gg => `<label class="gpick"><input type="checkbox" data-cg="${gg.id}" ${(c.guestIds || []).includes(gg.id) ? 'checked' : ''}>${guestAvatarHtml(gg, 'avatar xs')}<span>${esc(gg.name)}</span></label>`).join('') || '<p class="muted" style="margin:0">Ajoute d\'abord des invités.</p>';
+    openModal(`
+      <div class="modal-head"><h2>${editing ? 'Modifier le concept' : 'Nouveau concept'}</h2><button class="icon-btn" data-close type="button">✕</button></div>
+      <div class="modal-body">
+        <div class="field"><label>Titre</label><input class="input" id="cTitle" value="${esc(c.title)}" placeholder="Nom du concept"></div>
+        <div class="field-row cols-2">
+          <div class="field"><label>Format</label><input class="input" id="cFormat" value="${esc(c.format || '')}" placeholder="Talk show, Battle, Cypher…"></div>
+          <div class="field"><label>Statut</label><select class="input" id="cStatus">${statusOpts}</select></div>
+        </div>
+        <div class="field"><label>Couleur</label><input class="input" id="cColor" value="${esc(c.color || '#9146FF')}" placeholder="#9146FF"></div>
+        <div class="field"><label>Pitch</label><textarea class="textarea" id="cPitch" placeholder="Le concept en 1-2 phrases">${esc(c.pitch || '')}</textarea></div>
+        <div class="panel-title" style="margin-top:4px">Invités pressentis</div>
+        <div class="gpick-grid">${guestChecks}</div>
+        <div class="field" style="margin-top:10px"><label>Notes</label><textarea class="textarea" id="cNotes" placeholder="Déroulé, références, matos…">${esc(c.notes || '')}</textarea></div>
+      </div>
+      <div class="modal-foot">
+        ${editing ? '<button class="btn btn-ghost" id="cDel" type="button">Supprimer</button>' : ''}
+        <button class="btn btn-primary" id="cSave" type="button">Enregistrer</button>
+      </div>`);
+    $('#cSave').addEventListener('click', () => {
+      c.title = $('#cTitle').value.trim() || 'Sans titre';
+      c.format = $('#cFormat').value.trim();
+      c.status = $('#cStatus').value;
+      c.color = $('#cColor').value.trim() || '#9146FF';
+      c.pitch = $('#cPitch').value.trim();
+      c.notes = $('#cNotes').value.trim();
+      c.guestIds = modalHost.querySelectorAll('[data-cg]:checked') ? Array.from(modalHost.querySelectorAll('[data-cg]:checked')).map(i => i.dataset.cg) : [];
+      if (!editing) state.concepts.push(c);
+      save(); closeModal(); render(); toast(editing ? 'Concept mis à jour ✓' : 'Concept ajouté ✓', 'ok');
+    });
+    const del = $('#cDel');
+    if (del) del.addEventListener('click', () => { state.concepts = state.concepts.filter(x => x.id !== id); save(); closeModal(); render(); toast('Concept supprimé', 'info'); });
+  }
+  function conceptToLive(id) {
+    const c = (state.concepts || []).find(x => x.id === id); if (!c) return;
+    const guests = (c.guestIds || []).map(guestById).filter(Boolean);
+    const live = {
+      id: uid('live'), title: c.title, subtitle: c.format || '', guest: guests[0] ? guests[0].name : '',
+      status: 'planifie', date: '', location: '', times: { crew: '', guest: '', live: '' },
+      castIds: ['m_sherko'], music: [],
+      segments: [{ id: uid('seg'), num: 1, label: 'Introduction', dur: 15, blocks: [{ role: 'SHERKO', title: 'Ouverture', items: [c.pitch || 'Présenter le concept.'] }] }],
+    };
+    state.lives.push(live);
+    if (c.status !== 'used') c.status = 'used';
+    save(); toast('Concept transformé en live ✓', 'ok');
+    navigate('live', { liveId: live.id, tab: 'conducteur' });
   }
 
   // =================================================================
@@ -1217,6 +1489,12 @@
     switch (action) {
       case 'add-track': openTrackModal(); break;
       case 'edit-track': openTrackModal(id); break;
+      case 'add-guest': openGuestModal(); break;
+      case 'edit-guest': openGuestModal(id); break;
+      case 'cycle-guest-status': cycleGuestStatus(id); break;
+      case 'add-concept': openConceptModal(); break;
+      case 'edit-concept': openConceptModal(id); break;
+      case 'concept-to-live': conceptToLive(id); break;
       case 'new-live': openLiveModal(); break;
       case 'edit-live': openLiveModal(liveById(id)); break;
       case 'duplicate-live': duplicateLive(id); break;
