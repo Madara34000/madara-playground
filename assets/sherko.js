@@ -72,20 +72,70 @@
     { k: 'x',         label: 'X',         ico: '𝕏',  base: 'https://x.com/',         brand: '#1d9bf0' },
   ];
   const emptySocials = () => ({ instagram: '', tiktok: '', twitch: '', youtube: '', x: '' });
+  const emptyFollowers = () => ({ instagram: null, tiktok: null, twitch: null, youtube: null, x: null });
+  function defaultBrief() {
+    return [
+      { id: uid('bs'), title: 'Qui c\'est', body: '' },
+      { id: uid('bs'), title: 'Son actu du moment', body: '' },
+      { id: uid('bs'), title: 'Pourquoi l\'inviter', body: '' },
+      { id: uid('bs'), title: 'Angles d\'interview', body: '' },
+      { id: uid('bs'), title: 'À éviter / sensible', body: '' },
+    ];
+  }
+  // backfill new dossier fields on any guest (migration-safe)
+  function normalizeGuest(g) {
+    g.socials = g.socials || emptySocials();
+    g.followers = g.followers || emptyFollowers();
+    if (typeof g.realName !== 'string') g.realName = '';
+    if (typeof g.city !== 'string') g.city = '';
+    if (typeof g.country !== 'string') g.country = '';
+    if (typeof g.tagline !== 'string') g.tagline = '';
+    if (typeof g.dispo !== 'string') g.dispo = '';
+    if (!Array.isArray(g.tags)) g.tags = [];
+    if (!g.contact) g.contact = { manager: '', phone: '', email: '', handle: '' };
+    if (!Array.isArray(g.brief)) g.brief = defaultBrief();
+    return g;
+  }
   function seedGuests() {
     return [
-      { id: 'g_benjay', name: 'BENJAY', genre: 'Producteur / Artiste', color: 'var(--c-benjay)', av: 'B', photo: null,
-        socials: { ...emptySocials(), instagram: 'benjay' }, status: 'done', notes: 'Live du 28/06 — parcours, BOTA, Brésil.' },
-      { id: 'g_jdos', name: 'JDOS', genre: 'Chroniqueur — JDOSCOPE', color: 'var(--c-jdos)', av: 'J', photo: null,
-        socials: emptySocials(), status: 'confirmed', notes: 'Chronique récurrente + débat meilleure œuvre.' },
-      { id: 'g_diwiid', name: 'DiWiiD', genre: 'Chroniqueur — La Cuisine du Di', color: 'var(--c-diwiid)', av: 'D', photo: null,
-        socials: emptySocials(), status: 'confirmed', notes: 'Passage cuisine + dessert.' },
-      { id: 'g_dope', name: 'DOPE', genre: 'Twitcheur / Chroniqueur', color: '#FF6B9D', av: 'Do', photo: null,
-        socials: emptySocials(), status: 'contacted', notes: 'Réactions chat, ambiance.' },
-      { id: 'g_olb', name: 'OLB', genre: 'Twitcheur / Chroniqueur', color: '#5BC8FF', av: 'O', photo: null,
-        socials: emptySocials(), status: 'contacted', notes: 'Débats, ambiance plateau.' },
-      { id: 'g_new', name: 'Artiste à sourcer', genre: 'Rappeur / Chanteur', color: '#9146FF', av: '?', photo: null,
-        socials: emptySocials(), status: 'to_contact', notes: 'Colle son Insta/TikTok pour le contacter en amont.' },
+      { id: 'g_benjay', name: 'BENJAY', realName: '', genre: 'Producteur / Artiste', city: '', country: 'Belgique / Brésil',
+        color: 'var(--c-benjay)', av: 'B', photo: null,
+        socials: { ...emptySocials(), instagram: 'benjay' }, followers: emptyFollowers(),
+        tagline: 'Producteur multi-diamants — do Brasil', tags: ['Rap FR', 'Prod', 'Bouyon', 'Brésil'],
+        contact: { manager: '', phone: '', email: '', handle: '@benjay' }, dispo: '', status: 'done',
+        notes: 'Live du 28/06 — parcours, BOTA, Brésil.',
+        brief: [
+          { id: uid('bs'), title: 'Qui c\'est', body: "Producteur multi-diamants et réalisateur artistique. A nourri la culture avec DAMSO : TieksVie, 60 Années, BXLZOO, Festival de Rêves." },
+          { id: uid('bs'), title: 'Son actu du moment', body: "'BOTA', son 1er single en tant qu'artiste. Grosses inspirations brésiliennes, un vrai gars do Brasil." },
+          { id: uid('bs'), title: 'Pourquoi l\'inviter', body: "Science de producteur rare, souci du détail extrême, souvent en avance sur les tendances (Finis-Les, vague bouyon)." },
+          { id: uid('bs'), title: 'Angles d\'interview', body: "Histoire & nom · art vs sport et mental · process de prod sans redondance · futur. ITW II : BOTA, favelas, depuis quand il va au Brésil, ville/plat/sorties favorites." },
+          { id: uid('bs'), title: 'Perso / détail qui tue', body: "Archi clean : no drink, no smoke. Il fait littéralement du son sans se doper — rare de nos jours." },
+          { id: uid('bs'), title: 'À éviter / sensible', body: "—" },
+        ] },
+      { id: 'g_jdos', name: 'JDOS', realName: '', genre: 'Chroniqueur — JDOSCOPE', city: '', country: '',
+        color: 'var(--c-jdos)', av: 'J', photo: null, socials: emptySocials(), followers: emptyFollowers(),
+        tagline: 'Chronique art + débat meilleure œuvre', tags: ['Chronique', 'Débat'],
+        contact: { manager: '', phone: '', email: '', handle: '@jdos' }, dispo: '', status: 'confirmed',
+        notes: 'Chronique récurrente + débat meilleure œuvre.', brief: defaultBrief() },
+      { id: 'g_diwiid', name: 'DiWiiD', realName: '', genre: 'Chroniqueur — La Cuisine du Di', city: '', country: '',
+        color: 'var(--c-diwiid)', av: 'D', photo: null, socials: emptySocials(), followers: emptyFollowers(),
+        tagline: 'Le dessert du jour, La Cuisine du Di', tags: ['Chronique', 'Cuisine'],
+        contact: { manager: '', phone: '', email: '', handle: '@diwiid' }, dispo: '', status: 'confirmed',
+        notes: 'Passage cuisine + dessert.', brief: defaultBrief() },
+      { id: 'g_dope', name: 'DOPE', realName: '', genre: 'Twitcheur / Chroniqueur', city: '', country: '',
+        color: '#FF6B9D', av: 'Do', photo: null, socials: emptySocials(), followers: emptyFollowers(),
+        tagline: 'Réactions chat & ambiance', tags: ['Twitch', 'React'],
+        contact: { manager: '', phone: '', email: '', handle: '@dope' }, dispo: '', status: 'contacted',
+        notes: 'Réactions chat, ambiance.', brief: defaultBrief() },
+      { id: 'g_olb', name: 'OLB', realName: '', genre: 'Twitcheur / Chroniqueur', city: '', country: '',
+        color: '#5BC8FF', av: 'O', photo: null, socials: emptySocials(), followers: emptyFollowers(),
+        tagline: 'Débats & ambiance plateau', tags: ['Twitch', 'Débat'],
+        contact: { manager: '', phone: '', email: '', handle: '@olb' }, dispo: '', status: 'contacted',
+        notes: 'Débats, ambiance plateau.', brief: defaultBrief() },
+      { id: 'g_new', name: 'Artiste à sourcer', realName: '', genre: 'Rappeur / Chanteur', city: '', country: '',
+        color: '#9146FF', av: '?', photo: null, socials: emptySocials(), followers: emptyFollowers(),
+        tagline: '', tags: [], contact: { manager: '', phone: '', email: '', handle: '' }, dispo: '', status: 'to_contact',
+        notes: 'Colle son Insta/TikTok pour le contacter en amont.', brief: defaultBrief() },
     ];
   }
 
@@ -285,6 +335,7 @@
         if (d && d.team && d.lives) {
           d.settings = { ...defaultSettings(), ...(d.settings || {}) };
           if (!Array.isArray(d.guests)) d.guests = seedGuests();
+          else d.guests.forEach(normalizeGuest);
           if (!Array.isArray(d.concepts)) d.concepts = seedConcepts();
           return d;
         }
@@ -320,6 +371,7 @@
   function navigate(name, opts = {}) {
     view.name = name;
     if (opts.liveId !== undefined) view.liveId = opts.liveId;
+    if (opts.guestId !== undefined) view.guestId = opts.guestId;
     if (opts.tab) view.tab = opts.tab;
     window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
     render();
@@ -327,7 +379,7 @@
   }
 
   function syncNav() {
-    const active = view.name === 'live' ? 'lives' : view.name;
+    const active = view.name === 'live' ? 'lives' : (view.name === 'guest' ? 'invites' : view.name);
     $$('.topnav-btn, .botnav-btn').forEach(b => b.classList.toggle('is-active', b.dataset.nav === active));
   }
 
@@ -384,6 +436,7 @@
       case 'home':       html = renderHome(); break;
       case 'mur':        html = renderMur(); break;
       case 'invites':    html = renderInvites(); break;
+      case 'guest':      html = renderGuest(); break;
       case 'concepts':   html = renderConcepts(); break;
       case 'lives':      html = renderLives(); break;
       case 'live':       html = renderLive(); break;
@@ -548,16 +601,20 @@
   function guestCard(g) {
     const st = guestStatusMeta(g.status);
     const chips = guestSocialChips(g);
+    const filled = (g.brief || []).filter(b => b.body && b.body.trim() && b.body.trim() !== '—').length;
     return `
       <div class="guest-card" style="--gc:${g.color || 'var(--c-guest)'}">
-        <div class="gc-top">
+        <div class="gc-top" data-open-guest="${g.id}" role="button" tabindex="0">
           ${guestAvatarHtml(g, 'avatar lg')}
           <div class="gc-id"><div class="gc-name">${esc(g.name)}</div><div class="gc-genre">${esc(g.genre || '')}</div></div>
           <button class="status-pill" data-action="cycle-guest-status" data-id="${g.id}" style="--sc:${st.color}" title="Changer le statut">${st.label}</button>
         </div>
-        ${chips ? `<div class="gc-socials">${chips}</div>` : '<div class="gc-nosoc">Pas encore d\'ID réseau — clique Modifier</div>'}
+        ${chips ? `<div class="gc-socials">${chips}</div>` : '<div class="gc-nosoc">Pas encore d\'ID réseau</div>'}
         ${g.notes ? `<div class="gc-notes">${esc(g.notes)}</div>` : ''}
-        <div class="gc-actions"><button class="btn btn-sm btn-ghost" data-action="edit-guest" data-id="${g.id}" type="button">✎ Modifier</button></div>
+        <div class="gc-actions">
+          <span class="gc-brief-n">📋 ${filled}/${(g.brief || []).length} rubriques</span>
+          <button class="btn btn-sm" data-open-guest="${g.id}" type="button">Ouvrir le dossier →</button>
+        </div>
       </div>`;
   }
   function renderInvites() {
@@ -590,27 +647,51 @@
   }
   function openGuestModal(id) {
     const editing = !!id;
-    const g = editing ? guestById(id) : { id: uid('g'), name: '', genre: '', color: '#9146FF', av: '?', photo: null, socials: emptySocials(), status: 'to_contact', notes: '' };
+    const g = editing ? guestById(id) : normalizeGuest({ id: uid('g'), name: '', genre: '', color: '#9146FF', av: '?', photo: null, status: 'to_contact', notes: '' });
+    const c = g.contact || {};
     const statusOpts = GUEST_STATUS.map(s => `<option value="${s.k}" ${g.status === s.k ? 'selected' : ''}>${s.label}</option>`).join('');
-    const socRows = GUEST_SOCIALS.map(s => `<div class="field" style="margin-bottom:8px"><label>${s.ico} ${s.label}</label><input class="input" data-gsoc="${s.k}" value="${esc((g.socials || {})[s.k] || '')}" placeholder="ID / pseudo (ex : ${s.base.replace('https://', '')}...)"></div>`).join('');
+    const socRows = GUEST_SOCIALS.map(s => `
+      <div class="field-row cols-2" style="margin-bottom:8px">
+        <div class="field" style="margin:0"><label>${s.ico} ${s.label} — ID</label><input class="input" data-gsoc="${s.k}" value="${esc((g.socials || {})[s.k] || '')}" placeholder="pseudo"></div>
+        <div class="field" style="margin:0"><label>abonnés</label><input class="input" data-gfoll="${s.k}" value="${(g.followers || {})[s.k] != null ? esc((g.followers)[s.k]) : ''}" placeholder="ex : 32000" inputmode="numeric"></div>
+      </div>`).join('');
     openModal(`
-      <div class="modal-head"><h2>${editing ? 'Modifier l\'invité' : 'Nouvel invité'}</h2><button class="icon-btn" data-close type="button">✕</button></div>
+      <div class="modal-head"><h2>${editing ? 'Éditer l\'identité' : 'Nouvel invité'}</h2><button class="icon-btn" data-close type="button">✕</button></div>
       <div class="modal-body">
         <div class="field"><label>Photo (option)</label>
           <div class="photo-edit"><span class="photo-preview" id="gPrev">${g.photo ? `<img src="${esc(g.photo)}" alt="">` : `<span class="avatar" style="background:${g.color}">${esc(g.av || '?')}</span>`}</span>
             <div class="photo-edit-actions"><label class="btn btn-sm" style="cursor:pointer">📷 Importer<input type="file" id="gFile" accept="image/*" hidden></label>
               <input class="input" id="gUrl" placeholder="…ou URL d'image" value="${g.photo && /^https?:/.test(g.photo) ? esc(g.photo) : ''}"></div></div></div>
         <div class="field-row cols-2">
-          <div class="field"><label>Nom</label><input class="input" id="gName" value="${esc(g.name)}" placeholder="Nom d'artiste"></div>
-          <div class="field"><label>Genre / rôle</label><input class="input" id="gGenre" value="${esc(g.genre || '')}" placeholder="Rappeur, danseur, chroniqueur…"></div>
+          <div class="field"><label>Nom d'artiste</label><input class="input" id="gName" value="${esc(g.name)}" placeholder="BENJAY"></div>
+          <div class="field"><label>Vrai nom (option)</label><input class="input" id="gReal" value="${esc(g.realName || '')}" placeholder="Prénom Nom"></div>
         </div>
+        <div class="field-row cols-2">
+          <div class="field"><label>Genre / rôle</label><input class="input" id="gGenre" value="${esc(g.genre || '')}" placeholder="Rappeur, producteur…"></div>
+          <div class="field"><label>Tags (séparés par virgule)</label><input class="input" id="gTags" value="${esc((g.tags || []).join(', '))}" placeholder="Rap FR, Prod, Brésil"></div>
+        </div>
+        <div class="field-row cols-2">
+          <div class="field"><label>Ville</label><input class="input" id="gCity" value="${esc(g.city || '')}" placeholder="Paris"></div>
+          <div class="field"><label>Pays / origine</label><input class="input" id="gCountry" value="${esc(g.country || '')}" placeholder="France"></div>
+        </div>
+        <div class="field"><label>Accroche</label><input class="input" id="gTagline" value="${esc(g.tagline || '')}" placeholder="En une phrase"></div>
         <div class="field-row cols-2">
           <div class="field"><label>Statut</label><select class="input" id="gStatus">${statusOpts}</select></div>
           <div class="field"><label>Couleur</label><input class="input" id="gColor" value="${esc(g.color || '#9146FF')}" placeholder="#9146FF"></div>
         </div>
-        <div class="panel-title" style="margin-top:4px">IDs réseaux (pour sourcer)</div>
+        <div class="panel-title" style="margin-top:4px">IDs réseaux + abonnés</div>
         ${socRows}
-        <div class="field"><label>Notes</label><textarea class="textarea" id="gNotes" placeholder="Pourquoi l'inviter, dispo, contact, angle…">${esc(g.notes || '')}</textarea></div>
+        <div class="panel-title" style="margin-top:4px">Contact (privé)</div>
+        <div class="field-row cols-2">
+          <div class="field"><label>Manager</label><input class="input" id="gMgr" value="${esc(c.manager || '')}" placeholder="Nom du manager"></div>
+          <div class="field"><label>Pseudo / DM</label><input class="input" id="gHandle" value="${esc(c.handle || '')}" placeholder="@..."></div>
+        </div>
+        <div class="field-row cols-2">
+          <div class="field"><label>Téléphone</label><input class="input" id="gPhone" value="${esc(c.phone || '')}" placeholder="+33…"></div>
+          <div class="field"><label>Email</label><input class="input" id="gEmail" value="${esc(c.email || '')}" placeholder="email@…"></div>
+        </div>
+        <div class="field"><label>Dispo</label><input class="input" id="gDispo" value="${esc(g.dispo || '')}" placeholder="Ex : week-ends, après mars…"></div>
+        <div class="field"><label>Note rapide</label><textarea class="textarea" id="gNotes" placeholder="Résumé express (le gros brief se remplit dans le dossier)">${esc(g.notes || '')}</textarea></div>
       </div>
       <div class="modal-foot">
         ${editing ? '<button class="btn btn-ghost" id="gDel" type="button">Supprimer</button>' : ''}
@@ -623,14 +704,23 @@
     $('#gUrl').addEventListener('change', () => { const v = $('#gUrl').value.trim(); if (v && /^https?:\/\//.test(v)) { photo = v; refresh(); } });
     $('#gSave').addEventListener('click', () => {
       g.name = $('#gName').value.trim() || 'Sans nom';
+      g.realName = $('#gReal').value.trim();
       g.genre = $('#gGenre').value.trim();
+      g.tags = $('#gTags').value.split(',').map(t => t.trim()).filter(Boolean);
+      g.city = $('#gCity').value.trim();
+      g.country = $('#gCountry').value.trim();
+      g.tagline = $('#gTagline').value.trim();
       g.status = $('#gStatus').value;
       g.color = $('#gColor').value.trim() || '#9146FF';
+      g.dispo = $('#gDispo').value.trim();
       g.notes = $('#gNotes').value.trim();
       g.photo = photo || null;
       g.av = (g.name[0] || '?').toUpperCase();
       g.socials = g.socials || emptySocials();
+      g.followers = g.followers || emptyFollowers();
+      g.contact = { manager: $('#gMgr').value.trim(), handle: $('#gHandle').value.trim(), phone: $('#gPhone').value.trim(), email: $('#gEmail').value.trim() };
       modalHost.querySelectorAll('[data-gsoc]').forEach(inp => { g.socials[inp.dataset.gsoc] = inp.value.trim().replace(/^@/, ''); });
+      modalHost.querySelectorAll('[data-gfoll]').forEach(inp => { const n = parseInt(inp.value.replace(/[^0-9]/g, ''), 10); g.followers[inp.dataset.gfoll] = isNaN(n) ? null : n; });
       if (!editing) state.guests.push(g);
       save(); closeModal(); render(); toast(editing ? 'Invité mis à jour ✓' : 'Invité ajouté ✓', 'ok');
     });
@@ -642,6 +732,106 @@
     const i = GUEST_STATUS.findIndex(s => s.k === g.status);
     g.status = GUEST_STATUS[(i + 1) % GUEST_STATUS.length].k;
     save(); render();
+  }
+
+  // ---------- Dossier invité (vue détail, plateau TV) ----------
+  function contactRow(k, v) { return v ? `<div class="kv-row"><span>${k}</span><b>${esc(v)}</b></div>` : ''; }
+  function briefSection(g, b, i) {
+    const n = (g.brief || []).length;
+    const has = b.body && b.body.trim();
+    return `
+      <div class="brief-sec">
+        <div class="bs-head">
+          <h4>${esc(b.title || 'Sans titre')}</h4>
+          <div class="bs-tools">
+            <button class="icon-btn sm" data-action="move-brief-section" data-id="${g.id}" data-bs="${b.id}" data-dir="-1" ${i === 0 ? 'disabled' : ''} title="Monter">↑</button>
+            <button class="icon-btn sm" data-action="move-brief-section" data-id="${g.id}" data-bs="${b.id}" data-dir="1" ${i === n - 1 ? 'disabled' : ''} title="Descendre">↓</button>
+            <button class="icon-btn sm" data-action="edit-brief-section" data-id="${g.id}" data-bs="${b.id}" title="Modifier">✎</button>
+            <button class="icon-btn sm" data-action="del-brief-section" data-id="${g.id}" data-bs="${b.id}" title="Supprimer">✕</button>
+          </div>
+        </div>
+        <div class="bs-body ${has ? '' : 'empty'}">${has ? esc(b.body).replace(/\n/g, '<br>') : 'Vide — clique ✎ pour remplir cette rubrique.'}</div>
+      </div>`;
+  }
+  function renderGuest() {
+    const g = guestById(view.guestId);
+    if (!g) return `<button class="back" data-nav="invites" type="button">← Invités</button><p class="muted">Invité introuvable.</p>`;
+    const st = guestStatusMeta(g.status);
+    const socialTiles = GUEST_SOCIALS.map(s => {
+      const h = (g.socials || {})[s.k]; if (!h) return '';
+      const f = (g.followers || {})[s.k];
+      return `<a class="soc-tile" href="${esc(s.base + h.replace(/^@/, ''))}" target="_blank" rel="noopener" style="--b:${s.brand}"><span class="st-ico">${s.ico}</span><span class="st-body"><b>${esc(s.label)}</b><span>${f != null ? fmtCount(f) + ' abonnés' : '@' + esc(h)}</span></span></a>`;
+    }).join('');
+    const totalFoll = GUEST_SOCIALS.reduce((a, s) => a + ((g.followers || {})[s.k] || 0), 0);
+    const brief = (g.brief || []).map((b, i) => briefSection(g, b, i)).join('');
+    const tags = (g.tags || []).map(t => `<span class="gtag">${esc(t)}</span>`).join('');
+    const c = g.contact || {};
+    const hasContact = c.manager || c.phone || c.email || c.handle;
+    return `
+      <button class="back" data-nav="invites" type="button">← Répertoire d'invités</button>
+      <div class="dossier" style="--gc:${g.color || 'var(--c-guest)'}">
+        <div class="dossier-hero">
+          <div class="dh-tag">● DOSSIER INVITÉ</div>
+          ${guestAvatarHtml(g, 'avatar xl')}
+          <div class="dh-id">
+            <div class="dh-name">${esc(g.name)}</div>
+            ${g.realName ? `<div class="dh-real">${esc(g.realName)}</div>` : ''}
+            <div class="dh-meta">${[g.genre, g.city, g.country].filter(Boolean).map(esc).join(' · ')}</div>
+            ${g.tagline ? `<div class="dh-tagline">“${esc(g.tagline)}”</div>` : ''}
+          </div>
+          <div class="dh-side">
+            <button class="status-pill" data-action="cycle-guest-status" data-id="${g.id}" style="--sc:${st.color}">${st.label}</button>
+            <button class="btn btn-sm btn-ghost" data-action="edit-guest" data-id="${g.id}" type="button">✎ Éditer l'identité</button>
+          </div>
+        </div>
+        ${tags ? `<div class="dossier-tags">${tags}</div>` : ''}
+        <div class="dossier-grid">
+          <div class="dossier-main">
+            <div class="dsec-head"><h3>Brief</h3><button class="btn btn-sm" data-action="add-brief-section" data-id="${g.id}" type="button">＋ Rubrique</button></div>
+            <div class="brief-list">${brief || '<p class="muted">Aucune rubrique. Ajoute-en une.</p>'}</div>
+          </div>
+          <aside class="dossier-aside">
+            <div class="panel">
+              <div class="panel-title">Réseaux${totalFoll ? ` · ${fmtCount(totalFoll)}` : ''}</div>
+              ${socialTiles || '<p class="muted" style="margin:0;font-size:13px">Aucun réseau. Édite l\'identité pour ajouter les IDs.</p>'}
+            </div>
+            <div class="panel">
+              <div class="panel-title">Contact</div>
+              ${hasContact || g.dispo ? `<div class="kv">${contactRow('Manager', c.manager)}${contactRow('Tél', c.phone)}${contactRow('Email', c.email)}${contactRow('Pseudo', c.handle)}${contactRow('Dispo', g.dispo)}</div>` : '<p class="muted" style="margin:0;font-size:13px">Pas d\'infos contact.</p>'}
+            </div>
+          </aside>
+        </div>
+      </div>`;
+  }
+  function openBriefSectionModal(gid, sid) {
+    const g = guestById(gid); if (!g) return;
+    const editing = !!sid;
+    const sec = editing ? (g.brief || []).find(x => x.id === sid) : { id: uid('bs'), title: '', body: '' };
+    if (!sec) return;
+    openModal(`
+      <div class="modal-head"><h2>${editing ? 'Modifier la rubrique' : 'Nouvelle rubrique'}</h2><button class="icon-btn" data-close type="button">✕</button></div>
+      <div class="modal-body">
+        <div class="field"><label>Sous-titre (nom de la rubrique)</label><input class="input" id="bsTitle" value="${esc(sec.title)}" placeholder="Ex : Son actu, Anecdotes, Angles d'interview…"></div>
+        <div class="field"><label>Contenu du brief</label><textarea class="textarea tall" id="bsBody" placeholder="Écris tout ce qu'il faut savoir ici…">${esc(sec.body)}</textarea></div>
+      </div>
+      <div class="modal-foot"><button class="btn btn-primary" id="bsSave" type="button">Enregistrer</button></div>`);
+    $('#bsSave').addEventListener('click', () => {
+      sec.title = $('#bsTitle').value.trim() || 'Sans titre';
+      sec.body = $('#bsBody').value;
+      if (!editing) g.brief.push(sec);
+      save(); closeModal(); render(); toast('Rubrique enregistrée ✓', 'ok');
+    });
+  }
+  function moveBriefSection(gid, sid, dir) {
+    const g = guestById(gid); if (!g) return;
+    const i = g.brief.findIndex(x => x.id === sid); const j = i + dir;
+    if (i < 0 || j < 0 || j >= g.brief.length) return;
+    const tmp = g.brief[i]; g.brief[i] = g.brief[j]; g.brief[j] = tmp;
+    save(); render();
+  }
+  function delBriefSection(gid, sid) {
+    const g = guestById(gid); if (!g) return;
+    g.brief = g.brief.filter(x => x.id !== sid); save(); render(); toast('Rubrique supprimée', 'info');
   }
 
   // =================================================================
@@ -1415,6 +1605,9 @@
     const openLive = e.target.closest('[data-open-live]');
     if (openLive) { navigate('live', { liveId: openLive.dataset.openLive, tab: 'conducteur' }); return; }
 
+    const openGuest = e.target.closest('[data-open-guest]');
+    if (openGuest) { navigate('guest', { guestId: openGuest.dataset.openGuest }); return; }
+
     const tabBtn = e.target.closest('[data-tab]');
     if (tabBtn) { view.tab = tabBtn.dataset.tab; render(); return; }
 
@@ -1492,6 +1685,10 @@
       case 'add-guest': openGuestModal(); break;
       case 'edit-guest': openGuestModal(id); break;
       case 'cycle-guest-status': cycleGuestStatus(id); break;
+      case 'add-brief-section': openBriefSectionModal(id); break;
+      case 'edit-brief-section': openBriefSectionModal(id, node.dataset.bs); break;
+      case 'del-brief-section': delBriefSection(id, node.dataset.bs); break;
+      case 'move-brief-section': moveBriefSection(id, node.dataset.bs, Number(node.dataset.dir)); break;
       case 'add-concept': openConceptModal(); break;
       case 'edit-concept': openConceptModal(id); break;
       case 'concept-to-live': conceptToLive(id); break;

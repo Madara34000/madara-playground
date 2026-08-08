@@ -547,6 +547,61 @@ button.status-pill:hover { transform: scale(1.05); }
 .gpick input { accent-color: var(--purple); }
 .gpick span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+/* ---------- Guest card actions ---------- */
+.gc-actions { margin-top: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.gc-top { cursor: pointer; border-radius: 12px; padding: 2px; margin: -2px; transition: background .15s; }
+.gc-top:hover { background: color-mix(in srgb, var(--gc) 8%, transparent); }
+.gc-brief-n { font-size: 11.5px; color: var(--ink-3); font-weight: 700; }
+
+/* ---------- Dossier invité (plateau TV pro) ---------- */
+.avatar.xl { width: 94px; height: 94px; border-radius: 22px; font-size: 40px; }
+.dossier { margin-top: 6px; }
+.dossier-hero { position: relative; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  padding: 26px 24px; border-radius: var(--radius-lg); overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--gc) 40%, var(--stroke));
+  background: linear-gradient(120deg, color-mix(in srgb, var(--gc) 22%, var(--panel)) 0%, var(--panel) 60%); }
+.dossier-hero::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5;
+  background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(0,0,0,.06) 3px 4px); }
+.dossier-hero > * { position: relative; z-index: 1; }
+.dh-tag { position: absolute; top: 14px; left: 24px; font-family: 'Space Grotesk', monospace; font-size: 11px; font-weight: 700;
+  letter-spacing: .22em; color: #ff5c7a; display: inline-flex; align-items: center; gap: 7px; z-index: 2; }
+.dh-tag::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #ff2d55; box-shadow: 0 0 10px #ff2d55; animation: liveDot 1.3s infinite; }
+.dh-id { flex: 1; min-width: 200px; margin-top: 8px; }
+.dh-name { font-family: 'Space Grotesk'; font-size: clamp(30px, 6vw, 46px); font-weight: 700; line-height: 1; letter-spacing: -.01em; }
+.dh-real { font-size: 14px; color: var(--ink-2); margin-top: 6px; }
+.dh-meta { font-size: 13.5px; color: var(--ink-2); margin-top: 8px; font-weight: 600; }
+.dh-tagline { font-size: 14px; color: var(--ink); margin-top: 10px; font-style: italic; opacity: .9; }
+.dh-side { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.dossier-tags { display: flex; flex-wrap: wrap; gap: 7px; margin: 16px 2px; }
+.gtag { font-size: 12px; font-weight: 700; color: var(--ink-2); background: var(--glass-2); border: 1px solid var(--stroke); padding: 4px 11px; border-radius: 999px; }
+.dossier-grid { display: grid; grid-template-columns: 1fr 320px; gap: 18px; align-items: start; }
+.dsec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.dsec-head h3 { font-family: 'Space Grotesk'; font-size: 20px; font-weight: 700; }
+.brief-list { display: flex; flex-direction: column; gap: 12px; }
+.brief-sec { border: 1px solid var(--stroke); border-radius: var(--radius); background: var(--glass); overflow: hidden; }
+.brief-sec .bs-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 15px; background: var(--glass-2); border-bottom: 1px solid var(--stroke); }
+.bs-head h4 { font-size: 13px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--purple-2); }
+.bs-tools { display: flex; gap: 4px; opacity: .55; transition: opacity .15s; }
+.brief-sec:hover .bs-tools { opacity: 1; }
+.bs-tools .icon-btn.sm { width: 28px; height: 28px; font-size: 12px; }
+.bs-tools .icon-btn[disabled] { opacity: .25; pointer-events: none; }
+.bs-body { padding: 14px 15px; font-size: 14px; line-height: 1.65; color: var(--ink); white-space: pre-wrap; }
+.bs-body.empty { color: var(--ink-3); font-style: italic; }
+.dossier-aside { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 84px; }
+.soc-tile { display: flex; align-items: center; gap: 11px; padding: 9px 11px; border-radius: 12px; margin-bottom: 8px;
+  background: color-mix(in srgb, var(--b) 12%, transparent); border: 1px solid color-mix(in srgb, var(--b) 35%, transparent); }
+.soc-tile:last-child { margin-bottom: 0; }
+.st-ico { width: 34px; height: 34px; flex: none; border-radius: 9px; display: grid; place-items: center; font-size: 16px; background: color-mix(in srgb, var(--b) 22%, transparent); }
+.st-body { display: flex; flex-direction: column; min-width: 0; }
+.st-body b { font-size: 13.5px; }
+.st-body span { font-size: 12px; color: var(--ink-2); }
+.kv { display: flex; flex-direction: column; gap: 8px; }
+.kv-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; font-size: 13px; }
+.kv-row span { color: var(--ink-3); flex: none; }
+.kv-row b { text-align: right; word-break: break-word; }
+.textarea.tall { min-height: 200px; }
+@media (max-width: 780px) { .dossier-grid { grid-template-columns: 1fr; } .dossier-aside { position: static; } .dh-side { flex-direction: row; align-items: center; } }
+
 /* ---------- Channel / Twitch panel ---------- */
 .tw-channel { display: grid; gap: 14px; }
 .tw-live-banner { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-radius: var(--radius); border: 1px solid rgba(255,59,123,.4); background: linear-gradient(90deg, rgba(255,59,123,.16), rgba(145,70,255,.06)); }
