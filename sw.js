@@ -1,5 +1,5 @@
 // SHERKO LIVE · Studio — Service Worker (offline shell)
-const CACHE = 'sherkolive-v6';
+const CACHE = 'sherkolive-v7';
 const ASSETS = [
   './',
   './index.html',
