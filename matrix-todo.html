@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+<meta name="theme-color" content="#000000" />
+<title>MATRIX // TODO</title>
+<meta name="description" content="Fond d'écran interactif — todo list au design Matrix code rain." />
+<!-- Plein écran "Ajouter à l'écran d'accueil" (iOS + Android) -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MATRIX TODO" />
+<meta name="mobile-web-app-capable" content="yes" />
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Crect width='180' height='180' fill='%23000'/%3E%3Ctext x='50%25' y='54%25' font-family='monospace' font-size='120' fill='%2300ff41' text-anchor='middle' dominant-baseline='middle'%3E%E2%9C%93%3C/text%3E%3C/svg%3E" />
+<style>
+  :root {
+    --c:      #00ff41;  /* couleur principale (themable via JS) */
+    --c-dim:  #00b32d;
+    --c-fade: #0a3d1c;
+    --bg:     #000000;
+    --glow:   0 0 8px color-mix(in srgb, var(--c) 60%, transparent);
+    --mono: "SFMono-Regular", "Courier New", Consolas, Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--c);
+    font-family: var(--mono);
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ---------- Matrix rain canvas (fond) ---------- */
+  #matrix { position: fixed; inset: 0; z-index: 0; display: block; }
+
+  #scanlines {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px,
+      rgba(0,0,0,.18) 3px, rgba(0,0,0,0) 4px
+    );
+    mix-blend-mode: multiply; opacity: .55;
+  }
+
+  /* ---------- Panneau Todo ---------- */
+  .panel {
+    position: fixed; z-index: 2;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: min(560px, 92vw); max-height: 86vh;
+    display: flex; flex-direction: column;
+    background: rgba(0, 12, 4, .82);
+    border: 1px solid var(--c-dim);
+    border-radius: 10px;
+    box-shadow: var(--glow), inset 0 0 40px color-mix(in srgb, var(--c) 6%, transparent);
+    backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+    overflow: hidden;
+    animation: bootIn .6s ease-out both;
+  }
+  @keyframes bootIn {
+    from { opacity: 0; transform: translate(-50%, -46%) scale(.98); filter: blur(4px); }
+    to   { opacity: 1; transform: translate(-50%, -50%) scale(1);   filter: blur(0); }
+  }
+
+  .titlebar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--c-fade);
+    background: color-mix(in srgb, var(--c) 8%, #000 92%);
+    user-select: none;
+  }
+  .dot { width: 11px; height: 11px; border-radius: 50%; }
+  .dot.r { background: #ff5f56; } .dot.y { background: #ffbd2e; } .dot.g { background: var(--c); box-shadow: var(--glow); }
+  .titlebar h1 {
+    font-size: 13px; font-weight: 700; letter-spacing: 2px; margin-left: 6px;
+    text-shadow: var(--glow); white-space: nowrap;
+  }
+  .titlebar .blink { animation: blink 1s steps(2,start) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .tools { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+  .iconbtn {
+    background: transparent; border: 1px solid var(--c-fade);
+    color: var(--c-dim); font-family: var(--mono); font-size: 13px;
+    width: 26px; height: 26px; border-radius: 5px; cursor: pointer;
+    display: grid; place-items: center; transition: all .15s; line-height: 1;
+  }
+  .iconbtn:hover, .iconbtn.on { background: var(--c); color: #000; box-shadow: var(--glow); border-color: var(--c); }
+  .clock { font-size: 12px; color: var(--c-dim); letter-spacing: 1px; margin-left: 4px; }
+
+  /* zone de saisie */
+  .prompt {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 14px; border-bottom: 1px solid var(--c-fade);
+  }
+  .prompt .chev { color: var(--c); text-shadow: var(--glow); font-weight: 700; }
+  .prompt input {
+    flex: 1; background: transparent; border: none; outline: none;
+    color: var(--c); font-family: var(--mono); font-size: 15px;
+    caret-color: var(--c); text-shadow: 0 0 4px color-mix(in srgb, var(--c) 50%, transparent);
+  }
+  .prompt input::placeholder { color: var(--c-fade); }
+  .prompt button {
+    background: transparent; border: 1px solid var(--c-dim); color: var(--c);
+    font-family: var(--mono); font-size: 13px; padding: 5px 12px;
+    border-radius: 5px; cursor: pointer; transition: all .15s;
+  }
+  .prompt button:hover { background: var(--c); color: #000; box-shadow: var(--glow); }
+
+  /* filtres */
+  .filters { display: flex; gap: 4px; padding: 8px 14px 0; }
+  .filters button {
+    flex: 1; background: transparent; border: 1px solid var(--c-fade);
+    color: var(--c-dim); font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1px; padding: 5px 0; border-radius: 5px; cursor: pointer;
+    transition: all .15s;
+  }
+  .filters button.on { background: color-mix(in srgb, var(--c) 14%, transparent); color: var(--c); border-color: var(--c-dim); text-shadow: var(--glow); }
+
+  /* liste */
+  .list {
+    list-style: none; overflow-y: auto; padding: 6px 0; margin-top: 4px;
+    scrollbar-width: thin; scrollbar-color: var(--c-dim) transparent;
+  }
+  .list::-webkit-scrollbar { width: 8px; }
+  .list::-webkit-scrollbar-thumb { background: var(--c-dim); border-radius: 4px; }
+
+  .item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 16px; border-bottom: 1px solid color-mix(in srgb, var(--c-fade) 50%, transparent);
+    cursor: pointer; transition: background .15s;
+    animation: rowIn .35s ease-out both;
+  }
+  @keyframes rowIn { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: none; } }
+  .item:hover { background: color-mix(in srgb, var(--c) 6%, transparent); }
+
+  .box {
+    flex: 0 0 18px; width: 18px; height: 18px;
+    border: 1px solid var(--c-dim); border-radius: 3px;
+    display: grid; place-items: center; font-size: 12px;
+    color: var(--c); text-shadow: var(--glow);
+  }
+  .item.done .box { background: var(--c); color: #000; box-shadow: var(--glow); }
+
+  .text { flex: 1; font-size: 15px; line-height: 1.35; word-break: break-word; }
+  .item.done .text {
+    color: var(--c-dim); text-decoration: line-through;
+    text-decoration-color: var(--c); opacity: .65;
+  }
+  .text.editing {
+    outline: 1px solid var(--c-dim); border-radius: 4px;
+    padding: 2px 4px; background: rgba(0,0,0,.4); white-space: pre-wrap;
+  }
+
+  .del {
+    flex: 0 0 auto; background: transparent; border: none;
+    color: var(--c-fade); font-family: var(--mono); font-size: 16px;
+    cursor: pointer; padding: 2px 6px; border-radius: 4px; opacity: 0; transition: all .15s;
+  }
+  .item:hover .del { opacity: 1; }
+  .del:hover { color: #ff5f56; text-shadow: 0 0 6px #ff5f56; }
+
+  .empty { padding: 28px 16px; text-align: center; color: var(--c-fade); font-size: 14px; letter-spacing: 1px; }
+
+  /* footer / stats */
+  .footer {
+    display: flex; align-items: center; gap: 14px;
+    padding: 10px 14px; border-top: 1px solid var(--c-fade);
+    background: color-mix(in srgb, var(--c) 6%, #000 94%);
+    font-size: 12px; color: var(--c-dim); letter-spacing: 1px;
+  }
+  .footer .bar { flex: 1; height: 6px; border: 1px solid var(--c-fade); border-radius: 3px; overflow: hidden; }
+  .footer .bar span { display: block; height: 100%; width: 0; background: var(--c); box-shadow: var(--glow); transition: width .4s cubic-bezier(.34,1.56,.64,1); }
+  .footer .clearDone { background: transparent; border: none; color: var(--c-dim); font-family: var(--mono); font-size: 12px; cursor: pointer; letter-spacing: 1px; white-space: nowrap; }
+  .footer .clearDone:hover { color: var(--c); text-shadow: var(--glow); }
+
+  /* glitch titre */
+  .glitch { position: relative; }
+  .glitch::before, .glitch::after {
+    content: attr(data-text); position: absolute; left: 0; top: 0;
+    width: 100%; overflow: hidden; clip-path: inset(0 0 0 0);
+  }
+  .glitch::before { color: #ff00c1; transform: translate(-1px, 0); animation: g1 2.6s infinite linear alternate; }
+  .glitch::after  { color: #00fff9; transform: translate( 1px, 0); animation: g2 2.2s infinite linear alternate; }
+  @keyframes g1 { 0%,92%{clip-path:inset(0 0 100% 0)} 94%{clip-path:inset(20% 0 40% 0)} 96%{clip-path:inset(60% 0 10% 0)} 100%{clip-path:inset(0 0 100% 0)} }
+  @keyframes g2 { 0%,90%{clip-path:inset(100% 0 0 0)} 93%{clip-path:inset(40% 0 30% 0)} 97%{clip-path:inset(10% 0 70% 0)} 100%{clip-path:inset(100% 0 0 0)} }
+
+  @media (max-width: 480px) {
+    .clock { display: none; }
+    .del { opacity: 1; }
+    .titlebar h1 { font-size: 12px; letter-spacing: 1px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .glitch::before, .glitch::after { animation: none; display: none; }
+    .panel { animation: none; }
+  }
+</style>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+  <div id="scanlines"></div>
+
+  <section class="panel" role="application" aria-label="Liste de tâches Matrix">
+    <header class="titlebar">
+      <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      <h1 class="glitch" data-text="MATRIX // TODO">MATRIX // TODO<span class="blink">_</span></h1>
+      <div class="tools">
+        <button class="iconbtn" id="themeBtn" title="Changer de couleur" aria-label="Changer de couleur">◑</button>
+        <button class="iconbtn" id="soundBtn" title="Sons on/off" aria-label="Activer le son">♪</button>
+        <span class="clock" id="clock">--:--:--</span>
+      </div>
+    </header>
+
+    <form class="prompt" id="form" autocomplete="off">
+      <span class="chev">&gt;</span>
+      <input id="input" type="text" maxlength="120" placeholder="ajouter une tâche..." aria-label="Nouvelle tâche" />
+      <button type="submit">EXEC</button>
+    </form>
+
+    <div class="filters" id="filters">
+      <button data-f="all" class="on">TOUT</button>
+      <button data-f="active">ACTIVES</button>
+      <button data-f="done">FAITES</button>
+    </div>
+
+    <ul class="list" id="list" aria-live="polite"></ul>
+
+    <footer class="footer">
+      <span id="count">0 / 0</span>
+      <div class="bar"><span id="progress"></span></div>
+      <button class="clearDone" id="clearDone">[ purger ✓ ]</button>
+    </footer>
+  </section>
+
+<script>
+(function () {
+  "use strict";
+
+  /* =========================================================
+     1. MATRIX CODE RAIN
+     ========================================================= */
+  const canvas = document.getElementById("matrix");
+  const ctx = canvas.getContext("2d");
+  const GLYPHS = "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎ0123456789ｦｧｨｩｪｫｬｭｮ".split("");
+  const FONT_SIZE = 16;
+  let columns, drops;
+  let rainColor = "#00ff41", headColor = "#cfffd6";
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    columns = Math.floor(canvas.width / FONT_SIZE);
+    drops = new Array(columns).fill(0).map(() => Math.random() * -50);
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  function drawMatrix() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.06)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.font = FONT_SIZE + "px monospace";
+    for (let i = 0; i < drops.length; i++) {
+      const char = GLYPHS[(Math.random() * GLYPHS.length) | 0];
+      const x = i * FONT_SIZE;
+      const y = drops[i] * FONT_SIZE;
+      if (Math.random() > 0.975) {
+        ctx.fillStyle = headColor; ctx.shadowColor = rainColor; ctx.shadowBlur = 8;
+      } else {
+        ctx.fillStyle = rainColor; ctx.shadowBlur = 0;
+      }
+      ctx.fillText(char, x, y);
+      ctx.shadowBlur = 0;
+      if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i] += 0.6;
+    }
+  }
+
+  let rafId, last = 0;
+  function loop(t) {
+    rafId = requestAnimationFrame(loop);
+    if (t - last < 45) return;
+    last = t;
+    drawMatrix();
+  }
+  rafId = requestAnimationFrame(loop);
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) cancelAnimationFrame(rafId);
+    else { last = 0; rafId = requestAnimationFrame(loop); }
+  });
+
+  /* =========================================================
+     2. THÈMES
+     ========================================================= */
+  const THEMES = [
+    { name: "matrix", c: "#00ff41", dim: "#00b32d", fade: "#0a3d1c", head: "#cfffd6" },
+    { name: "amber",  c: "#ffb000", dim: "#b37b00", fade: "#3d2a05", head: "#fff0cf" },
+    { name: "cyan",   c: "#00e5ff", dim: "#0094b3", fade: "#053b42", head: "#cffaff" }
+  ];
+  const THEME_KEY = "matrix_todo_theme";
+  let themeIdx = parseInt(localStorage.getItem(THEME_KEY) || "0", 10) || 0;
+
+  function applyTheme(idx) {
+    const t = THEMES[((idx % THEMES.length) + THEMES.length) % THEMES.length];
+    const r = document.documentElement.style;
+    r.setProperty("--c", t.c);
+    r.setProperty("--c-dim", t.dim);
+    r.setProperty("--c-fade", t.fade);
+    rainColor = t.c; headColor = t.head;
+    try { localStorage.setItem(THEME_KEY, String(idx % THEMES.length)); } catch (e) {}
+  }
+  applyTheme(themeIdx);
+  document.getElementById("themeBtn").addEventListener("click", function () {
+    themeIdx = (themeIdx + 1) % THEMES.length;
+    applyTheme(themeIdx);
+    beep(660, 0.04);
+  });
+
+  /* =========================================================
+     3. SON (WebAudio, off par défaut)
+     ========================================================= */
+  const SOUND_KEY = "matrix_todo_sound";
+  let soundOn = localStorage.getItem(SOUND_KEY) === "1";
+  let audioCtx = null;
+  const soundBtn = document.getElementById("soundBtn");
+  if (soundOn) soundBtn.classList.add("on");
+
+  function beep(freq, dur) {
+    if (!soundOn) return;
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = "square"; o.frequency.value = freq;
+      g.gain.setValueAtTime(0.04, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(); o.stop(audioCtx.currentTime + dur);
+    } catch (e) {}
+  }
+  soundBtn.addEventListener("click", function () {
+    soundOn = !soundOn;
+    soundBtn.classList.toggle("on", soundOn);
+    try { localStorage.setItem(SOUND_KEY, soundOn ? "1" : "0"); } catch (e) {}
+    if (soundOn) beep(880, 0.06);
+  });
+
+  /* =========================================================
+     4. TODO LIST + persistance
+     ========================================================= */
+  const STORE_KEY = "matrix_todo_v1";
+  const listEl     = document.getElementById("list");
+  const formEl     = document.getElementById("form");
+  const inputEl    = document.getElementById("input");
+  const countEl    = document.getElementById("count");
+  const progressEl = document.getElementById("progress");
+  const clearDoneEl= document.getElementById("clearDone");
+  const filtersEl  = document.getElementById("filters");
+
+  let todos = load();
+  let filter = "all";
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
+    catch (e) { return []; }
+  }
+  function save() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(todos)); } catch (e) {}
+  }
+
+  function visible() {
+    if (filter === "active") return todos.filter(function (t) { return !t.done; });
+    if (filter === "done")   return todos.filter(function (t) { return t.done; });
+    return todos;
+  }
+
+  function render() {
+    listEl.innerHTML = "";
+    const rows = visible();
+
+    if (rows.length === 0) {
+      const li = document.createElement("li");
+      li.className = "empty";
+      li.textContent = filter === "all"
+        ? "// aucune tâche — le système est vide"
+        : "// rien dans ce filtre";
+      listEl.appendChild(li);
+    } else {
+      rows.forEach(function (todo) {
+        const li = document.createElement("li");
+        li.className = "item" + (todo.done ? " done" : "");
+        li.dataset.id = todo.id;
+
+        const box = document.createElement("span");
+        box.className = "box";
+        box.textContent = todo.done ? "✓" : "";
+
+        const text = document.createElement("span");
+        text.className = "text";
+        text.textContent = todo.text;
+
+        const del = document.createElement("button");
+        del.className = "del";
+        del.setAttribute("aria-label", "Supprimer");
+        del.textContent = "✕";
+
+        li.appendChild(box); li.appendChild(text); li.appendChild(del);
+        listEl.appendChild(li);
+      });
+    }
+
+    const done = todos.filter(function (t) { return t.done; }).length;
+    countEl.textContent = done + " / " + todos.length;
+    progressEl.style.width = (todos.length ? (done / todos.length) * 100 : 0) + "%";
+  }
+
+  function addTodo(text) {
+    text = text.trim();
+    if (!text) return;
+    todos.unshift({ id: Date.now() + "-" + Math.random().toString(36).slice(2, 7), text: text, done: false });
+    save(); render(); beep(440, 0.05);
+  }
+  function toggle(id) {
+    const t = todos.find(function (t) { return t.id === id; });
+    if (t) { t.done = !t.done; save(); render(); beep(t.done ? 720 : 360, 0.05); }
+  }
+  function remove(id) {
+    todos = todos.filter(function (t) { return t.id !== id; });
+    save(); render(); beep(200, 0.06);
+  }
+
+  /* édition par double-clic */
+  function editInline(li, id) {
+    const t = todos.find(function (t) { return t.id === id; });
+    if (!t) return;
+    const textEl = li.querySelector(".text");
+    textEl.classList.add("editing");
+    textEl.setAttribute("contenteditable", "true");
+    textEl.focus();
+    // place le curseur en fin
+    const range = document.createRange(); range.selectNodeContents(textEl); range.collapse(false);
+    const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+
+    function commit() {
+      textEl.removeEventListener("blur", commit);
+      textEl.removeEventListener("keydown", onKey);
+      const val = textEl.textContent.trim();
+      if (val) { t.text = val.slice(0, 120); }
+      save(); render();
+    }
+    function onKey(e) {
+      if (e.key === "Enter") { e.preventDefault(); textEl.blur(); }
+      if (e.key === "Escape") { textEl.textContent = t.text; textEl.blur(); }
+    }
+    textEl.addEventListener("blur", commit);
+    textEl.addEventListener("keydown", onKey);
+  }
+
+  formEl.addEventListener("submit", function (e) {
+    e.preventDefault();
+    addTodo(inputEl.value);
+    inputEl.value = "";
+    inputEl.focus();
+  });
+
+  // clic sur la ligne => toggle ; clic ✕ => supprime
+  listEl.addEventListener("click", function (e) {
+    const li = e.target.closest(".item");
+    if (!li) return;
+    if (e.target.classList.contains("editing")) return; // en cours d'édition
+    const id = li.dataset.id;
+    if (e.target.classList.contains("del")) remove(id);
+    else toggle(id);
+  });
+  // double-clic => édition
+  listEl.addEventListener("dblclick", function (e) {
+    const li = e.target.closest(".item");
+    if (!li) return;
+    e.preventDefault();
+    editInline(li, li.dataset.id);
+  });
+
+  clearDoneEl.addEventListener("click", function () {
+    todos = todos.filter(function (t) { return !t.done; });
+    save(); render(); beep(150, 0.08);
+  });
+
+  filtersEl.addEventListener("click", function (e) {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+    filter = btn.dataset.f;
+    [].forEach.call(filtersEl.children, function (b) { b.classList.toggle("on", b === btn); });
+    render();
+  });
+
+  // amorçage de démo au tout premier lancement
+  if (todos.length === 0 && !localStorage.getItem(STORE_KEY)) {
+    todos = [
+      { id: "demo1", text: "Suivre le lapin blanc 🐇", done: false },
+      { id: "demo2", text: "Choisir la pilule rouge", done: true  },
+      { id: "demo3", text: "Apprendre le kung-fu", done: false }
+    ];
+    save();
+  }
+  render();
+  if (window.matchMedia("(min-width: 600px)").matches) inputEl.focus();
+
+  /* =========================================================
+     5. Horloge
+     ========================================================= */
+  const clockEl = document.getElementById("clock");
+  function tick() {
+    const d = new Date();
+    const p = function (n) { return String(n).padStart(2, "0"); };
+    clockEl.textContent = p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds());
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
+</body>
+</html>
